@@ -1,0 +1,12 @@
+.hero-bg-animation {
+  animation: circleToRect 1.5s ease-out forwards;
+}
+
+@keyframes circleToRect {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
