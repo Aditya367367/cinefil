@@ -3,10 +3,12 @@ import { authService } from '../services/authService';
 
 interface User {
   id: number;
+  username?: string;
   email: string;
   role: string;
   full_name: string;
   member_id?: number;
+  member_slug?: string;
   role_title?: string;
   photo_url?: string;
   short_description?: string;
@@ -19,6 +21,11 @@ interface User {
   membership_status?: string;
   has_pending_application?: boolean;
   is_member?: boolean;
+  is_membership_executive?: boolean;
+  is_rights_verification_officer?: boolean;
+  is_legal_officer?: boolean;
+  is_ceo_authorised_officer?: boolean;
+  is_membership_committee_member?: boolean;
   company?: {
     id: string;
     name: string;
@@ -32,7 +39,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: any) => Promise<any>;
-  signup: (details: any) => Promise<any>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -50,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.success && data.profile) {
         setUser(data.profile);
         setIsAuthenticated(true);
+        return data.profile;
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -76,26 +83,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const data = await authService.login(credentials);
       if (data.success) {
-        await refreshProfile(); // Fetch full profile
-        return { success: true };
+        const u = await refreshProfile(); // Fetch full profile
+        return { success: true, user: u };
       }
       return { success: false, error: data.error || 'Login failed.' };
-    } catch (e: any) {
-      return { success: false, error: e.response?.data?.error || 'Server error occurred.' };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signup = async (details: any) => {
-    setIsLoading(true);
-    try {
-      const data = await authService.signup(details);
-      if (data.success) {
-        await refreshProfile(); // Fetch full profile
-        return { success: true };
-      }
-      return { success: false, error: data.error || 'Signup failed.' };
     } catch (e: any) {
       return { success: false, error: e.response?.data?.error || 'Server error occurred.' };
     } finally {
@@ -115,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, signup, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

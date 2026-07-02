@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { Snackbar, SnackbarMessage, SnackbarSeverity } from '../components/Snackbar';
+import { Snackbar, SnackbarMessage, SnackbarSeverity } from '../components/pages/Snackbar';
+import { handleApiError } from '../../utils/errorHandler';
 
 interface SnackbarContextType {
-  showSnackbar: (message: string, severity?: SnackbarSeverity, duration?: number) => void;
+  showSnackbar: (message: any, severity?: SnackbarSeverity, duration?: number) => void;
   hideSnackbar: () => void;
 }
 
@@ -11,9 +12,17 @@ const SnackbarContext = createContext<SnackbarContextType | undefined>(undefined
 export function SnackbarProvider({ children }: { children: ReactNode }) {
   const [snackbar, setSnackbar] = useState<SnackbarMessage | null>(null);
 
-  const showSnackbar = (message: string, severity: SnackbarSeverity = 'info', duration?: number) => {
+  const showSnackbar = (message: any, severity: SnackbarSeverity = 'info', duration?: number) => {
     const id = Date.now().toString();
-    setSnackbar({ id, message, severity, duration });
+    let resolvedMessage = 'An unexpected error occurred';
+    
+    if (typeof message === 'string') {
+      resolvedMessage = message;
+    } else if (message && typeof message === 'object') {
+      resolvedMessage = handleApiError(message);
+    }
+    
+    setSnackbar({ id, message: resolvedMessage, severity, duration });
   };
 
   const hideSnackbar = () => {

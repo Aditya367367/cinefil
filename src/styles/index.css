@@ -10,4 +10,20 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  /* Global border-radius override to set cards, panels, and dropdowns to boxy with a tiny roundness */
+  .rounded-xl,
+  .rounded-lg,
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-md,
+  .rounded,
+  .rounded-sm,
+  [class*="rounded-xl"],
+  [class*="rounded-2xl"],
+  [class*="rounded-3xl"],
+  [class*="rounded-lg"],
+  [class*="rounded-md"] {
+    border-radius: 4px !important;
+  }
 }
