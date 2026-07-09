@@ -15,13 +15,17 @@ export function StepFilmDetails() {
   const {
     films, excelUploaded, applications,
     handleFilmChange, addFilm, removeFilm, handleExcelUpload,
-    nextStep, prevStep,
+    nextStep, prevStep, isProducer,
   } = useMembershipForm();
 
   const isNoFilmApp = applications?.some((app: any) => app.status === 'no_film');
 
   // Local state for cast input (per-film tag input)
   const [castInputs, setCastInputs] = useState<{ [key: number]: string }>({});
+
+  const options = isProducer
+    ? ["Producer", "Producer and still holds all rights himself"]
+    : ["Negative rights holder"];
 
   const handleOwnershipTypeChange = (index: number, option: string) => {
     const current = films[index].ownership_type || [];
@@ -56,6 +60,14 @@ export function StepFilmDetails() {
           <p className="mf-step__subtitle">Add details of the films you own or hold rights to.</p>
         </div>
         <div style={{ display: "flex", gap: "10px", flexShrink: 0 }}>
+          <a
+            href={getBackendFileUrl('/api/v1/download-sample-excel/')}
+            className="mf-btn mf-btn--small mf-btn--outline"
+            style={{ textDecoration: "none", color: "inherit", display: "inline-flex", alignItems: "center", gap: "4px" }}
+            download="sample_films.xlsx"
+          >
+            Download Sample Excel
+          </a>
           <input type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} className="mf-hidden-input" id="excel-upload" />
           <label htmlFor="excel-upload" className={`mf-btn mf-btn--small ${excelUploaded ? "mf-btn--outline" : "mf-btn--outline"}`} style={{ cursor: "pointer", color: excelUploaded ? "#059669" : undefined, borderColor: excelUploaded ? "#a7f3d0" : undefined }}>
             <Upload size={14} /> {excelUploaded ? "Uploaded ✓" : "Excel Upload"}
@@ -147,7 +159,7 @@ export function StepFilmDetails() {
               <div className="mf-field--span">
                 <label className="mf-label">Ownership Type</label>
                 <div className="mf-radio-group" style={{ marginTop: "6px", gridTemplateColumns: "1fr", gap: "8px" }}>
-                  {OWNERSHIP_OPTIONS.map((option) => (
+                  {options.map((option) => (
                     <div
                       key={option}
                       className={`mf-radio-card ${(film.ownership_type || []).includes(option) ? "mf-radio-card--selected" : ""}`}

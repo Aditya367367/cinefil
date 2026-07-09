@@ -28,6 +28,7 @@ function MembershipFormInner() {
     handleAnimationComplete,
     applications,
     loadingApplications,
+    currentStepKey,
   } = useMembershipForm();
 
   const { user } = useAuth();
@@ -39,35 +40,19 @@ function MembershipFormInner() {
   const noFilmApplication = applications?.find(app => app.status === 'no_film');
 
   const renderStep = () => {
-    if (!isAuthenticated) {
-      switch (step) {
-        case 1: return <StepMembershipCategory />;
-        case 2: return <StepApplicantDetails />;
-        case 3: return <StepAuthorizedRep />;
-        case 4: return <StepBankDetails />;
-        case 5: return <StepKycDocuments />;
-        case 6: return <StepOwnershipDetails />;
-        case 7: return <StepFilmDetails />;
-        case 8: return <StepDeclaration />;
-        case 9: return <StepAgreement />;
-        case 10: return <StepReview />;
-        case 11: return <StepMembershipFee />;
-        default: return null;
-      }
-    } else {
-      switch (step) {
-        case 1: return <StepApplicantDetails />;
-        case 2: return <StepAuthorizedRep />;
-        case 3: return <StepBankDetails />;
-        case 4: return <StepKycDocuments />;
-        case 5: return <StepOwnershipDetails />;
-        case 6: return <StepFilmDetails />;
-        case 7: return <StepDeclaration />;
-        case 8: return <StepAgreement />;
-        case 9: return <StepReview />;
-        case 10: return <StepMembershipFee />;
-        default: return null;
-      }
+    switch (currentStepKey) {
+      case "category": return <StepMembershipCategory />;
+      case "applicant": return <StepApplicantDetails />;
+      case "representative": return <StepAuthorizedRep />;
+      case "bank": return <StepBankDetails />;
+      case "kyc": return <StepKycDocuments />;
+      case "ownership": return <StepOwnershipDetails />;
+      case "film": return <StepFilmDetails />;
+      case "declaration": return <StepDeclaration />;
+      case "agreement": return <StepAgreement />;
+      case "review": return <StepReview />;
+      case "fee": return <StepMembershipFee />;
+      default: return null;
     }
   };
 
@@ -153,7 +138,7 @@ function MembershipFormInner() {
         )}
         <div className="mf-layout">
           {/* Left Sidebar: Vertical Stepper */}
-          <ProgressBar currentStep={step} totalSteps={totalSteps} isAuthenticated={isAuthenticated} />
+          <ProgressBar />
           
           {/* Right Area: Form Card */}
           <div className="mf-main-content">

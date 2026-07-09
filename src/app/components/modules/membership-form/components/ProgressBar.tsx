@@ -1,21 +1,27 @@
 import React from "react";
 import { Check } from "lucide-react";
+import { useMembershipForm } from "../context/MembershipFormContext";
 
-const STEP_LABELS: Record<number, { label: string; shortLabel: string }> = {
-  1: { label: "Membership Category", shortLabel: "Category" },
-  2: { label: "Personal Information", shortLabel: "Personal Info" },
-  3: { label: "Authorized Representative", shortLabel: "Representative" },
-  4: { label: "Bank Details", shortLabel: "Bank Details" },
-  5: { label: "KYC Documents", shortLabel: "KYC Documents" },
-  6: { label: "Ownership Details", shortLabel: "Ownership" },
-  7: { label: "Film Details", shortLabel: "Repertoire Details" },
-  8: { label: "Declaration of Rights", shortLabel: "Declaration" },
-  9: { label: "Membership Agreement", shortLabel: "Agreement" },
-  10: { label: "Review Application", shortLabel: "Review" },
-  11: { label: "Membership Fee", shortLabel: "Fee Payment" },
-};
+export const ProgressBar = () => {
+  const { step, totalSteps, isAuthenticated, isProducer } = useMembershipForm();
 
-export const ProgressBar = ({ currentStep, totalSteps, isAuthenticated = false }: { currentStep: number; totalSteps: number, isAuthenticated?: boolean }) => {
+  const labels: string[] = [];
+  if (!isAuthenticated) {
+    labels.push("Membership Category");
+  }
+  labels.push("Personal Information");
+  if (!isProducer) {
+    labels.push("Authorized Representative");
+  }
+  labels.push("Bank Details");
+  labels.push("KYC Documents");
+  labels.push("Ownership Details");
+  labels.push("Film Details");
+  labels.push("Declaration of Rights");
+  labels.push("Membership Agreement");
+  labels.push("Review Application");
+  labels.push("Membership Fee");
+
   return (
     <div className="mf-sidebar">
       <h2 className="mf-progress-title">Membership Application</h2>
@@ -23,16 +29,9 @@ export const ProgressBar = ({ currentStep, totalSteps, isAuthenticated = false }
       <div className="mf-stepper">
         {Array.from({ length: totalSteps }, (_, i) => {
           const stepNum = i + 1;
-          
-          let mappedIndex = stepNum;
-          if (isAuthenticated) {
-            // If authenticated, we skip step 1 (Category), so physical step 1 maps to logical step 2.
-            mappedIndex = stepNum + 1; 
-          }
-          
-          const meta = STEP_LABELS[mappedIndex] || { label: `Step ${stepNum}`, shortLabel: `Step ${stepNum}` };
-          const isCompleted = stepNum < currentStep;
-          const isActive = stepNum === currentStep;
+          const label = labels[i] || `Step ${stepNum}`;
+          const isCompleted = stepNum < step;
+          const isActive = stepNum === step;
 
           let itemClass = "mf-step-item";
           if (isActive) itemClass += " mf-step-item--active";
@@ -44,7 +43,7 @@ export const ProgressBar = ({ currentStep, totalSteps, isAuthenticated = false }
                 {isCompleted ? <Check size={16} strokeWidth={3} /> : stepNum}
               </div>
               <div className="mf-step-content">
-                <span className="mf-step-label">{meta.label}</span>
+                <span className="mf-step-label">{label}</span>
               </div>
             </div>
           );

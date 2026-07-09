@@ -121,6 +121,14 @@ export const memberService = {
     return response.data;
   },
 
+  async sendExecutiveReview(id: number, recipientType: 'user' | 'ceo', reviews: Record<string, string>) {
+    const response = await api.post(`/officer/applications/${id}/send-review/`, {
+      recipient_type: recipientType,
+      reviews
+    });
+    return response.data;
+  },
+
   // ──────────────────────────────────────────
   // Razorpay Payment Endpoints
   // ──────────────────────────────────────────

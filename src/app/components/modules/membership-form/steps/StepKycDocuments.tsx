@@ -28,7 +28,7 @@ export function StepKycDocuments() {
 
   const uploads = [
     { id: "pan-card", label: "PAN Card", required: true, file: panCard, existingUrl: existingPanCardUrl, handler: makeUploadHandler("panCard", setPanCard) },
-    { id: "cert-inc", label: "Certificate of Incorporation", required: true, file: certificateOfIncorporation, existingUrl: existingCertificateOfIncorporationUrl, handler: makeUploadHandler("certificateOfIncorporation", setCertificateOfIncorporation) },
+    { id: "cert-inc", label: "Certificate of Incorporation", required: false, file: certificateOfIncorporation, existingUrl: existingCertificateOfIncorporationUrl, handler: makeUploadHandler("certificateOfIncorporation", setCertificateOfIncorporation) },
     { id: "identity-proof", label: "Identity Proof", hint: "Aadhar / Passport / DL", required: true, file: identityProof, existingUrl: existingIdentityProofUrl, handler: makeUploadHandler("identityProof", setIdentityProof) },
     { id: "address-proof", label: "Address Proof", required: true, file: addressProof, existingUrl: existingAddressProofUrl, handler: makeUploadHandler("addressProof", setAddressProof) },
     { id: "board-res", label: "Board Resolution", hint: "if company", required: false, file: boardResolution, existingUrl: existingBoardResolutionUrl, handler: makeUploadHandler("boardResolution", setBoardResolution) },
@@ -38,7 +38,7 @@ export function StepKycDocuments() {
     <div className="mf-step">
       <div className="mf-step__header">
         <h3 className="mf-step__title">KYC Documents</h3>
-        <p className="mf-step__subtitle">Upload your required KYC documents in PDF or JPG format.</p>
+        <p className="mf-step__subtitle">Upload your required KYC documents in PDF or JPG format. KYC documents of yours.</p>
       </div>
 
       <div className="mf-grid">

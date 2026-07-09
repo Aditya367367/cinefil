@@ -41,6 +41,8 @@ export interface MembershipFormContextType {
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   totalSteps: number;
+  isProducer: boolean;
+  currentStepKey: string;
   nextStep: () => void;
   prevStep: () => void;
 
@@ -309,7 +311,30 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const { showSnackbar } = useSnackbar();
 
   const [step, setStep] = useState(1);
-  const totalSteps = isAuthenticated ? 10 : 11;
+  const selectedMembershipType = membershipTypes.find((t) => t.id === parseInt(selectedType));
+  const isProducer = isAuthenticated
+    ? !!selectedMembershipType?.membership_name?.toLowerCase().includes("producer")
+    : membershipCategories.includes("producer_member");
+
+  const activeSteps: string[] = [];
+  if (!isAuthenticated) {
+    activeSteps.push("category");
+  }
+  activeSteps.push("applicant");
+  if (!isProducer) {
+    activeSteps.push("representative");
+  }
+  activeSteps.push("bank");
+  activeSteps.push("kyc");
+  activeSteps.push("ownership");
+  activeSteps.push("film");
+  activeSteps.push("declaration");
+  activeSteps.push("agreement");
+  activeSteps.push("review");
+  activeSteps.push("fee");
+
+  const totalSteps = activeSteps.length;
+  const currentStepKey = activeSteps[step - 1] || "";
   const [excelUploaded, setExcelUploaded] = useState(false);
 
   const [panCard, setPanCard] = useState<File | null>(null);
@@ -503,12 +528,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const selectedMembershipType = membershipTypes.find((t) => t.id === parseInt(selectedType));
-
   const nextStep = () => {
-    const currentFormStep = isAuthenticated ? step + 1 : step;
-
-    if (currentFormStep === 1) {
+    if (currentStepKey === "category") {
       if (membershipCategories.length === 0) {
         showSnackbar("Please select at least one membership category.", "error");
         return;
@@ -518,7 +539,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         return;
       }
     }
-    if (currentFormStep === 2) {
+    if (currentStepKey === "applicant") {
       if (!applicantName.trim() || !applicantEmail.trim() || !mobileNumber.trim()) {
         showSnackbar("Please fill in your name, email address, and mobile number.", "error");
         return;
@@ -532,7 +553,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         return;
       }
     }
-    if (currentFormStep === 3) {
+    if (currentStepKey === "representative") {
       if (repName || repEmail || repPan) {
         if (!repName.trim() || !repEmail.trim() || !repPan.trim()) {
           showSnackbar("Please fill in Name, Email and PAN for Authorized Representative.", "error");
@@ -540,7 +561,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         }
       }
     }
-    if (currentFormStep === 4) {
+    if (currentStepKey === "bank") {
       if (!accountHolderName.trim() || !bankName.trim() || !branchName.trim() || !accountNumber.trim() || !ifscCode.trim()) {
         showSnackbar("Please fill in all mandatory bank details (Name, Bank, Branch, Account No, IFSC).", "error");
         return;
@@ -558,15 +579,12 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         return;
       }
     }
-    if (currentFormStep === 5) {
+    if (currentStepKey === "kyc") {
       if (!panCard && !existingPanCardUrl) {
         showSnackbar("Please upload your PAN card.", "error");
         return;
       }
-      if (!certificateOfIncorporation && !existingCertificateOfIncorporationUrl) {
-        showSnackbar("Please upload Certificate of Incorporation.", "error");
-        return;
-      }
+      // Certificate of Incorporation is now optional!
       if (!identityProof && !existingIdentityProofUrl) {
         showSnackbar("Please upload your Aadhar / Passport / Driving Licence.", "error");
         return;
@@ -580,8 +598,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         return;
       }
     }
-    if (currentFormStep === 6) {
-      const isProducer = isAuthenticated
+    if (currentStepKey === "ownership") {
+      const isProducerCategory = isAuthenticated
         ? selectedMembershipType?.membership_name?.includes("Producer")
         : membershipCategories.includes("producer_member");
 
@@ -589,7 +607,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         ? !selectedMembershipType?.membership_name?.includes("Producer")
         : membershipCategories.includes("other_member");
 
-      if (isProducer) {
+      if (isProducerCategory) {
         if (!isOriginalProducer || !productionHouseName.trim() || !totalFilmsOwned.trim() || (!producerOwnershipDeclaration && !existingProducerOwnershipDeclarationUrl)) {
           showSnackbar("Please fill all producer details.", "error");
           return;
@@ -610,20 +628,20 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         }
       }
     }
-    if (currentFormStep === 7) {
+    if (currentStepKey === "film") {
       const isFilmsPartiallyFilled = films.some(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language);
       if (!isFilmsPartiallyFilled) {
         showSnackbar("Please complete all required fields, including at least one film.", "error");
         return;
       }
     }
-    if (currentFormStep === 8) {
+    if (currentStepKey === "declaration") {
       if (!declareLawfulOwner || !authorizeCinefil || !agreeToAbide) {
         showSnackbar("Please accept all declarations.", "error");
         return;
       }
     }
-    if (currentFormStep === 9) {
+    if (currentStepKey === "agreement") {
       if (!agreementAccepted || !digitalSignature.trim() || !signaturePlace.trim() || !signatureDate) {
         showSnackbar("Please accept the agreement and provide your digital signature, place, and date.", "error");
         return;
@@ -1023,7 +1041,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const value: MembershipFormContextType = {
-    step, setStep, totalSteps, nextStep, prevStep,
+    step, setStep, totalSteps, isProducer, currentStepKey, nextStep, prevStep,
     membershipTypes, selectedType, setSelectedType,
     applicantName, setApplicantName, cinLlp, setCinLlp, gstNumber, setGstNumber,
     panNumberField, setPanNumberField, dobIncorporation, setDobIncorporation,

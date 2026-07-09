@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Shield, CheckCircle, XCircle, FileText, User,
-  CreditCard, Film, ArrowRight, AlertCircle, RefreshCw, FileCheck
+  CreditCard, Film, ArrowRight, AlertCircle, RefreshCw, FileCheck, Mail
 } from "lucide-react";
 import { memberService } from "../../../services/memberService";
 import { useAuth } from "../../../context/AuthContext";
@@ -97,6 +97,38 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [sectionReviews, setSectionReviews] = useState<Record<string, string>>({});
+  const [sendReviewLoading, setSendReviewLoading] = useState(false);
+
+  useEffect(() => {
+    setSectionReviews({});
+  }, [selectedApp?.id]);
+
+  const handleReviewChange = (section: string, value: string) => {
+    setSectionReviews(prev => ({
+      ...prev,
+      [section]: value
+    }));
+  };
+
+  const handleSendReview = async (recipientType: 'user' | 'ceo') => {
+    if (!selectedApp) return;
+    setSendReviewLoading(true);
+    setErrorMsg("");
+    try {
+      const res = await memberService.sendExecutiveReview(selectedApp.id, recipientType, sectionReviews);
+      if (res.success) {
+        showSnackbar(`Review comments successfully sent to ${recipientType === 'user' ? 'applicant' : 'CEO'}.`, "success");
+      } else {
+        setErrorMsg(res.error || "Failed to send review comments.");
+      }
+    } catch (e: any) {
+      const msg = e.response?.data?.error || "Error sending review comments.";
+      setErrorMsg(msg);
+    } finally {
+      setSendReviewLoading(false);
+    }
+  };
 
   const fetchApplications = async () => {
     setLoading(true);
@@ -213,6 +245,24 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
     );
   };
 
+  const renderSectionReviewInput = (sectionName: string) => {
+    if (!(user?.is_membership_executive || user?.role === 'membership_executive')) return null;
+    return (
+      <div className="p-6 pt-0 border-t border-slate-100 mt-4">
+        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+          Section Review Comment
+        </label>
+        <textarea
+          value={sectionReviews[sectionName] || ""}
+          onChange={(e) => handleReviewChange(sectionName, e.target.value)}
+          placeholder={`Write review comments for ${sectionName}...`}
+          className="w-full text-xs rounded border border-slate-200 bg-slate-50 p-3 text-slate-800 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+          rows={2}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Header Banner */}
@@ -325,6 +375,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                     </div>
                   )}
                 </div>
+                {renderSectionReviewInput("Step 1: Membership Category")}
               </div>
 
               {/* Step 2: Applicant Details */}
@@ -353,6 +404,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                     </p>
                   </div>
                 </div>
+                {renderSectionReviewInput("Step 2: Applicant Details")}
               </div>
 
               {/* Step 3: Authorized Representative */}
@@ -378,6 +430,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                      {renderDocumentLink("Representative Authority Letter", selectedApp.rep_authority_letter)}
                   </div>
                 </div>
+                {renderSectionReviewInput("Step 3: Authorized Representative")}
               </div>
 
               {/* Step 4: Bank details */}
@@ -404,6 +457,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                      {renderDocumentLink("GST Certificate", selectedApp.gst_certificate)}
                   </div>
                 </div>
+                {renderSectionReviewInput("Step 4: Bank Account Details")}
               </div>
               
               {/* Step 5: KYC Documents */}
@@ -421,6 +475,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderDocumentLink("Address Proof", selectedApp.address_proof)}
                   {renderDocumentLink("Board Resolution", selectedApp.board_resolution)}
                 </div>
+                {renderSectionReviewInput("Step 5: KYC Documents")}
               </div>
 
               {/* Step 6: Ownership Details */}
@@ -445,6 +500,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                     {renderFieldValue("Other Ownership Declaration", selectedApp.other_ownership_declaration)}
                   </div>
                 </div>
+                {renderSectionReviewInput("Step 6: Ownership Details")}
               </div>
 
               {/* Step 7: Film Details */}
@@ -519,6 +575,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                     No films submitted in this application.
                   </div>
                 )}
+                {renderSectionReviewInput("Step 7: Film Details")}
               </div>
 
               {/* Step 8: Declaration */}
@@ -534,6 +591,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Authorized Cinefil", selectedApp.authorize_cinefil, true)}
                   {renderFieldValue("Agreed to Rules & Regulations", selectedApp.agree_to_abide, true)}
                 </div>
+                {renderSectionReviewInput("Step 8: Declaration")}
               </div>
 
               {/* Step 9: Agreement */}
@@ -550,6 +608,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Place of Signature", selectedApp.signature_place)}
                   {renderFieldValue("Date of Signature", selectedApp.signature_date)}
                 </div>
+                {renderSectionReviewInput("Step 9: Agreement")}
               </div>
               
               {/* Step 10: Membership Fee */}
@@ -572,7 +631,56 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                      {renderDocumentLink("Payment Receipt", selectedApp.payment_receipt)}
                   </div>
                 </div>
+                {renderSectionReviewInput("Step 10: Membership Fee")}
               </div>
+
+              {/* Executive Review Report Summary */}
+              {(user?.is_membership_executive || user?.role === 'membership_executive') && (
+                <div className="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-200 bg-indigo-50/50">
+                    <h3 className="text-xs font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2">
+                      <FileText size={14} className="text-indigo-600" />
+                      Executive Review Report Summary
+                    </h3>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    {Object.entries(sectionReviews).filter(([_, val]) => val.trim() !== "").length === 0 ? (
+                      <p className="text-xs font-medium text-slate-500 italic">No review comments written yet. Fill in comments below individual sections.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {Object.entries(sectionReviews).map(([sec, val]) => {
+                          if (!val.trim()) return null;
+                          return (
+                            <div key={sec} className="bg-slate-50 border border-slate-100 p-3 rounded">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{sec}</span>
+                              <p className="text-xs text-slate-700 font-medium whitespace-pre-wrap">{val}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
+                      <button
+                        onClick={() => handleSendReview('user')}
+                        disabled={sendReviewLoading || Object.values(sectionReviews).filter(v => v.trim() !== '').length === 0}
+                        className="inline-flex items-center gap-2 rounded bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 text-xs font-bold text-white transition-all disabled:opacity-50 shadow-sm"
+                      >
+                        <Mail size={14} />
+                        Send Review to User via Email
+                      </button>
+                      <button
+                        onClick={() => handleSendReview('ceo')}
+                        disabled={sendReviewLoading || Object.values(sectionReviews).filter(v => v.trim() !== '').length === 0}
+                        className="inline-flex items-center gap-2 rounded bg-slate-800 hover:bg-slate-900 px-4 py-2.5 text-xs font-bold text-white transition-all disabled:opacity-50 shadow-sm"
+                      >
+                        <FileText size={14} />
+                        Send Report to CEO
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Spacer for fixed bottom bar */}
               <div className="h-20"></div>

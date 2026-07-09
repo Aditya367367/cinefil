@@ -192,8 +192,10 @@ function MainApp() {
         <Footer onNavigate={navigate} />
       )}
       <CookieConsent />
+      
     </div>
   );
+
 }
 
 export default function App() {

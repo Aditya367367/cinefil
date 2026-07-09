@@ -155,7 +155,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
       {/* Announcements */}
       <div style={{ backgroundColor: "var(--cinefil-light-bg)" }} className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {announcementsLoading && <p className="text-center text-sm">Loading announcements...</p>}
           {announcementsError && <p className="text-center text-sm text-red-500">{announcementsError}</p>}
           {!announcementsLoading && !announcementsError && (
@@ -186,7 +186,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Are you using... */}
