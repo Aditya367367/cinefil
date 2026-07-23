@@ -46,7 +46,12 @@ export function StepOwnershipDetails() {
   return (
     <div className="mf-step">
       <div className="mf-step__header">
-        <h3 className="mf-step__title">Ownership Details</h3>
+        <h3 className="mf-step__title flex items-center gap-2">
+          Ownership Details
+          <abbr title="Specify if you are the original producer of the films or a negative rights holder, and provide details of the production house and total films owned." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
         <p className="mf-step__subtitle">Provide your copyright ownership details based on your membership category.</p>
       </div>
 

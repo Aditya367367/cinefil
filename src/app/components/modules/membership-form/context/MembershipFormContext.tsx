@@ -23,10 +23,9 @@ export interface Film {
   title: SelectOption | null;
   cast: SelectOption[] | null;
   year: string;
+  release_date?: string;
   language: string;
-  producer_name: string;
-  director_name: string;
-  duration: string;
+  remarks?: string;
   ownership_type: string[];
   censor_certificate: File | null;
   copyright_certificate: File | null;
@@ -42,7 +41,9 @@ export interface MembershipFormContextType {
   setStep: React.Dispatch<React.SetStateAction<number>>;
   totalSteps: number;
   isProducer: boolean;
+  startedAsGuest: boolean;
   currentStepKey: string;
+  activeSteps: string[];
   nextStep: () => void;
   prevStep: () => void;
 
@@ -209,6 +210,9 @@ export interface MembershipFormContextType {
   agreeToAbide: boolean;
   setAgreeToAbide: React.Dispatch<React.SetStateAction<boolean>>;
 
+  companyName: string;
+  setCompanyName: React.Dispatch<React.SetStateAction<string>>;
+
   // Agreement
   agreementAccepted: boolean;
   setAgreementAccepted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -218,6 +222,22 @@ export interface MembershipFormContextType {
   setSignaturePlace: React.Dispatch<React.SetStateAction<string>>;
   signatureDate: string;
   setSignatureDate: React.Dispatch<React.SetStateAction<string>>;
+  agreementSigningOption: string;
+  setAgreementSigningOption: React.Dispatch<React.SetStateAction<string>>;
+  agreementSignedDocument: File | null;
+  setAgreementSignedDocument: React.Dispatch<React.SetStateAction<File | null>>;
+  existingAgreementSignedDocumentUrl: string | null;
+  setExistingAgreementSignedDocumentUrl: React.Dispatch<React.SetStateAction<string | null>>;
+
+  // KYC Photos
+  passportPhoto: File | null;
+  setPassportPhoto: React.Dispatch<React.SetStateAction<File | null>>;
+  passportPhoto2: File | null;
+  setPassportPhoto2: React.Dispatch<React.SetStateAction<File | null>>;
+  existingPassportPhotoUrl: string | null;
+  setExistingPassportPhotoUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  existingPassportPhoto2Url: string | null;
+  setExistingPassportPhoto2Url: React.Dispatch<React.SetStateAction<string | null>>;
 
   // Payment
   paymentReceipt: File | null;
@@ -248,6 +268,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const [membershipTypes, setMembershipTypes] = useState<MembershipTypeItem[]>([]);
   const [selectedType, setSelectedType] = useState<string>("");
   const [applicantName, setApplicantName] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("");
   const [cinLlp, setCinLlp] = useState<string>("");
   const [gstNumber, setGstNumber] = useState<string>("");
   const [panNumberField, setPanNumberField] = useState<string>("");
@@ -279,7 +300,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const [existingAssignmentAgreementUrl, setExistingAssignmentAgreementUrl] = useState<string | null>(null);
   const [existingOtherOwnershipDeclarationUrl, setExistingOtherOwnershipDeclarationUrl] = useState<string | null>(null);
 
-  const [films, setFilms] = useState<Film[]>([{ title: null, cast: null, year: '', language: '', producer_name: '', director_name: '', duration: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
+  const [films, setFilms] = useState<Film[]>([{ title: null, cast: null, year: '', release_date: '', language: '', remarks: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
 
   const [repName, setRepName] = useState<string>("");
   const [repDesignation, setRepDesignation] = useState<string>("");
@@ -310,23 +331,21 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
 
   const { showSnackbar } = useSnackbar();
 
+  const [startedAsGuest] = useState(() => !isAuthenticated);
   const [step, setStep] = useState(1);
   const selectedMembershipType = membershipTypes.find((t) => t.id === parseInt(selectedType));
-  const isProducer = isAuthenticated
-    ? !!selectedMembershipType?.membership_name?.toLowerCase().includes("producer")
-    : membershipCategories.includes("producer_member");
+  const isProducer = membershipCategories.length > 0
+    ? membershipCategories.includes("producer_member")
+    : !!selectedMembershipType?.membership_name?.toLowerCase().includes("producer");
 
   const activeSteps: string[] = [];
-  if (!isAuthenticated) {
-    activeSteps.push("category");
+  if (startedAsGuest) {
+    activeSteps.push("register");
   }
+  activeSteps.push("category");
   activeSteps.push("applicant");
-  if (!isProducer) {
-    activeSteps.push("representative");
-  }
   activeSteps.push("bank");
   activeSteps.push("kyc");
-  activeSteps.push("ownership");
   activeSteps.push("film");
   activeSteps.push("declaration");
   activeSteps.push("agreement");
@@ -362,6 +381,14 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const [digitalSignature, setDigitalSignature] = useState<string>("");
   const [signaturePlace, setSignaturePlace] = useState<string>("");
   const [signatureDate, setSignatureDate] = useState<string>("");
+  const [agreementSigningOption, setAgreementSigningOption] = useState<string>("no_dsc");
+  const [agreementSignedDocument, setAgreementSignedDocument] = useState<File | null>(null);
+  const [existingAgreementSignedDocumentUrl, setExistingAgreementSignedDocumentUrl] = useState<string | null>(null);
+  
+  const [passportPhoto, setPassportPhoto] = useState<File | null>(null);
+  const [passportPhoto2, setPassportPhoto2] = useState<File | null>(null);
+  const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<string | null>(null);
+  const [existingPassportPhoto2Url, setExistingPassportPhoto2Url] = useState<string | null>(null);
 
   const [paymentReceipt, setPaymentReceipt] = useState<File | null>(null);
   const [existingPaymentReceiptUrl, setExistingPaymentReceiptUrl] = useState<string | null>(null);
@@ -421,7 +448,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   }, [applications, applicationId]);
 
   useEffect(() => {
-    if (!isAuthenticated && membershipTypes.length > 0) {
+    if (membershipTypes.length > 0) {
       if (membershipCategories.includes("producer_member")) {
         const prodType = membershipTypes.find(t => t.membership_name.toLowerCase().includes("producer"));
         if (prodType) setSelectedType(prodType.id.toString());
@@ -430,12 +457,21 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         if (otherType) setSelectedType(otherType.id.toString());
       }
     }
-  }, [membershipCategories, membershipTypes, isAuthenticated]);
+  }, [membershipCategories, membershipTypes]);
 
   useEffect(() => {
     if (user) {
       setApplicantName(user.full_name || "");
       setApplicantEmail(user.email || "");
+      if (user.phone) {
+        setMobileNumber(user.phone);
+      }
+      if (user.is_email_verified) {
+        setIsEmailVerified(true);
+      }
+      if (user.is_mobile_verified) {
+        setIsMobileVerified(true);
+      }
     }
   }, [user]);
 
@@ -487,7 +523,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const addFilm = () => {
-    setFilms([...films, { title: null, cast: null, year: '', language: '', producer_name: '', director_name: '', duration: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
+    setFilms([...films, { title: null, cast: null, year: '', release_date: '', language: '', remarks: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
   };
 
   const removeFilm = (index: number) => {
@@ -509,10 +545,6 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         title: f.title ? { value: f.title, label: f.title } : null,
         cast: f.cast ? f.cast.split(',').map((c: string) => ({ value: c.trim(), label: c.trim() })) : [],
         year: f.year || '',
-        language: f.language || '',
-        producer_name: f.producer_name || '',
-        director_name: f.director_name || '',
-        duration: f.duration || '',
         ownership_type: f.ownership_type ? f.ownership_type.split(',').map((o: string) => o.trim()) : [],
         censor_certificate: null,
         copyright_certificate: null,
@@ -529,6 +561,16 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const nextStep = () => {
+    if (currentStepKey === "register") {
+      if (!isAuthenticated) {
+        showSnackbar("Please complete account registration first.", "error");
+        return;
+      }
+      if (!isEmailVerified || !isMobileVerified) {
+        showSnackbar("Please verify both email and mobile OTP before proceeding.", "error");
+        return;
+      }
+    }
     if (currentStepKey === "category") {
       if (membershipCategories.length === 0) {
         showSnackbar("Please select at least one membership category.", "error");
@@ -552,30 +594,34 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         showSnackbar("Please verify your mobile number.", "error");
         return;
       }
-    }
-    if (currentStepKey === "representative") {
-      if (repName || repEmail || repPan) {
-        if (!repName.trim() || !repEmail.trim() || !repPan.trim()) {
-          showSnackbar("Please fill in Name, Email and PAN for Authorized Representative.", "error");
-          return;
-        }
+      if (!panNumberField.trim() || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumberField)) {
+        showSnackbar("Please enter a valid 10-character PAN Number (e.g. ABCDE1234F).", "error");
+        return;
+      }
+      if (!registeredAddress.trim() || !/^[A-Za-z0-9\s#,\-\/\.]{5,255}$/.test(registeredAddress)) {
+        showSnackbar("Please enter a valid Address (5-255 characters).", "error");
+        return;
+      }
+      if (!city.trim() || !/^[A-Za-z\s-]{2,100}$/.test(city)) {
+        showSnackbar("Please enter a valid City name (letters and spaces only).", "error");
+        return;
+      }
+      if (!stateField.trim()) {
+        showSnackbar("Please select a valid State.", "error");
+        return;
+      }
+      if (!country.trim()) {
+        showSnackbar("Please select a valid Country.", "error");
+        return;
+      }
+      if (!pinCode.trim() || !/^[1-9][0-9]{5}$/.test(pinCode)) {
+        showSnackbar("Please enter a valid 6-digit Indian Pin Code (cannot start with 0).", "error");
+        return;
       }
     }
     if (currentStepKey === "bank") {
       if (!accountHolderName.trim() || !bankName.trim() || !branchName.trim() || !accountNumber.trim() || !ifscCode.trim()) {
         showSnackbar("Please fill in all mandatory bank details (Name, Bank, Branch, Account No, IFSC).", "error");
-        return;
-      }
-      if (!canceledCheck && !existingCanceledCheckUrl) {
-        showSnackbar("Please upload a canceled check.", "error");
-        return;
-      }
-      if (documentErrors.canceledCheck) {
-        showSnackbar(documentErrors.canceledCheck, "error");
-        return;
-      }
-      if (documentErrors.gstCertificate) {
-        showSnackbar(documentErrors.gstCertificate, "error");
         return;
       }
     }
@@ -584,48 +630,22 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         showSnackbar("Please upload your PAN card.", "error");
         return;
       }
-      // Certificate of Incorporation is now optional!
-      if (!identityProof && !existingIdentityProofUrl) {
-        showSnackbar("Please upload your Aadhar / Passport / Driving Licence.", "error");
+      const isIndividual = applicantTypes.includes("individual");
+      if (!isIndividual && !boardResolution && !existingBoardResolutionUrl) {
+        showSnackbar("Please upload Authority Letter or Board Resolution for entity.", "error");
         return;
       }
-      if (!addressProof && !existingAddressProofUrl) {
-        showSnackbar("Please upload your Address Proof.", "error");
+      if (!passportPhoto && !existingPassportPhotoUrl) {
+        showSnackbar("Please upload Passport Photograph 1.", "error");
         return;
       }
-      if (documentErrors.panCard || documentErrors.certificateOfIncorporation || documentErrors.identityProof || documentErrors.addressProof || documentErrors.boardResolution) {
+      if (!passportPhoto2 && !existingPassportPhoto2Url) {
+        showSnackbar("Please upload Passport Photograph 2.", "error");
+        return;
+      }
+      if (documentErrors.panCard || documentErrors.boardResolution || documentErrors.passportPhoto || documentErrors.passportPhoto2) {
         showSnackbar("Please fix document errors before proceeding.", "error");
         return;
-      }
-    }
-    if (currentStepKey === "ownership") {
-      const isProducerCategory = isAuthenticated
-        ? selectedMembershipType?.membership_name?.includes("Producer")
-        : membershipCategories.includes("producer_member");
-
-      const isOtherMember = isAuthenticated
-        ? !selectedMembershipType?.membership_name?.includes("Producer")
-        : membershipCategories.includes("other_member");
-
-      if (isProducerCategory) {
-        if (!isOriginalProducer || !productionHouseName.trim() || !totalFilmsOwned.trim() || (!producerOwnershipDeclaration && !existingProducerOwnershipDeclarationUrl)) {
-          showSnackbar("Please fill all producer details.", "error");
-          return;
-        }
-        if (documentErrors.producerOwnershipDeclaration) {
-          showSnackbar(documentErrors.producerOwnershipDeclaration, "error");
-          return;
-        }
-      }
-      if (isOtherMember) {
-        if (natureOfOwnership.length === 0 || (!assignmentAgreement && !existingAssignmentAgreementUrl) || (!otherOwnershipDeclaration && !existingOtherOwnershipDeclarationUrl)) {
-          showSnackbar("Please fill all other member details.", "error");
-          return;
-        }
-        if (documentErrors.assignmentAgreement || documentErrors.otherOwnershipDeclaration) {
-          showSnackbar("Please fix document errors.", "error");
-          return;
-        }
       }
     }
     if (currentStepKey === "film") {
@@ -644,6 +664,15 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (currentStepKey === "agreement") {
       if (!agreementAccepted || !digitalSignature.trim() || !signaturePlace.trim() || !signatureDate) {
         showSnackbar("Please accept the agreement and provide your digital signature, place, and date.", "error");
+        return;
+      }
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const localTodayStr = `${year}-${month}-${day}`;
+      if (signatureDate < localTodayStr) {
+        showSnackbar("Signature date cannot be in the past.", "error");
         return;
       }
     }
@@ -675,6 +704,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       }
     }
     formData.append('applicant_name', applicantName);
+    formData.append('company_name', companyName);
     formData.append('applicant_email', applicantEmail);
     formData.append('cin_llpin', cinLlp);
     formData.append('gst_number', gstNumber);
@@ -719,6 +749,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (identityProof) formData.append('identity_proof', identityProof);
     if (addressProof) formData.append('address_proof', addressProof);
     if (boardResolution) formData.append('board_resolution', boardResolution);
+    if (passportPhoto) formData.append('passport_photo', passportPhoto);
+    if (passportPhoto2) formData.append('passport_photo_2', passportPhoto2);
 
     const isProducer = isAuthenticated
       ? selectedMembershipType?.membership_name?.includes("Producer")
@@ -745,12 +777,11 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       title: typeof f.title === 'object' ? (f.title?.label || f.title?.value || '') : (f.title || ''),
       cast: f.cast?.map((c: any) => c.label || c.value || c),
       year: f.year,
+      release_date: (f as any).release_date || '',
       language: f.language,
-      producer_name: f.producer_name,
-      director_name: f.director_name,
-      duration: f.duration,
       ownership_type: f.ownership_type,
-    })).filter(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language);
+      remarks: (f as any).remarks || '',
+    })).filter(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language || (f as any).release_date || (f as any).remarks);
 
     formData.append('films', JSON.stringify(filmsData));
 
@@ -771,6 +802,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     formData.append('digital_signature', digitalSignature);
     formData.append('signature_place', signaturePlace);
     formData.append('signature_date', signatureDate);
+    formData.append('agreement_signing_option', agreementSigningOption);
+    if (agreementSignedDocument) formData.append('agreement_signed_document', agreementSignedDocument);
 
     // Payment
     if (paymentReceipt) formData.append('payment_receipt', paymentReceipt);
@@ -782,7 +815,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const resetFormState = () => {
     setStep(1);
     setApplicationId("");
-    setFilms([{ title: null, cast: null, year: '', language: '', producer_name: '', director_name: '', duration: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
+    setFilms([{ title: null, cast: null, year: '', release_date: '', language: '', remarks: '', ownership_type: [], censor_certificate: null, copyright_certificate: null, ownership_document: null }]);
     setCinLlp("");
     setGstNumber("");
     setPanNumberField("");
@@ -836,6 +869,14 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     setDigitalSignature("");
     setSignaturePlace("");
     setSignatureDate("");
+    setCompanyName("");
+    setAgreementSigningOption("no_dsc");
+    setAgreementSignedDocument(null);
+    setExistingAgreementSignedDocumentUrl(null);
+    setPassportPhoto(null);
+    setPassportPhoto2(null);
+    setExistingPassportPhotoUrl(null);
+    setExistingPassportPhoto2Url(null);
     setPaymentReceipt(null);
   };
 
@@ -848,18 +889,6 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     const isFilmsPartiallyFilled = films.some(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language);
     if (!isFilmsPartiallyFilled) {
       showSnackbar("Please complete all required fields, including at least one film, before submitting.", "error");
-      return;
-    }
-
-    if (!paymentReceipt && !existingPaymentReceiptUrl) {
-      const isPaidNoReceipt = applications.some((app: any) => app.status === 'paid_no_receipt');
-      if (paymentStatus === 'successful') {
-        showSnackbar("Payment successful! Please download and upload the receipt below to complete your submission.", "warning");
-      } else if (isPaidNoReceipt) {
-        showSnackbar("Please upload your payment receipt to complete your submission.", "warning");
-      } else {
-        showSnackbar("Please make the online payment via Razorpay or upload a payment receipt to submit.", "warning");
-      }
       return;
     }
 
@@ -999,7 +1028,21 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.upi_id) setUpiId(draftData.upi_id);
     if (draftData.canceled_check) setExistingCanceledCheckUrl(draftData.canceled_check);
     if (draftData.gst_certificate) setExistingGstCertificateUrl(draftData.gst_certificate);
-    if (draftData.company_name) setAccountHolderName(draftData.company_name); // Or if company name exists elsewhere
+    if (draftData.company_name) {
+      setCompanyName(draftData.company_name);
+    }
+    if (draftData.agreement_signing_option) {
+      setAgreementSigningOption(draftData.agreement_signing_option);
+    }
+    if (draftData.agreement_signed_document) {
+      setExistingAgreementSignedDocumentUrl(draftData.agreement_signed_document);
+    }
+    if (draftData.passport_photo) {
+      setExistingPassportPhotoUrl(draftData.passport_photo);
+    }
+    if (draftData.passport_photo_2) {
+      setExistingPassportPhoto2Url(draftData.passport_photo_2);
+    }
     
     // KYC Documents
     if (draftData.pan_card) setExistingPanCardUrl(draftData.pan_card);
@@ -1041,7 +1084,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const value: MembershipFormContextType = {
-    step, setStep, totalSteps, isProducer, currentStepKey, nextStep, prevStep,
+    step, setStep, totalSteps, isProducer, startedAsGuest, currentStepKey, activeSteps, nextStep, prevStep,
     membershipTypes, selectedType, setSelectedType,
     applicantName, setApplicantName, cinLlp, setCinLlp, gstNumber, setGstNumber,
     panNumberField, setPanNumberField, dobIncorporation, setDobIncorporation,
@@ -1049,6 +1092,14 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     city, setCity, stateField, setStateField, country, setCountry, pinCode, setPinCode,
     website, setWebsite, telephoneNumber, setTelephoneNumber, mobileNumber, setMobileNumber,
     applicantEmail, setApplicantEmail,
+    companyName, setCompanyName,
+    agreementSigningOption, setAgreementSigningOption,
+    agreementSignedDocument, setAgreementSignedDocument,
+    existingAgreementSignedDocumentUrl, setExistingAgreementSignedDocumentUrl,
+    passportPhoto, setPassportPhoto,
+    passportPhoto2, setPassportPhoto2,
+    existingPassportPhotoUrl, setExistingPassportPhotoUrl,
+    existingPassportPhoto2Url, setExistingPassportPhoto2Url,
     repName, setRepName, repDesignation, setRepDesignation, repMobile, setRepMobile,
     repEmail, setRepEmail, repAadhar, setRepAadhar, repPan, setRepPan,
     repAuthorityLetter, setRepAuthorityLetter,

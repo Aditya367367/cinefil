@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Shield, CheckCircle, XCircle, FileText, User,
-  CreditCard, Film, ArrowRight, AlertCircle, RefreshCw, FileCheck, Mail
+  CreditCard, Film, ArrowRight, AlertCircle, RefreshCw, FileCheck, Mail, MessageSquare
 } from "lucide-react";
 import { memberService } from "../../../services/memberService";
 import { useAuth } from "../../../context/AuthContext";
@@ -22,52 +22,25 @@ interface Application {
   applicant_name: string;
   applicant_email: string;
   mobile_number: string;
-  cin_llpin?: string;
-  gst_number?: string;
   pan_number?: string;
-  dob_incorporation?: string;
+  company_name?: string;
   registered_address?: string;
-  correspondence_address?: string;
   city?: string;
   state?: string;
   country?: string;
   pin_code?: string;
-  website?: string;
-  telephone_number?: string;
-  rep_name?: string;
-  rep_designation?: string;
-  rep_mobile?: string;
-  rep_email?: string;
-  rep_aadhar?: string;
-  rep_pan?: string;
-  rep_authority_letter?: string;
   account_holder_name?: string;
   bank_name?: string;
   branch_name?: string;
   account_number?: string;
   ifsc_code?: string;
-  swift_code?: string;
-  upi_id?: string;
   pan_card?: string;
-  certificate_of_incorporation?: string;
-  identity_proof?: string;
-  address_proof?: string;
   board_resolution?: string;
-  canceled_check?: string;
-  gst_certificate?: string;
-  
-  // New fields
+  passport_photo?: string;
+  passport_photo_2?: string;
   membership_categories?: string[];
   applicant_types?: string[];
   other_applicant_type?: string;
-  is_original_producer?: boolean;
-  relation_with_producer?: string;
-  production_house_name?: string;
-  total_films_owned?: number;
-  producer_ownership_declaration?: boolean;
-  nature_of_ownership?: string[];
-  assignment_agreement?: string;
-  other_ownership_declaration?: string;
   declare_lawful_owner?: boolean;
   authorize_cinefil?: boolean;
   agree_to_abide?: boolean;
@@ -81,11 +54,14 @@ interface Application {
   payment_status?: string;
   razorpay_order_id?: string;
   razorpay_payment_id?: string;
-
   documents?: ApplicationDocument[];
   submitted_film_data?: any[];
   application_date: string;
   membership_type_name?: string;
+  agreement_signing_option?: string;
+  agreement_signed_document?: string;
+  status_history?: any[];
+  latest_remarks?: string;
 }
 
 export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string) => void }) {
@@ -99,6 +75,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
   const [errorMsg, setErrorMsg] = useState("");
   const [sectionReviews, setSectionReviews] = useState<Record<string, string>>({});
   const [sendReviewLoading, setSendReviewLoading] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'queue' | 'detail'>('queue');
 
   useEffect(() => {
     setSectionReviews({});
@@ -135,10 +112,11 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
     try {
       const res = await memberService.getOfficerApplications();
       if (res.success) {
-        setApplications(res.applications);
-        if (res.applications.length > 0) {
+        const primeApps = (res.applications || []).filter((a: Application) => a.status !== 'associate_member');
+        setApplications(primeApps);
+        if (primeApps.length > 0) {
           // Keep currently selected app if it still exists in the refreshed list
-          setSelectedApp(prev => prev ? (res.applications.find((a: Application) => a.id === prev.id) || res.applications[0]) : res.applications[0]);
+          setSelectedApp(prev => prev ? (primeApps.find((a: Application) => a.id === prev.id) || primeApps[0]) : primeApps[0]);
         } else {
           setSelectedApp(null);
         }
@@ -285,15 +263,37 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
         </button>
       </header>
 
+      {/* Mobile Navigation Bar */}
+      <div className="lg:hidden flex border-b border-slate-200 bg-white">
+        <button
+          onClick={() => setMobileTab('queue')}
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all ${
+            mobileTab === 'queue' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50' : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          Inbox Queue ({applications.length})
+        </button>
+        <button
+          onClick={() => setMobileTab('detail')}
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-wider text-center border-b-2 transition-all ${
+            mobileTab === 'detail' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50' : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          Application Details {selectedApp ? `#${selectedApp.id}` : ''}
+        </button>
+      </div>
+
       {/* Main Layout Split */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Sidebar Queue */}
-        <aside className="w-full lg:w-[350px] border-r border-slate-200 bg-white p-5 flex flex-col shrink-0">
+        <aside className={`w-full lg:w-[350px] border-r border-slate-200 bg-white p-5 flex-col shrink-0 ${
+          mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'
+        }`}>
           <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4 flex items-center justify-between">
             Pending Inbox 
             <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">{applications.length}</span>
           </h2>
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
             {loading && applications.length === 0 ? (
               <div className="text-center py-10 text-slate-400 text-sm">
                 <RefreshCw className="animate-spin mx-auto mb-2 text-indigo-400" size={24} />
@@ -304,32 +304,53 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                 No applications pending for your role at this time.
               </div>
             ) : (
-              applications.map((app) => (
-                <div
-                  key={app.id}
-                  onClick={() => { setSelectedApp(app); setErrorMsg(""); }}
-                  className={`p-4 rounded border cursor-pointer transition-all ${
-                    selectedApp?.id === app.id
-                      ? "bg-indigo-50 border-indigo-200 shadow-sm"
-                      : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-start gap-2 mb-2">
-                    <h3 className="font-bold text-sm text-slate-900 truncate w-40">{app.applicant_name}</h3>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${getStatusBadgeClass(app.status)}`}>
-                      {app.status.replace(/_/g, " ")}
-                    </span>
+              applications.map((app) => {
+                const cardRemark = app.latest_remarks || (Array.isArray(app.status_history) ? app.status_history.find((h: any) => h.remarks)?.remarks : "") || "";
+
+                return (
+                  <div
+                    key={app.id}
+                    onClick={() => { setSelectedApp(app); setErrorMsg(""); setMobileTab('detail'); }}
+                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                      selectedApp?.id === app.id
+                        ? "bg-indigo-50/80 border-indigo-300 shadow-sm"
+                        : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h3 className="font-bold text-sm text-slate-900 truncate flex-1">{app.applicant_name}</h3>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider shrink-0 ${getStatusBadgeClass(app.status)}`}>
+                        {app.status.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                    
+                    <p className="text-xs text-slate-500 truncate font-medium">{app.applicant_email}</p>
+
+                    {/* Display Remarks in Sidebar */}
+                    {cardRemark ? (
+                      <div className="mt-2.5 p-2 rounded bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 leading-snug">
+                        <div className="flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider text-amber-800 mb-0.5">
+                          <MessageSquare size={11} className="text-amber-600 shrink-0" />
+                          <span>Remark / Note:</span>
+                        </div>
+                        <p className="font-medium line-clamp-2 text-slate-800">{cardRemark}</p>
+                      </div>
+                    ) : (
+                      <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-wider">
+                        Submitted: {new Date(app.application_date).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-500 truncate font-medium">{app.applicant_email}</p>
-                  <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-wider">Submitted: {new Date(app.application_date).toLocaleDateString()}</p>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </aside>
 
         {/* Right Details Panel */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8 bg-slate-50 custom-scrollbar relative">
+        <main className={`flex-1 overflow-y-auto p-4 lg:p-8 bg-slate-50 custom-scrollbar relative ${
+          mobileTab === 'detail' ? 'block' : 'hidden lg:block'
+        }`}>
           {selectedApp ? (
             <div className="max-w-5xl mx-auto space-y-6 pb-40">
               {/* Top Summary Card */}
@@ -387,58 +408,28 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   </h3>
                 </div>
                 <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {renderFieldValue("Company/Applicant Name", selectedApp.applicant_name)}
+                  {renderFieldValue("Name of the Applicant", selectedApp.applicant_name)}
+                  {renderFieldValue("Company / Firm / Banner", selectedApp.company_name)}
                   {renderFieldValue("Email Address", selectedApp.applicant_email)}
                   {renderFieldValue("Mobile Number", selectedApp.mobile_number)}
-                  {renderFieldValue("CIN / LLPIN", selectedApp.cin_llpin)}
-                  {renderFieldValue("GST Number", selectedApp.gst_number)}
                   {renderFieldValue("PAN Number", selectedApp.pan_number)}
-                  {renderFieldValue("Date of Birth/Incorporation", selectedApp.dob_incorporation)}
-                  {renderFieldValue("Website", selectedApp.website)}
-                  {renderFieldValue("Telephone Number", selectedApp.telephone_number)}
                   
                   <div className="col-span-full border-b border-slate-100 pb-2">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Registered Address</p>
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Address</p>
                     <p className="text-sm font-medium text-slate-900 leading-relaxed">
-                      {selectedApp.registered_address}, {selectedApp.city}, {selectedApp.state}, {selectedApp.country} - {selectedApp.pin_code}
+                      {[selectedApp.registered_address, selectedApp.city, selectedApp.state, selectedApp.country, selectedApp.pin_code].filter(Boolean).join(", ")}
                     </p>
                   </div>
                 </div>
                 {renderSectionReviewInput("Step 2: Applicant Details")}
               </div>
 
-              {/* Step 3: Authorized Representative */}
-              <div className="bg-white border border-slate-200 rounded shadow-sm">
-                <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
-                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                    <User size={14} className="text-indigo-600" />
-                    Step 3: Authorized Representative
-                  </h3>
-                </div>
-                <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {renderFieldValue("Representative Name", selectedApp.rep_name)}
-                  {renderFieldValue("Representative Designation", selectedApp.rep_designation)}
-                  {renderFieldValue("Representative Mobile", selectedApp.rep_mobile)}
-                  {renderFieldValue("Representative Email", selectedApp.rep_email)}
-                  {renderFieldValue("Representative Aadhar", selectedApp.rep_aadhar)}
-                  {renderFieldValue("Representative PAN", selectedApp.rep_pan)}
-                </div>
-                
-                <div className="p-6 pt-0 border-t border-slate-100 mt-4">
-                  <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 mt-4">Representative Documents</h4>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                     {renderDocumentLink("Representative Authority Letter", selectedApp.rep_authority_letter)}
-                  </div>
-                </div>
-                {renderSectionReviewInput("Step 3: Authorized Representative")}
-              </div>
-
-              {/* Step 4: Bank details */}
+              {/* Step 3: Bank Details */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <CreditCard size={14} className="text-indigo-600" />
-                    Step 4: Bank Account Details
+                    Step 3: Bank Account Details
                   </h3>
                 </div>
                 <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -447,68 +438,33 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Branch Name", selectedApp.branch_name)}
                   {renderFieldValue("Account Number", selectedApp.account_number)}
                   {renderFieldValue("IFSC Code", selectedApp.ifsc_code)}
-                  {renderFieldValue("SWIFT Code", selectedApp.swift_code)}
-                  {renderFieldValue("UPI ID", selectedApp.upi_id)}
                 </div>
-                <div className="p-6 pt-0 border-t border-slate-100 mt-4">
-                  <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 mt-4">Bank Documents</h4>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                     {renderDocumentLink("Canceled Check", selectedApp.canceled_check)}
-                     {renderDocumentLink("GST Certificate", selectedApp.gst_certificate)}
-                  </div>
-                </div>
-                {renderSectionReviewInput("Step 4: Bank Account Details")}
+                {renderSectionReviewInput("Step 3: Bank Account Details")}
               </div>
               
-              {/* Step 5: KYC Documents */}
+              {/* Step 4: KYC Documents */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <FileText size={14} className="text-indigo-600" />
-                    Step 5: KYC Documents
+                    Step 4: KYC Documents
                   </h3>
                 </div>
                 <div className="p-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {renderDocumentLink("PAN Card", selectedApp.pan_card)}
-                  {renderDocumentLink("Certificate of Incorporation", selectedApp.certificate_of_incorporation)}
-                  {renderDocumentLink("Identity Proof", selectedApp.identity_proof)}
-                  {renderDocumentLink("Address Proof", selectedApp.address_proof)}
-                  {renderDocumentLink("Board Resolution", selectedApp.board_resolution)}
+                  {renderDocumentLink("Authority Letter / Board Resolution", selectedApp.board_resolution)}
+                  {renderDocumentLink("Passport Photograph 1", selectedApp.passport_photo)}
+                  {renderDocumentLink("Passport Photograph 2", selectedApp.passport_photo_2)}
                 </div>
-                {renderSectionReviewInput("Step 5: KYC Documents")}
+                {renderSectionReviewInput("Step 4: KYC Documents")}
               </div>
 
-              {/* Step 6: Ownership Details */}
-              <div className="bg-white border border-slate-200 rounded shadow-sm">
-                <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
-                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                    <FileText size={14} className="text-indigo-600" />
-                    Step 6: Ownership Details
-                  </h3>
-                </div>
-                <div className="p-6 grid gap-6 sm:grid-cols-2">
-                  {renderFieldValue("Original Producer", selectedApp.is_original_producer, true)}
-                  {renderFieldValue("Relation with Producer", selectedApp.relation_with_producer)}
-                  {renderFieldValue("Production House Name", selectedApp.production_house_name)}
-                  {renderFieldValue("Total Films Owned", selectedApp.total_films_owned)}
-                  {renderFieldValue("Producer Ownership Declaration", selectedApp.producer_ownership_declaration, true)}
-                  {renderFieldValue("Nature of Ownership", Array.isArray(selectedApp.nature_of_ownership) ? selectedApp.nature_of_ownership.join(", ") : selectedApp.nature_of_ownership)}
-                  <div className="col-span-full">
-                    {renderFieldValue("Assignment Agreement Details", selectedApp.assignment_agreement)}
-                  </div>
-                  <div className="col-span-full">
-                    {renderFieldValue("Other Ownership Declaration", selectedApp.other_ownership_declaration)}
-                  </div>
-                </div>
-                {renderSectionReviewInput("Step 6: Ownership Details")}
-              </div>
-
-              {/* Step 7: Film Details */}
+              {/* Step 5: Film Details */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <Film size={14} className="text-indigo-600" />
-                    Step 7: Film Details
+                    Step 5: Repertoire Details
                   </h3>
                   <span className="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded text-[10px]">
                     {selectedApp.submitted_film_data?.length || 0} FILMS
@@ -518,9 +474,10 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                 {selectedApp.submitted_film_data && selectedApp.submitted_film_data.length > 0 ? (
                   <div className="divide-y divide-slate-100">
                     {selectedApp.submitted_film_data.map((f: any, idx: number) => {
+                      const dbFilm = selectedApp.films?.[idx] || selectedApp.films?.find((df: any) => df.title?.toLowerCase() === (f.title?.label || f.title?.value || f.title || "").toLowerCase());
                       const censorDoc = getFilmDocument(selectedApp, idx, 'censor_certificate');
-                      const copyrightDoc = getFilmDocument(selectedApp, idx, 'copyright_certificate');
-                      const ownershipDoc = getFilmDocument(selectedApp, idx, 'ownership_document');
+                      const censorDocUrl = censorDoc?.file || f.censor_certificate_url || dbFilm?.documents?.find((d: any) => d.document_type?.toLowerCase().includes('censor'))?.file_url || dbFilm?.documents?.find((d: any) => d.document_type?.toLowerCase().includes('censor'))?.file;
+                      const censorNo = f.censor_certificate_no || dbFilm?.censor_certificate_no;
 
                       return (
                         <div key={idx} className="p-6">
@@ -528,7 +485,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                             <div>
                               <h4 className="font-black text-slate-900 text-base">{f.title?.label || f.title?.value || f.title || f.film_id || `Untitled Film #${idx + 1}`}</h4>
                               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-1">
-                                {f.year || "Unknown Year"} • {f.language || "Unknown Language"}
+                                {f.release_year || f.year || (f.release_date ? f.release_date.split('-')[0] : "Unknown Year")} • {f.language || "Unknown Language"}
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -542,12 +499,12 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                           
                           <div className="grid gap-4 sm:grid-cols-2 text-sm mb-4">
                             <div>
-                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Director</span>
-                              <span className="font-medium text-slate-800">{f.director_name || "N/A"}</span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Release Date</span>
+                              <span className="font-medium text-slate-800">{f.release_date || dbFilm?.release_date || "N/A"}</span>
                             </div>
                             <div>
-                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Producer</span>
-                              <span className="font-medium text-slate-800">{f.producer_name || "N/A"}</span>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Censor Certificate Number</span>
+                              <span className="font-medium text-slate-800 font-mono">{censorNo || "N/A"}</span>
                             </div>
                             <div className="col-span-full">
                               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Star Cast</span>
@@ -555,15 +512,17 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                                 {Array.isArray(f.cast) ? f.cast.map((c:any) => c.label || c.value || c).join(", ") : (f.cast || "N/A")}
                               </span>
                             </div>
+                            <div className="col-span-full">
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Remarks</span>
+                              <span className="font-medium text-slate-800">{f.remarks || dbFilm?.remarks || "—"}</span>
+                            </div>
                           </div>
 
                           {/* Film Documents */}
                           <div className="mt-4">
                             <h5 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Film Documents</h5>
                             <div className="grid gap-3 sm:grid-cols-3">
-                               {renderDocumentLink("Censor Certificate", censorDoc?.file)}
-                               {renderDocumentLink("Copyright Certificate", copyrightDoc?.file)}
-                               {renderDocumentLink("Ownership Document", ownershipDoc?.file)}
+                               {renderDocumentLink("Censor Certificate", censorDocUrl)}
                             </div>
                           </div>
                         </div>
@@ -575,15 +534,15 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                     No films submitted in this application.
                   </div>
                 )}
-                {renderSectionReviewInput("Step 7: Film Details")}
+                {renderSectionReviewInput("Step 5: Repertoire Details")}
               </div>
 
-              {/* Step 8: Declaration */}
+              {/* Step 6: Declaration */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <CheckCircle size={14} className="text-indigo-600" />
-                    Step 8: Declaration
+                    Step 6: Declaration
                   </h3>
                 </div>
                 <div className="p-6 grid gap-6 sm:grid-cols-3">
@@ -591,15 +550,15 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Authorized Cinefil", selectedApp.authorize_cinefil, true)}
                   {renderFieldValue("Agreed to Rules & Regulations", selectedApp.agree_to_abide, true)}
                 </div>
-                {renderSectionReviewInput("Step 8: Declaration")}
+                {renderSectionReviewInput("Step 6: Declaration")}
               </div>
 
-              {/* Step 9: Agreement */}
+              {/* Step 7: Agreement */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <CheckCircle size={14} className="text-indigo-600" />
-                    Step 9: Agreement
+                    Step 7: Agreement
                   </h3>
                 </div>
                 <div className="p-6 grid gap-6 sm:grid-cols-3">
@@ -608,15 +567,15 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Place of Signature", selectedApp.signature_place)}
                   {renderFieldValue("Date of Signature", selectedApp.signature_date)}
                 </div>
-                {renderSectionReviewInput("Step 9: Agreement")}
+                {renderSectionReviewInput("Step 7: Agreement")}
               </div>
               
-              {/* Step 10: Membership Fee */}
+              {/* Step 8: Membership Fee */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <CreditCard size={14} className="text-indigo-600" />
-                    Step 10: Membership Fee
+                    Step 8: Membership Fee
                   </h3>
                 </div>
                 <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -625,13 +584,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {renderFieldValue("Razorpay Order ID", selectedApp.razorpay_order_id)}
                   {renderFieldValue("Razorpay Payment ID", selectedApp.razorpay_payment_id)}
                 </div>
-                <div className="p-6 pt-0 border-t border-slate-100 mt-4">
-                  <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 mt-4">Payment Documents</h4>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                     {renderDocumentLink("Payment Receipt", selectedApp.payment_receipt)}
-                  </div>
-                </div>
-                {renderSectionReviewInput("Step 10: Membership Fee")}
+                {renderSectionReviewInput("Step 8: Membership Fee")}
               </div>
 
               {/* Executive Review Report Summary */}
@@ -702,7 +655,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   {/* Membership Executive Options */}
                   {(user?.is_membership_executive || user?.role === 'membership_executive') && (
                     <>
-                      {['submitted', 'kyc_under_review', 'documents_pending', 'query_raised'].includes(selectedApp.status) && (
+                      {['submitted', 'kyc_under_review', 'documents_pending', 'query_raised', 'associate_member'].includes(selectedApp.status) && (
                         <button
                           onClick={() => handleStatusUpdate("ownership_verification")}
                           disabled={actionLoading}
@@ -780,7 +733,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                   )}
                   
                   {/* Universal Reject / Query */}
-                  {['submitted', 'kyc_under_review', 'documents_pending', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review'].includes(selectedApp.status) && (
+                  {['submitted', 'kyc_under_review', 'documents_pending', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review', 'associate_member'].includes(selectedApp.status) && (
                     <>
                       <button
                         onClick={() => handleStatusUpdate("query_raised")}

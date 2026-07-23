@@ -21,10 +21,13 @@ interface User {
   membership_status?: string;
   has_pending_application?: boolean;
   is_member?: boolean;
+  is_prime?: boolean;
   is_membership_executive?: boolean;
   is_rights_verification_officer?: boolean;
   is_legal_officer?: boolean;
   is_ceo_authorised_officer?: boolean;
+  is_email_verified?: boolean;
+  is_mobile_verified?: boolean;
   is_membership_committee_member?: boolean;
   company?: {
     id: string;
@@ -39,6 +42,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: any) => Promise<any>;
+  signup: (userData: any) => Promise<any>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -94,6 +98,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signup = async (userData: any) => {
+    try {
+      const data = await authService.signup(userData);
+      if (data.success) {
+        const u = await refreshProfile(); // Fetch full profile
+        return { success: true, user: u };
+      }
+      return { success: false, errors: data.errors, error: data.error || 'Signup failed.' };
+    } catch (e: any) {
+      return { success: false, error: e.response?.data?.error || 'Server error occurred.', errors: e.response?.data?.errors };
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -106,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, signup, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

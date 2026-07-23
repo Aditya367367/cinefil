@@ -108,6 +108,15 @@ export const memberService = {
     }
   },
 
+  async checkAvailability(email?: string, mobile?: string) {
+    try {
+      const response = await api.post('/auth/check-availability/', { email, mobile });
+      return response.data;
+    } catch (err: any) {
+      return err.response?.data || { success: false, error: "Failed to check availability" };
+    }
+  },
+
   // ──────────────────────────────────────────
   // Officer Endpoints
   // ──────────────────────────────────────────
@@ -139,6 +148,11 @@ export const memberService = {
 
   async verifyRazorpayPayment(data: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string; application_id: number }) {
     const response = await api.post('/payments/razorpay/verify-payment/', data);
+    return response.data;
+  },
+
+  async upgradeToPrime() {
+    const response = await api.post('/members/upgrade-prime/');
     return response.data;
   },
 };

@@ -10,6 +10,15 @@ export const authService = {
     return response.data;
   },
 
+  async signup(data: any) {
+    const response = await api.post('/auth/signup/', data);
+    if (response.data.success) {
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+    }
+    return response.data;
+  },
+
   async logout() {
     const refresh = localStorage.getItem('refresh_token');
     try {

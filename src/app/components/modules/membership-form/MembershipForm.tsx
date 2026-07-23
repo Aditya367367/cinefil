@@ -1,12 +1,13 @@
 import React from "react";
 import { useMembershipForm, MembershipFormProvider } from "./context/MembershipFormContext";
 import { ProgressBar } from "./components/ProgressBar";
+import { StepRegisterAccount } from "./steps/StepRegisterAccount";
 import { StepMembershipCategory } from "./steps/StepMembershipCategory";
 import { StepApplicantDetails } from "./steps/StepApplicantDetails";
-import { StepAuthorizedRep } from "./steps/StepAuthorizedRep";
+
 import { StepBankDetails } from "./steps/StepBankDetails";
 import { StepKycDocuments } from "./steps/StepKycDocuments";
-import { StepOwnershipDetails } from "./steps/StepOwnershipDetails";
+
 import { StepFilmDetails } from "./steps/StepFilmDetails";
 import { StepDeclaration } from "./steps/StepDeclaration";
 import { StepAgreement } from "./steps/StepAgreement";
@@ -41,12 +42,13 @@ function MembershipFormInner() {
 
   const renderStep = () => {
     switch (currentStepKey) {
+      case "register": return <StepRegisterAccount />;
       case "category": return <StepMembershipCategory />;
       case "applicant": return <StepApplicantDetails />;
-      case "representative": return <StepAuthorizedRep />;
+
       case "bank": return <StepBankDetails />;
       case "kyc": return <StepKycDocuments />;
-      case "ownership": return <StepOwnershipDetails />;
+
       case "film": return <StepFilmDetails />;
       case "declaration": return <StepDeclaration />;
       case "agreement": return <StepAgreement />;

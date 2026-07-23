@@ -26,6 +26,7 @@ export function StepMembershipFee() {
     setShowCongratulations,
     membershipTypes,
     applications,
+    setApplications,
   } = useMembershipForm();
 
   const { showSnackbar } = useSnackbar();
@@ -64,10 +65,16 @@ export function StepMembershipFee() {
   const annualFeeAmount = activeType ? parseFee(activeType.annual_fee) : 5000;
   const totalFee = joiningFeeAmount + annualFeeAmount;
 
-  const isAlreadyPaid = applications?.some((app: any) => 
-    (app.status === 'paid_no_receipt' || app.payment_status === 'successful' || app.payment_status === 'captured') && 
-    (app.id === applicationId || !applicationId)
+  const currentApp = applications?.find((app: any) => 
+    app.status === 'associate_member' || (applicationId && app.id === Number(applicationId))
   );
+
+  const isAlreadyPaid = !!(currentApp && (
+    currentApp.status === 'associate_member' || 
+    currentApp.status === 'paid_no_receipt' || 
+    currentApp.payment_status === 'successful' || 
+    currentApp.payment_status === 'captured'
+  ));
 
   // Helper to load Razorpay SDK dynamically
   const loadRazorpayScript = () => {
@@ -142,9 +149,15 @@ export function StepMembershipFee() {
               application_id: applicationId,
             });
 
-            if (verifyRes.success) {
-              showSnackbar("Payment verified successfully! Please download and upload the receipt to submit.", "success");
+             if (verifyRes.success) {
+              showSnackbar("Payment verified successfully! Registered as Associate Member.", "success");
               setPaymentStatus("success");
+              if (verifyRes.application) {
+                setApplications((prev: any[]) => {
+                  const filtered = prev.filter(app => app.id !== verifyRes.application.id);
+                  return [...filtered, verifyRes.application];
+                });
+              }
             } else {
               throw new Error(verifyRes.error || "Signature verification failed.");
             }
@@ -267,8 +280,14 @@ export function StepMembershipFee() {
       });
 
       if (verifyRes.success) {
-        showSnackbar("Sandbox Payment simulation successful! Please download and upload the receipt to submit.", "success");
+        showSnackbar("Sandbox Payment simulation successful! Registered as Associate Member.", "success");
         setPaymentStatus("success");
+        if (verifyRes.application) {
+          setApplications((prev: any[]) => {
+            const filtered = prev.filter(app => app.id !== verifyRes.application.id);
+            return [...filtered, verifyRes.application];
+          });
+        }
       } else {
         throw new Error(verifyRes.error || "Sandbox signature verification failed.");
       }
@@ -299,6 +318,182 @@ export function StepMembershipFee() {
         return "";
     }
   };
+
+  const [upgrading, setUpgrading] = useState(false);
+
+  const handleUpgradeToPrime = async () => {
+    setUpgrading(true);
+    try {
+      const res = await memberService.upgradeToPrime();
+      if (res.success) {
+        showSnackbar("Successfully upgraded to Prime Membership!", "success");
+        window.location.href = "/member-dashboard";
+      } else {
+        showSnackbar(res.error || "Failed to upgrade to Prime.", "error");
+      }
+    } catch (err: any) {
+      console.error(err);
+      showSnackbar("An error occurred during upgrade. Please try again.", "error");
+    } finally {
+      setUpgrading(false);
+    }
+  };
+
+  if (isAlreadyPaid || paymentStatus === "success") {
+    const membershipNumber = currentApp?.membership_number || "AM-Pending";
+    return (
+      <div className="mf-step" style={{ animation: "fadeIn 0.5s ease" }}>
+        <div style={{ textAlign: "center", padding: "40px 20px" }}>
+          <div style={{ position: "relative", display: "inline-block", marginBottom: "24px" }}>
+            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#22c55e", opacity: 0.15, transform: "scale(1.2)", animation: "pulse 2s infinite" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "80px", height: "80px", borderRadius: "50%", background: "#22c55e", color: "white", boxShadow: "0 10px 15px -3px rgba(34, 197, 94, 0.4)", margin: "0 auto" }}>
+              <Check size={40} style={{ margin: "0 auto" }} />
+            </div>
+          </div>
+
+          <h3 className="mf-step__title" style={{ fontSize: "24px", color: "#1e293b", marginBottom: "8px", fontWeight: 800 }}>
+            Registration Successful!
+          </h3>
+          <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>
+            Your payment has been verified and your associate membership is now active.
+          </p>
+
+          <div style={{
+            background: "rgba(255, 255, 255, 0.8)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid #e2e8f0",
+            borderRadius: "16px",
+            padding: "24px",
+            maxWidth: "500px",
+            margin: "0 auto 28px",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.025)"
+          }}>
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Allotted Membership Number
+            </span>
+            <div style={{ fontSize: "28px", fontWeight: 800, color: "#183858", marginTop: "4px", letterSpacing: "0.02em" }}>
+              {membershipNumber}
+            </div>
+          </div>
+
+          <div className="mf-info-box mf-info-box--neutral" style={{
+            textAlign: "left",
+            maxWidth: "600px",
+            margin: "0 auto 32px",
+            padding: "20px",
+            borderRadius: "12px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0"
+          }}>
+            <h4 style={{ fontWeight: 800, fontSize: "14px", color: "#183858", marginBottom: "12px" }}>
+              Note - Upgradation to Prime Member
+            </h4>
+            <p style={{ fontSize: "13px", color: "#334155", lineHeight: "1.6", marginBottom: "12px", fontWeight: 600 }}>
+              You are successfully registered as Cinefil associate member. Your number is {membershipNumber} and until you upgrade to prime you no get royalty. Upgrade from here:
+            </p>
+            <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.6", borderTop: "1px solid #e2e8f0", paddingTop: "12px" }}>
+              <p style={{ marginBottom: "8px" }}>
+                Admission as a Prime Member shall be an internal administrative process of CINEFIL, contingent upon the furnishing of the prescribed supporting documents — including, without limitation, Censor Certificates, Probates, Letters of Administration or other instruments evidencing devolution of title upon legal heirs — as and when required by CINEFIL, and shall at all times remain subject to statutory compliance under the Copyright Act, 1957 read with the Copyright Rules, 2013, as amended from time to time, and such other applicable laws, as the case may be; defects, if any, shall be auto-flagged for internal scrutiny by CINEFIL.
+              </p>
+              <p>
+                Entitlement to the quarterly distribution of royalties, as provided under the Copyright Rules, 2013, shall accrue only upon admission as a Prime Member and upon due completion of the statutory compliance and verification process prescribed thereunder.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center", maxWidth: "600px", margin: "0 auto" }}>
+            <button
+              type="button"
+              onClick={downloadReceipt}
+              className="mf-btn mf-btn--prev"
+              style={{ padding: "12px 24px", display: "inline-flex", alignItems: "center", gap: "8px", border: "1px solid #cbd5e1" }}
+            >
+              <Download size={18} />
+              Download Receipt
+            </button>
+
+            {isAuthenticated ? (
+              <>
+                <button
+                  type="button"
+                  disabled={upgrading}
+                  onClick={handleUpgradeToPrime}
+                  className="mf-btn"
+                  style={{
+                    padding: "12px 24px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    backgroundColor: "var(--color-gold)",
+                    color: "var(--color-navy)",
+                    fontWeight: 700,
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 6px -1px rgba(212, 163, 89, 0.2)"
+                  }}
+                >
+                  {upgrading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Upgrading...
+                    </>
+                  ) : (
+                    "Upgrade to Prime"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.location.href = "/member-dashboard"}
+                  className="mf-btn"
+                  style={{
+                    padding: "12px 24px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    backgroundColor: "#183858",
+                    color: "white",
+                    fontWeight: 700,
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Go to Dashboard
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => window.location.href = "/login"}
+                className="mf-btn"
+                style={{
+                  padding: "12px 24px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  backgroundColor: "#183858",
+                  color: "white",
+                  fontWeight: 700,
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer"
+                }}
+              >
+                Go to Login / Dashboard
+              </button>
+            )}
+          </div>
+          
+          {!isAuthenticated && (
+            <p style={{ fontSize: "12px", color: "#64748b", marginTop: "16px" }}>
+              Please check your registered email for your account login credentials to access your dashboard and manage your films.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mf-step">
@@ -341,8 +536,22 @@ export function StepMembershipFee() {
       )}
 
       <div className="mf-step__header">
-        <h3 className="mf-step__title">Membership Fee</h3>
+        <h3 className="mf-step__title flex items-center gap-2">
+          Membership Fee
+          <abbr title="Pay the required membership fee to complete the application and receive your associate membership number." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
         <p className="mf-step__subtitle">Review your fees and complete the payment process.</p>
+      </div>
+
+      <div className="mf-info-box mf-info-box--neutral" style={{ marginBottom: "20px", padding: "16px", borderRadius: "8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}>
+        <h4 style={{ fontWeight: 700, fontSize: "14px", color: "#183858", marginBottom: "8px" }}>Workflow & Membership Issuance:</h4>
+        <ul style={{ listStyleType: "disc", paddingLeft: "20px", fontSize: "13px", color: "#475569", lineHeight: "1.6" }}>
+          <li>Submit the application through the website.</li>
+          <li>On submission, your Associate Membership Number will be allotted automatically — you are now an Associate Member of CINEFIL.</li>
+          <li>On realisation of the fee, your membership becomes active.</li>
+        </ul>
       </div>
 
       {/* Fee summary */}
@@ -370,96 +579,23 @@ export function StepMembershipFee() {
       {/* Payment gateway */}
       <div>
         <span className="mf-section-label">Online Payment</span>
-        {paymentStatus === "success" || isAlreadyPaid ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center", padding: "16px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "8px", marginBottom: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#15803d", fontWeight: 700 }}>
-              <Check size={20} />
-              <span>{isAlreadyPaid ? "Already Paid!" : "Online Payment Successful!"}</span>
-            </div>
-            <button
-              type="button"
-              onClick={downloadReceipt}
-              className="mf-pay-btn"
-              style={{ backgroundColor: "#16a34a", color: "white", width: "auto", padding: "10px 20px" }}
-            >
-              <Download size={18} />
-              Download Receipt
-            </button>
-            <p style={{ fontSize: "12px", color: "#166534", textAlign: "center", marginTop: "4px", maxWidth: "400px" }}>
-              Please upload this downloaded receipt file in the section below and click "Submit Application" to finalize.
-            </p>
-          </div>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={handleRazorpayPayment}
-              disabled={paymentStatus !== "idle" && paymentStatus !== "failed"}
-              className="mf-pay-btn"
-            >
-              <CreditCard size={18} />
-              {paymentStatus === "idle" || paymentStatus === "failed" ? "Pay with Razorpay" : "Processing..."}
-            </button>
-            <p style={{ textAlign: "center", fontSize: "11px", color: "#94a3b8", marginTop: "8px" }}>
-              Secure transaction encrypted with Razorpay.
-            </p>
-          </>
-        )}
-      </div>
-
-      <hr className="mf-divider" />
-
-      {/* Upload receipt */}
-      <div>
-        <label className="mf-label">
-          Or Upload Payment Receipt <span className="mf-label__hint">(for bank transfers / offline payment)</span>
-        </label>
-        <input
-          type="file"
-          id="payment-receipt"
-          className="mf-hidden-input"
-          accept=".pdf,.jpg,.jpeg,.png"
-          onChange={(e) => setPaymentReceipt(e.target.files?.[0] || null)}
-        />
-        <label htmlFor="payment-receipt" className={`mf-upload ${paymentReceipt ? "mf-upload--has-file" : ""}`}>
-          {paymentReceipt ? (
-            <>
-              <Check size={18} style={{ color: "#059669" }} />
-              <span className="mf-upload__filename">{paymentReceipt.name}</span>
-            </>
-          ) : existingPaymentReceiptUrl ? (
-            <>
-              <Check size={18} style={{ color: "#059669" }} />
-              <span className="mf-upload__filename">Existing Receipt Uploaded</span>
-              <a href={getBackendFileUrl(existingPaymentReceiptUrl)} target="_blank" rel="noreferrer" style={{ fontSize: '12px', color: '#183858', textDecoration: 'underline' }} onClick={(e) => e.stopPropagation()}>
-                View Receipt
-              </a>
-            </>
-          ) : (
-            <>
-              <Upload size={20} className="mf-upload__icon" />
-              <span className="mf-upload__text">Click to upload payment receipt</span>
-              <span className="mf-upload__hint">PDF, JPG, or PNG</span>
-            </>
-          )}
-        </label>
-        {existingPaymentReceiptUrl && !paymentReceipt && (
-           <p style={{fontSize: '12px', color: '#64748b', marginTop: '6px', textAlign: 'center'}}>
-             You have already uploaded a receipt. Uploading a new one will replace it.
-           </p>
-        )}
+        <button
+          type="button"
+          onClick={handleRazorpayPayment}
+          disabled={paymentStatus !== "idle" && paymentStatus !== "failed"}
+          className="mf-pay-btn"
+        >
+          <CreditCard size={18} />
+          {paymentStatus === "idle" || paymentStatus === "failed" ? "Pay with Razorpay" : "Processing..."}
+        </button>
+        <p style={{ textAlign: "center", fontSize: "11px", color: "#94a3b8", marginTop: "8px" }}>
+          Secure transaction encrypted with Razorpay.
+        </p>
       </div>
 
       <div className="mf-actions">
         <button type="button" onClick={prevStep} className="mf-btn mf-btn--prev">
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          type="submit"
-          disabled={submitting || !( (isAlreadyPaid || paymentStatus === "success") && (paymentReceipt || existingPaymentReceiptUrl) )}
-          className="mf-btn mf-btn--submit"
-        >
-          {submitting ? "Submitting..." : "Submit Application"}
         </button>
       </div>
     </div>

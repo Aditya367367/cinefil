@@ -6,12 +6,12 @@ import { SkipTestingButton } from "../components/SkipTestingButton";
 export function StepKycDocuments() {
   const {
     panCard, setPanCard,
-    certificateOfIncorporation, setCertificateOfIncorporation,
-    identityProof, setIdentityProof,
-    addressProof, setAddressProof,
     boardResolution, setBoardResolution,
-    existingPanCardUrl, existingCertificateOfIncorporationUrl,
-    existingIdentityProofUrl, existingAddressProofUrl, existingBoardResolutionUrl,
+    passportPhoto, setPassportPhoto,
+    passportPhoto2, setPassportPhoto2,
+    existingPanCardUrl, existingBoardResolutionUrl,
+    existingPassportPhotoUrl, existingPassportPhoto2Url,
+    applicantTypes,
     documentErrors, setDocumentErrors,
     validateDocument,
     nextStep, prevStep,
@@ -26,19 +26,25 @@ export function StepKycDocuments() {
     }
   };
 
+  const isIndividual = applicantTypes.includes("individual");
+
   const uploads = [
     { id: "pan-card", label: "PAN Card", required: true, file: panCard, existingUrl: existingPanCardUrl, handler: makeUploadHandler("panCard", setPanCard) },
-    { id: "cert-inc", label: "Certificate of Incorporation", required: false, file: certificateOfIncorporation, existingUrl: existingCertificateOfIncorporationUrl, handler: makeUploadHandler("certificateOfIncorporation", setCertificateOfIncorporation) },
-    { id: "identity-proof", label: "Identity Proof", hint: "Aadhar / Passport / DL", required: true, file: identityProof, existingUrl: existingIdentityProofUrl, handler: makeUploadHandler("identityProof", setIdentityProof) },
-    { id: "address-proof", label: "Address Proof", required: true, file: addressProof, existingUrl: existingAddressProofUrl, handler: makeUploadHandler("addressProof", setAddressProof) },
-    { id: "board-res", label: "Board Resolution", hint: "if company", required: false, file: boardResolution, existingUrl: existingBoardResolutionUrl, handler: makeUploadHandler("boardResolution", setBoardResolution) },
+    { id: "board-res", label: "Authority Letter or Board Resolution", hint: "Mandatory for entities", required: !isIndividual, file: boardResolution, existingUrl: existingBoardResolutionUrl, handler: makeUploadHandler("boardResolution", setBoardResolution) },
+    { id: "passport-photo-1", label: "Passport-Size Photograph 1", required: true, file: passportPhoto, existingUrl: existingPassportPhotoUrl, handler: makeUploadHandler("passportPhoto", setPassportPhoto) },
+    { id: "passport-photo-2", label: "Passport-Size Photograph 2", required: true, file: passportPhoto2, existingUrl: existingPassportPhoto2Url, handler: makeUploadHandler("passportPhoto2", setPassportPhoto2) },
   ];
 
   return (
     <div className="mf-step">
       <div className="mf-step__header">
-        <h3 className="mf-step__title">KYC Documents</h3>
-        <p className="mf-step__subtitle">Upload your required KYC documents in PDF or JPG format. KYC documents of yours.</p>
+        <h3 className="mf-step__title flex items-center gap-2">
+          KYC Documents
+          <abbr title="Upload PAN Card, Board Resolution/Authority Letter (if entity), and two passport-size photographs." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
+        <p className="mf-step__subtitle">Upload your required KYC documents and photographs.</p>
       </div>
 
       <div className="mf-grid">

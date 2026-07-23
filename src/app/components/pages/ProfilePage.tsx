@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   CalendarRange,
@@ -15,6 +15,16 @@ import {
   FileText,
   Award,
   AlertCircle,
+  Globe,
+  ExternalLink,
+  Crown,
+  ShieldCheck,
+  Mail,
+  Phone,
+  Building2,
+  Sparkles,
+  Share2,
+  CheckCircle2,
 } from "lucide-react";
 import type { Page } from "./Navbar";
 import { Footer } from "./Footer";
@@ -77,38 +87,50 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
     const pathname = window.location.pathname;
     const slug = pathname.split("/").pop();
 
-    const loggedInSlug = loggedInUser ? (loggedInUser.member_slug || loggedInUser.slug || `${loggedInUser.username || loggedInUser.id}-${loggedInUser.id}`) : null;
-    
-    const isSelf = !slug || slug === "profile" || (loggedInUser && (
-      slug === loggedInSlug ||
-      slug === loggedInUser.member_slug ||
-      slug === loggedInUser.slug ||
-      slug === loggedInUser.username ||
-      slug === String(loggedInUser.id) ||
-      slug === String(loggedInUser.member_id)
-    ));
+    const loggedInSlug = loggedInUser
+      ? loggedInUser.member_slug ||
+        loggedInUser.slug ||
+        `${loggedInUser.username || loggedInUser.id}-${loggedInUser.id}`
+      : null;
 
-    const targetSlug = (!slug || slug === "profile") ? loggedInSlug : slug;
+    const isSelf =
+      !slug ||
+      slug === "profile" ||
+      (loggedInUser &&
+        (slug === loggedInSlug ||
+          slug === loggedInUser.member_slug ||
+          slug === loggedInUser.slug ||
+          slug === loggedInUser.username ||
+          slug === String(loggedInUser.id) ||
+          slug === String(loggedInUser.member_id)));
+
+    const targetSlug = !slug || slug === "profile" ? loggedInSlug : slug;
 
     if (targetSlug) {
-      if (!profileUser || (
-        profileUser.slug !== targetSlug &&
-        String(profileUser.id) !== targetSlug &&
-        profileUser.username !== targetSlug &&
-        (!isSelf || profileUser.id !== loggedInUser?.member_id)
-      )) {
+      if (
+        !profileUser ||
+        (profileUser.slug !== targetSlug &&
+          String(profileUser.id) !== targetSlug &&
+          profileUser.username !== targetSlug &&
+          (!isSelf || profileUser.id !== loggedInUser?.member_id))
+      ) {
         memberService
           .getMemberBySlug(targetSlug)
           .then((data) => setProfileUser(data))
           .catch((err) => {
             console.error("Failed to load member profile by slug", err);
-            if (isSelf && loggedInUser?.member_id) {
-              memberService.getMember(loggedInUser.member_id)
-                .then((data) => setProfileUser(data))
-                .catch((e) => {
-                  console.error("Failed to load member profile by ID", e);
-                  setProfileUser(loggedInUser);
-                });
+            if (isSelf) {
+              if (loggedInUser?.member_id) {
+                memberService
+                  .getMember(loggedInUser.member_id)
+                  .then((data) => setProfileUser(data))
+                  .catch((e) => {
+                    console.error("Failed to load member profile by ID", e);
+                    setProfileUser(loggedInUser);
+                  });
+              } else {
+                setProfileUser(loggedInUser);
+              }
             } else {
               setProfileNotFound(true);
             }
@@ -127,7 +149,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
 
     const timer = setTimeout(() => {
       setMinimumLoading(false);
-    }, 1500);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [loggedInUser, profileUser]);
@@ -138,7 +160,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
         name: profileUser.full_name || "",
         role: profileUser.role || "member",
         headline: profileUser.role_title || "",
-        location: profileUser.location || "India",
+        location: profileUser.location || "Mumbai, India",
         dob: profileUser.dob || "June 17, 2004",
         about: profileUser.biography || "",
         phone: profileUser.phone || "",
@@ -154,7 +176,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
         name: profileUser.full_name || "",
         role: profileUser.role || "member",
         headline: profileUser.role_title || "",
-        location: profileUser.location || "India",
+        location: profileUser.location || "Mumbai, India",
         dob: profileUser.dob || "June 17, 2004",
         about: profileUser.biography || "",
         phone: profileUser.phone || "",
@@ -169,16 +191,16 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      formData.append('full_name', draft.name);
-      formData.append('role_title', draft.headline);
-      formData.append('biography', draft.about);
-      formData.append('phone', draft.phone);
+      formData.append("full_name", draft.name);
+      formData.append("role_title", draft.headline);
+      formData.append("biography", draft.about);
+      formData.append("phone", draft.phone);
       if (draft.photo) {
-        formData.append('photo', draft.photo);
+        formData.append("photo", draft.photo);
       }
-      formData.append('location', draft.location);
-      formData.append('dob', draft.dob);
-      formData.append('username', draft.username);
+      formData.append("location", draft.location);
+      formData.append("dob", draft.dob);
+      formData.append("username", draft.username);
 
       const response = await authService.updateProfile(formData);
 
@@ -194,23 +216,20 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
     }
   };
 
-
   if (profileNotFound && !profileUser && !minimumLoading) {
     return (
-      <div className="min-h-[calc(100vh-5rem)] bg-gradient-to-tr from-[#f1f5f9] via-[#eef2f7] to-[#e2e8f0] flex items-center justify-center p-4 sm:p-6" style={{ fontFamily: "var(--font-body)" }}>
-        <div className="max-w-md w-full text-center bg-white/70 backdrop-blur-md p-8 rounded-xl border border-white/60 shadow-[0_12px_40px_rgba(15,23,42,0.04)] space-y-5">
-          <div className="mx-auto w-16 h-16 bg-rose-50/50 border border-rose-200/60 text-rose-500 rounded-lg flex items-center justify-center">
-            <AlertCircle size={36} />
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl space-y-5">
+          <div className="mx-auto w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center border border-rose-100">
+            <AlertCircle size={32} />
           </div>
-          <h2 className="text-xl font-bold" style={{ color: "var(--cinefil-navy)", fontFamily: "var(--font-heading)" }}>
-            Profile Not Found
-          </h2>
-          <p className="text-sm text-slate-500 font-medium leading-relaxed">
+          <h2 className="text-xl font-bold text-slate-900">Profile Not Found</h2>
+          <p className="text-sm text-slate-500 font-medium">
             The requested member profile could not be resolved or the member does not exist in our systems.
           </p>
           <button
             onClick={() => onNavigate("home" as any)}
-            className="w-full py-3 bg-[var(--cinefil-navy)] hover:bg-slate-800 text-white font-bold rounded-lg transition-colors duration-200"
+            className="w-full py-3 bg-[#1e3a5f] hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-sm"
           >
             Return to Homepage
           </button>
@@ -221,466 +240,524 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
 
   if (!profileUser || minimumLoading) {
     return (
-      <div className="min-h-[calc(100vh-5rem)] bg-gradient-to-tr from-[#f1f5f9] via-[#eef2f7] to-[#e2e8f0] px-3 py-5 sm:px-4 sm:py-8 lg:px-6" style={{ fontFamily: "var(--font-body)" }}>
-        <div className="mx-auto w-full max-w-7xl space-y-4 sm:space-y-6">
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-            <section className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-4 shadow-[0_12px_40px_rgba(15,23,42,0.04)] sm:p-6 lg:p-8">
-              <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-start">
-                <div className="h-36 w-full max-w-[9rem] shrink-0 rounded-lg bg-slate-200/80 animate-pulse sm:h-44 sm:max-w-[11rem] sm:w-44" />
-                <div className="min-w-0 flex-1 space-y-3 sm:space-y-4">
-                  <div className="h-3 sm:h-4 bg-slate-200/80 rounded w-1/4 animate-pulse" />
-                  <div className="h-6 sm:h-8 bg-slate-200/80 rounded w-3/4 animate-pulse" />
-                  <div className="h-4 sm:h-5 bg-slate-200/80 rounded w-1/2 animate-pulse" />
-                  <div className="flex gap-3 sm:gap-4">
-                    <div className="h-3 sm:h-4 bg-slate-200/80 rounded w-1/3 animate-pulse" />
-                    <div className="h-3 sm:h-4 bg-slate-200/80 rounded w-1/4 animate-pulse" />
-                  </div>
-                  <div className="pt-3 sm:pt-4 border-t border-slate-100">
-                    <div className="h-4 sm:h-5 bg-slate-200/80 rounded w-1/4 animate-pulse mb-2" />
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <div className="h-2.5 sm:h-3 bg-slate-200/80 rounded animate-pulse" />
-                      <div className="h-2.5 sm:h-3 bg-slate-200/80 rounded w-5/6 animate-pulse" />
-                      <div className="h-2.5 sm:h-3 bg-slate-200/80 rounded w-4/5 animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-            <aside className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:block lg:space-y-6">
-              <div className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-4 sm:p-6 shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
-                <div className="h-5 sm:h-6 bg-slate-200/80 rounded w-1/3 animate-pulse mb-2" />
-                <div className="h-2.5 sm:h-3 bg-slate-200/80 rounded w-1/2 animate-pulse mb-4 sm:mb-5" />
-                <div className="space-y-3 sm:space-y-3.5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="rounded-lg bg-slate-50/50 border border-slate-100/80 px-3 sm:px-4 py-2 sm:py-3">
-                      <div className="h-2 bg-slate-200/80 rounded w-1/4 animate-pulse mb-1" />
-                      <div className="h-3 sm:h-4 bg-slate-200/80 rounded w-1/2 animate-pulse" />
-                    </div>
-                  ))}
-                </div>
-                <div className="h-8 sm:h-10 bg-slate-200/80 rounded-lg animate-pulse mt-4 sm:mt-5" />
-              </div>
-              <div className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-4 sm:p-6 shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
-                <div className="h-5 sm:h-6 bg-slate-200/80 rounded w-1/3 animate-pulse mb-3 sm:mb-4" />
-                <div className="rounded-lg bg-slate-50/50 border border-slate-100/80 p-3 sm:p-4">
-                  <div className="h-3 sm:h-4 bg-slate-200/80 rounded w-1/3 animate-pulse mb-2" />
-                  <div className="h-2.5 sm:h-3 bg-slate-200/80 rounded w-full animate-pulse" />
-                </div>
-              </div>
-            </aside>
+      <div className="min-h-screen bg-slate-100 px-4 py-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="h-48 bg-slate-200 rounded-3xl animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white p-6 rounded-3xl space-y-4 animate-pulse">
+              <div className="h-6 bg-slate-200 rounded w-1/3" />
+              <div className="h-4 bg-slate-200 rounded w-1/2" />
+              <div className="h-20 bg-slate-200 rounded w-full" />
+            </div>
+            <div className="bg-white p-6 rounded-3xl space-y-4 animate-pulse">
+              <div className="h-6 bg-slate-200 rounded w-1/2" />
+              <div className="h-10 bg-slate-200 rounded w-full" />
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  const isPrime = profileUser.is_prime || profileUser.is_member_prime || loggedInUser?.is_prime;
+
+  // Check access control for Officer-only profiles
+  const profileIsOfficer = profileUser.is_membership_executive || profileUser.is_rights_verification_officer || profileUser.is_legal_officer || profileUser.is_ceo_authorised_officer || profileUser.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(profileUser.role || '');
+  const profileIsMember = profileUser.is_member === true || profileUser.membership_status === 'approved' || profileUser.role === 'member';
+
+  const isOfficerOnly = profileIsOfficer && !profileIsMember;
+  const isAccessBlocked = isOfficerOnly && !isOwnProfile;
+
+  if (isAccessBlocked) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl space-y-5">
+          <div className="mx-auto w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center border border-rose-100">
+            <Lock size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Private Profile</h2>
+          <p className="text-sm text-slate-500 font-medium">
+            This profile belongs to an administrator/officer and is not publicly accessible.
+          </p>
+          <button
+            onClick={() => onNavigate("home" as any)}
+            className="w-full py-3 bg-[#1e3a5f] hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-sm"
+          >
+            Return to Homepage
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className="min-h-[calc(100vh-5rem)] bg-gradient-to-tr from-[#f1f5f9] via-[#eef2f7] to-[#e2e8f0] px-3 py-5 sm:px-4 sm:py-8 lg:px-6" style={{ fontFamily: "var(--font-body)" }}>
-        <div className="mx-auto w-full max-w-7xl space-y-6">
+    <div className="min-h-screen bg-slate-50 font-sans">
+      
+      {/* Cover Header Banner */}
+      <div className="relative bg-gradient-to-r from-[#1e3a5f] via-[#0f2540] to-[#1e3a5f] text-white pt-12 pb-24 px-4 sm:px-8 overflow-hidden">
+        {/* Abstract Background Design Elements */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#c5a059_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-[#c5a059]/10 blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+          <button
+            onClick={() => onNavigate("home" as any)}
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-xl backdrop-blur-md transition"
+          >
+            <ArrowLeft size={14} /> Back to Society Portal
+          </button>
 
+          <div className="flex items-center gap-2">
+            {isPrime ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold backdrop-blur-md">
+                <Crown size={14} className="text-amber-400" />
+                Prime Society Member
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-200 text-xs font-bold backdrop-blur-md">
+                <ShieldCheck size={14} className="text-blue-400" />
+                Associate Member
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
 
-
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-            <section className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-4 shadow-[0_12px_40px_rgba(15,23,42,0.04)] sm:p-6 lg:p-8 transition-all hover:shadow-[0_16px_48px_rgba(15,23,42,0.06)]">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                <div className="relative h-44 w-full max-w-[11rem] shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-[#0f2540] via-[#183858] to-[#1e4570] p-1 sm:h-44 sm:w-44 shadow-sm border border-white/25">
-                  <div className="flex h-full w-full items-center justify-center rounded-lg bg-white/10 text-white relative overflow-hidden">
+      {/* Main Profile Body Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-16 space-y-8 relative z-20">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* LEFT COLUMN: Main Profile Info & Portfolio */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* Header Identity Card */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-md relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                
+                {/* Photo Avatar */}
+                <div className="relative shrink-0">
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-gradient-to-br from-[#1e3a5f] to-slate-900 border-4 border-white shadow-xl flex items-center justify-center text-white relative">
                     {photoPreview ? (
                       <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : profileUser.photo_url ? (
                       <img src={profileUser.photo_url} alt={profileUser.full_name} className="w-full h-full object-cover" />
                     ) : (
-                      <>
-                        <svg className="absolute w-full h-full opacity-10" viewBox="0 0 100 100" fill="currentColor">
-                          <circle cx="20" cy="20" r="15" />
-                          <path d="M 50 50 Q 60 40, 70 50 T 90 50" stroke="currentColor" fill="none" strokeWidth="2" />
-                          <rect x="30" y="70" width="40" height="20" rx="5" />
-                        </svg>
-                        <UserRound size={56} className="relative z-10 text-white/90" />
-                      </>
+                      <UserRound size={64} className="text-slate-400" />
                     )}
                   </div>
-                  {isOwnProfile && (
+                  {isPrime && (
+                    <div className="absolute -top-2 -right-2 p-1.5 bg-amber-500 text-slate-900 rounded-full shadow-lg border-2 border-white" title="Prime Member Verified">
+                      <Crown size={16} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Identity Details */}
+                <div className="flex-1 text-center sm:text-left min-w-0 space-y-2">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200/60">
+                      Registered Cinematograph Member
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                      @{profileUser.username || profileUser.generated_username || profileUser.slug || "member"}
+                    </span>
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-center sm:justify-start gap-2">
+                    <span>{profileUser.full_name}</span>
+                    <BadgeCheck size={22} className="text-blue-600 shrink-0" title="Verified Member" />
+                  </h1>
+
+                  <p className="text-sm font-semibold text-slate-600">
+                    {profileUser.role_title || "Film Producer / Rights Owner"}
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-medium text-slate-500 pt-2 border-t border-slate-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin size={14} className="text-amber-500" />
+                      {profileUser.location || "Mumbai, India"}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarRange size={14} className="text-amber-500" />
+                      Member since {profileUser.dob ? new Date(profileUser.dob).getFullYear() : "2024"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Edit Button for Profile Owner */}
+                {isOwnProfile && (
+                  <button
+                    onClick={openEditor}
+                    className="sm:self-start inline-flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-[#1e3a5f] hover:text-white text-slate-800 rounded-xl text-xs font-bold transition-all shadow-2xs shrink-0"
+                    type="button"
+                  >
+                    <Edit3 size={14} />
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Biography Section */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-3">
+              <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                <FileText size={18} className="text-amber-500" />
+                <span>Biography & Executive Overview</span>
+              </h3>
+              
+              {profileUser.biography ? (
+                <div className="text-sm leading-relaxed text-slate-600 font-normal">
+                  <p className={isBioExpanded ? "" : "line-clamp-4"}>
+                    {profileUser.biography}
+                  </p>
+                  {profileUser.biography.length > 200 && (
                     <button
-                      onClick={openEditor}
-                      className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[var(--cinefil-navy)] shadow-md hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all"
+                      onClick={() => setIsBioExpanded(!isBioExpanded)}
+                      className="mt-2 text-xs font-bold text-[#1e3a5f] hover:underline focus:outline-none"
                       type="button"
                     >
-                      <Edit3 size={15} />
+                      {isBioExpanded ? "Show Less" : "Read Full Biography"}
                     </button>
                   )}
                 </div>
+              ) : (
+                <p className="text-xs text-slate-400 italic bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  No biography added yet.
+                </p>
+              )}
+            </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--cinefil-gold)" }}>
-                      Member Profile
-                    </span>
-                    <span className="rounded bg-[#183858]/5 border border-[#183858]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--cinefil-navy)] capitalize tracking-wide">
-                      {profileUser.role || "member"}
-                    </span>
-                  </div>
-
-                  <h1 className="mt-2 text-3xl font-extrabold text-slate-900 tracking-tight">{profileUser.full_name}</h1>
-                  <p className="mt-1 text-base font-medium text-slate-600">{profileUser.role_title || "Managing Director / Producer"}</p>
-
-                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Username:</span>
-                      <span className="font-semibold text-slate-700">@{profileUser.username || profileUser.generated_username || profileUser.slug || "N/A"}</span>
-                    </span>
-
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-500 font-medium">
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin size={14} className="text-slate-400" />
-                      {profileUser.location || "India"}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <CalendarRange size={14} className="text-slate-400" />
-                      {profileUser.dob || "June 17, 2004"}
-                    </span>
-                  </div>
-
-                  {profileUser.social_links && profileUser.social_links.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {profileUser.social_links.map((link: any) => {
-                        const getPlatformColor = (platform: string) => {
-                          const p = platform.toLowerCase();
-                          if (p.includes('linkedin')) return 'bg-blue-50/50 text-blue-700 border-blue-200/50 hover:bg-blue-100/60';
-                          if (p.includes('twitter') || p.includes('x.com')) return 'bg-slate-100/50 text-slate-800 border-slate-200/60 hover:bg-slate-200/60';
-                          if (p.includes('facebook')) return 'bg-indigo-50/50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-100/60';
-                          if (p.includes('instagram')) return 'bg-pink-50/50 text-pink-700 border-pink-200/50 hover:bg-pink-100/60';
-                          if (p.includes('youtube')) return 'bg-red-50/50 text-red-700 border-red-200/50 hover:bg-red-100/60';
-                          return 'bg-slate-50/50 text-slate-700 border-slate-200/60 hover:bg-slate-150/60';
-                        };
-                        return (
-                          <a
-                            key={link.id}
-                            href={link.profile_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1 rounded border px-2.5 py-1 text-xs font-semibold tracking-wide transition-all ${getPlatformColor(link.platform)}`}
-                          >
-                            <span className="capitalize">{link.platform}</span>
-                          </a>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <div className="mt-6 border-t border-slate-100/80 pt-5">
-                    <h2 className="text-lg font-bold text-slate-900 tracking-wide">Biography</h2>
-                    {profileUser.biography ? (
-                      <div className="mt-2 text-sm leading-relaxed text-slate-600 font-normal">
-                        <p className={isBioExpanded ? "" : "line-clamp-3"}>
-                          {profileUser.biography}
-                        </p>
-                        {profileUser.biography.length > 180 && (
-                          <button
-                            onClick={() => setIsBioExpanded(!isBioExpanded)}
-                            className="mt-1 text-xs font-bold text-[var(--cinefil-gold)] hover:underline focus:outline-none"
-                            type="button"
-                          >
-                            {isBioExpanded ? "Read Less" : "Read More"}
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="mt-2 text-sm leading-relaxed text-slate-600 font-normal">No biography added yet.</p>
-                    )}
-                  </div>
-
-                  <div className="mt-8 border-t border-slate-100/80 pt-6">
-                    <h2 className="text-lg font-bold text-slate-900 tracking-wide flex items-center gap-2">
-                      <Film size={20} className="text-[var(--cinefil-gold)]" />
-                      Works (Registered Films)
-                    </h2>
-                    {profileUser.films && profileUser.films.length > 0 ? (
-                      <div className="mt-4 space-y-3">
-                        {profileUser.films.slice(0, 4).map((film: any) => (
-                          <div
-                            key={film.id}
-                            className="rounded-lg border border-white/60 bg-white/40 backdrop-blur-xs p-3 transition-all hover:border-[var(--cinefil-gold)]/60 hover:bg-white/80 hover:shadow-xs group w-full"
-                          >
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 font-medium w-full">
-                              <h3 className="font-bold text-slate-800 group-hover:text-[var(--cinefil-navy)] transition-colors text-sm mr-2">
-                                {film.title || "Untitled Film"}
-                              </h3>
-                              {film.release_year && (
-                                <span className="rounded bg-slate-100 border border-slate-200/50 px-1.5 py-0.5 font-bold text-slate-600 text-[10px]">
-                                  {film.release_year}
-                                </span>
-                              )}
-                              {film.language && (
-                                <span className="text-slate-600 font-semibold">• {film.language}</span>
-                              )}
-                              {film.duration && (
-                                <span className="text-slate-500 font-semibold">• {film.duration}</span>
-                              )}
-                              {film.director_name && (
-                                <span className="text-slate-500">
-                                  • Dir: <span className="font-semibold text-slate-700">{film.director_name}</span>
-                                </span>
-                              )}
-                              {film.producer_name && (
-                                <span className="text-slate-500">
-                                  • Prod: <span className="font-semibold text-slate-700">{film.producer_name}</span>
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-
-                        {profileUser.films.length > 4 && (
-                          <div className="mt-3 flex justify-end">
-                            <button
-                              onClick={() => onNavigate("member-dashboard/films")}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-[var(--cinefil-gold)] hover:underline focus:outline-none"
-                              type="button"
-                            >
-                              View More Works →
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="mt-3 text-sm text-slate-400 font-medium">No films registered under this member yet.</p>
-                    )}
-                  </div>
-
-                  {isOwnProfile && (
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      <button
-                        onClick={openEditor}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[var(--cinefil-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 hover:shadow-md active:scale-98 transition-all"
-                        type="button"
-                      >
-                        <Edit3 size={16} />
-                        Edit Profile
-                      </button>
-                      <button
-                        onClick={() => onNavigate("change-password")}
-                        className="inline-flex items-center gap-2 rounded-lg border border-[var(--cinefil-navy)] px-5 py-2.5 text-sm font-semibold text-[var(--cinefil-navy)] hover:bg-slate-50 active:scale-98 transition-all"
-                        type="button"
-                      >
-                        <Lock size={16} />
-                        Change Password
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            <aside className="grid gap-6 sm:grid-cols-2 lg:block lg:space-y-6">
-              <div className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-6 shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
-                <h2 className="text-xl font-bold text-slate-900 tracking-wide">Account Details</h2>
-                <p className="mt-1 text-xs text-slate-400 font-medium">Profile summary and access settings.</p>
-
-                <div className="mt-5 space-y-3">
-                  <div className="rounded-lg bg-white/40 border border-slate-200/40 px-4 py-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--cinefil-navy)] opacity-70">Status</p>
-                    <p className="mt-0.5 text-sm font-semibold text-slate-800">Active Producer / Owner</p>
-                  </div>
-                  <div className="rounded-lg bg-white/40 border border-slate-200/40 px-4 py-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Profile ID</p>
-                    <p className="mt-0.5 text-sm font-mono font-semibold text-slate-800">CL-2025-{profileUser.id.toString().padStart(3, '0')}</p>
-                  </div>
-                  <div className="rounded-lg bg-white/40 border border-slate-200/40 px-4 py-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Email Address</p>
-                    <p className="mt-0.5 text-sm font-semibold text-slate-800 truncate">{profileUser.email}</p>
-                  </div>
-                  <div className="rounded-lg bg-white/40 border border-slate-200/40 px-4 py-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Phone</p>
-                    <p className="mt-0.5 text-sm font-semibold text-slate-800">{profileUser.phone || "Not configured"}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-6 shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
-                <h3 className="text-lg font-bold text-slate-900 tracking-wide">Verification Status</h3>
-                {profileUser?.is_email_verified && profileUser?.is_mobile_verified ? (
-                  <div className="mt-4 rounded-lg bg-emerald-50/40 border border-emerald-100/50 p-4">
-                    <div className="flex items-center gap-2 text-emerald-800">
-                      <BadgeCheck size={18} className="text-emerald-600 shrink-0" />
-                      <span className="text-sm font-bold">Profile Verified</span>
-                    </div>
-                    <p className="mt-1.5 text-xs leading-relaxed text-emerald-700 font-medium">
-                      Your profile credentials have been formally verified by the society.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mt-4 rounded-lg bg-amber-50/40 border border-amber-100/50 p-4">
-                    <div className="flex items-center gap-2 text-amber-800">
-                      <AlertCircle size={18} className="text-amber-600 shrink-0" />
-                      <span className="text-sm font-bold">Profile Not Verified</span>
-                    </div>
-                    <p className="mt-1.5 text-xs leading-relaxed text-amber-700 font-medium">
-                      Your profile credentials have not been formally verified by the society yet. Please verify your email and mobile number.
-                    </p>
-                  </div>
+            {/* Registered Works / Film Catalogue Section */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                  <Film size={18} className="text-amber-500" />
+                  <span>Registered Film Portfolio</span>
+                </h3>
+                {profileUser.films && profileUser.films.length > 0 && (
+                  <span className="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                    {profileUser.films.length} Titles
+                  </span>
                 )}
               </div>
 
-              <div className="rounded-xl border border-white/60 bg-white/70 backdrop-blur-md p-6 shadow-[0_12px_40px_rgba(15,23,42,0.04)] sm:col-span-2 lg:col-span-1">
-                <h3 className="text-lg font-bold text-slate-900 tracking-wide flex items-center gap-2">
-                  <Award size={20} className="text-[var(--cinefil-gold)]" />
-                  Quick Actions
-                </h3>
-                <div className="mt-4 space-y-2">
-                  {[
-                    { label: "View Showcase Films", page: "films", icon: Film },
-                    { label: "Royalty Reports", page: "member-dashboard", icon: FileText },
-                    { label: "Membership Info", page: "membership-form", icon: Award },
-                  ].map(({ label, page, icon: Icon }) => (
-                    <button
-                      key={label}
-                      onClick={() => onNavigate(page as Page)}
-                      className="flex w-full items-center justify-between rounded-lg border border-slate-200/40 bg-white/40 px-4 py-3 text-left text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-[var(--cinefil-navy)] hover:bg-white/80"
-                      type="button"
+              {profileUser.films && profileUser.films.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {profileUser.films.map((film: any) => (
+                    <div
+                      key={film.id}
+                      className="bg-slate-50/70 border border-slate-200/70 rounded-2xl p-4 hover:border-amber-400/60 hover:bg-white transition-all duration-200 space-y-2 group"
                     >
-                      <span className="flex items-center gap-2.5">
-                        <Icon size={16} className="text-[var(--cinefil-navy)] opacity-80" />
-                        {label}
-                      </span>
-                      <ChevronRight size={16} className="text-slate-400" />
-                    </button>
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-bold text-sm text-slate-900 group-hover:text-[#1e3a5f] transition-colors line-clamp-1">
+                          {film.title}
+                        </h4>
+                        {film.release_year && (
+                          <span className="text-[10px] font-bold bg-white text-slate-700 border border-slate-200 px-2 py-0.5 rounded-md shrink-0">
+                            {film.release_year}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Globe size={12} className="text-amber-500" />
+                          {film.language || "Hindi"}
+                        </span>
+                        {film.censor_certificate_no && (
+                          <span className="font-mono text-[10px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                            Cert: #{film.censor_certificate_no}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
+              ) : (
+                <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                  <Film size={28} className="mx-auto text-slate-300" />
+                  <p className="text-xs font-semibold text-slate-600">No films catalogued yet under this profile.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions (If Own Profile) */}
+            {isOwnProfile && (
+              <div className="flex flex-wrap gap-4 pt-2">
+                <button
+                  onClick={() => onNavigate("member-dashboard" as any)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e3a5f] hover:bg-slate-800 text-white rounded-2xl text-xs font-bold shadow-md transition-all"
+                >
+                  <Sparkles size={16} /> Open Member Dashboard
+                </button>
+                <button
+                  onClick={() => onNavigate("change-password" as any)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-2xl text-xs font-bold transition-all shadow-2xs"
+                >
+                  <Lock size={16} /> Security & Password
+                </button>
               </div>
-            </aside>
+            )}
           </div>
 
-          {editOpen && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/40 px-4 py-6 backdrop-blur-md transition-all">
-              <div className="w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl border border-slate-100 animate-scale-up">
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--cinefil-gold)" }}>
-                      Management Console
-                    </p>
-                    <h2 className="mt-0.5 text-xl font-bold text-slate-900 tracking-wide">Update Profile Settings</h2>
-                  </div>
-                  <button
-                    onClick={() => setEditOpen(false)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
-                    type="button"
-                    aria-label="Close configuration window"
-                  >
-                    <X size={18} />
-                  </button>
+          {/* RIGHT COLUMN: Account Verification, Links & Society Actions */}
+          <div className="space-y-6">
+            
+            {/* Account & Verification Card */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 tracking-tight border-b border-slate-100 pb-3 flex items-center gap-2">
+                <ShieldCheck size={18} className="text-emerald-600" />
+                <span>Account & Verification</span>
+              </h3>
+
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="font-medium text-slate-500">Membership Tier</span>
+                  <span className="font-bold text-[#1e3a5f]">
+                    {isPrime ? "Prime Society Member" : "Associate Member"}
+                  </span>
                 </div>
 
-                <div className="grid gap-4 px-6 py-5 max-h-[calc(100vh-14rem)] overflow-y-auto">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Username (Display ID)
-                      <input
-                        value={draft.username}
-                        onChange={(event) => setDraft((value) => ({ ...value, username: event.target.value }))}
-                        className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                      />
-                    </label>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Legal Full Name
-                      <input
-                        value={draft.name}
-                        onChange={(event) => setDraft((value) => ({ ...value, name: event.target.value }))}
-                        className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                      />
-                    </label>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Phone Number
-                      <input
-                        value={draft.phone}
-                        onChange={(event) => setDraft((value) => ({ ...value, phone: event.target.value }))}
-                        className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                      />
-                    </label>
-                  </div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Profile Picture Display
-                    <input
-                      type="file"
-                      onChange={(event) => {
-                        const file = event.target.files ? event.target.files[0] : null;
-                        setDraft((value) => ({ ...value, photo: file }));
-                        if (file) {
-                          setPhotoPreview(URL.createObjectURL(file));
-                        } else {
-                          setPhotoPreview(null);
-                        }
-                      }}
-                      className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-500 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all"
-                    />
-                  </label>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Professional Headline Title
-                    <input
-                      value={draft.headline}
-                      onChange={(event) => setDraft((value) => ({ ...value, headline: event.target.value }))}
-                      className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                    />
-                  </label>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Primary Location
-                      <input
-                        value={draft.location}
-                        onChange={(event) => setDraft((value) => ({ ...value, location: event.target.value }))}
-                        className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                      />
-                    </label>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Date of Birth
-                      <input
-                        value={draft.dob}
-                        onChange={(event) => setDraft((value) => ({ ...value, dob: event.target.value }))}
-                        className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner"
-                      />
-                    </label>
-                  </div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    About Biography / Professional Track Record
-                    <textarea
-                      value={draft.about}
-                      onChange={(event) => setDraft((value) => ({ ...value, about: event.target.value }))}
-                      rows={4}
-                      className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:border-[var(--cinefil-navy)] transition-all shadow-inner resize-none"
-                    />
-                  </label>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="font-medium text-slate-500">Member Ref ID</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {profileUser.membership_number || `CL-${profileUser.id?.toString().padStart(4, '0')}`}
+                  </span>
                 </div>
 
-                <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-4 sm:flex-row sm:justify-end">
-                  <button
-                    onClick={() => setEditOpen(false)}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
-                    type="button"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveEditor}
-                    disabled={isSaving}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--cinefil-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 disabled:opacity-50 transition-all"
-                    type="button"
-                  >
-                    <Save size={15} />
-                    {isSaving ? "Saving Config..." : "Save Modifications"}
-                  </button>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="font-medium text-slate-500">Identity Status</span>
+                  <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    <CheckCircle2 size={12} /> Verified
+                  </span>
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Links & Contact Info */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 tracking-tight border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Globe size={18} className="text-amber-500" />
+                <span>Official Links & Contact</span>
+              </h3>
+
+              <div className="space-y-2.5">
+                {profileUser.email && (
+                  <a
+                    href={`mailto:${profileUser.email}`}
+                    className="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 text-xs font-semibold text-slate-700 transition"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Mail size={15} className="text-slate-400 shrink-0" />
+                      <span className="truncate">{profileUser.email}</span>
+                    </div>
+                    <ExternalLink size={14} className="text-slate-400 shrink-0" />
+                  </a>
+                )}
+
+                {profileUser.phone && (
+                  <a
+                    href={`tel:${profileUser.phone}`}
+                    className="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 text-xs font-semibold text-slate-700 transition"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Phone size={15} className="text-slate-400 shrink-0" />
+                      <span className="truncate">{profileUser.phone}</span>
+                    </div>
+                    <ExternalLink size={14} className="text-slate-400 shrink-0" />
+                  </a>
+                )}
+
+                {profileUser.social_links && profileUser.social_links.length > 0 ? (
+                  profileUser.social_links.map((link: any) => (
+                    <a
+                      key={link.id}
+                      href={link.profile_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 bg-amber-50/50 hover:bg-amber-100/60 rounded-xl border border-amber-200/60 text-xs font-bold text-amber-900 transition"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Globe size={15} className="text-amber-600 shrink-0" />
+                        <span className="capitalize truncate">{link.platform}</span>
+                      </div>
+                      <ExternalLink size={14} className="text-amber-600 shrink-0" />
+                    </a>
+                  ))
+                ) : (
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                    <p className="text-xs text-slate-400 font-medium">No additional social links attached.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Society Shortcuts */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 tracking-tight border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Award size={18} className="text-[#1e3a5f]" />
+                <span>Society Directory Shortcuts</span>
+              </h3>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => onNavigate("films" as Page)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-[#1e3a5f] hover:text-white rounded-xl border border-slate-100 text-xs font-bold text-slate-700 transition group"
+                >
+                  <span className="flex items-center gap-2">
+                    <Film size={15} className="text-amber-500 group-hover:text-amber-400" />
+                    Public CPL Film Catalog
+                  </span>
+                  <ChevronRight size={16} />
+                </button>
+
+                <button
+                  onClick={() => onNavigate("members" as Page)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-[#1e3a5f] hover:text-white rounded-xl border border-slate-100 text-xs font-bold text-slate-700 transition group"
+                >
+                  <span className="flex items-center gap-2">
+                    <UserRound size={15} className="text-amber-500 group-hover:text-amber-400" />
+                    CINEFIL Members Directory
+                  </span>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
         </div>
+
       </div>
 
+      {/* EDIT PROFILE MODAL */}
+      {editOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-md px-4 py-6">
+          <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200 animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="bg-[#1e3a5f] text-white px-6 py-5 flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500 text-slate-900 rounded-xl font-bold">
+                  <Edit3 size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold tracking-tight">Edit Member Profile</h3>
+                  <p className="text-[11px] text-amber-300">Update public presentation details & biography</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setEditOpen(false)}
+                className="p-1.5 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <div className="grid gap-4 px-6 py-6 max-h-[calc(100vh-14rem)] overflow-y-auto">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Display Username
+                  <input
+                    value={draft.username}
+                    onChange={(event) => setDraft((value) => ({ ...value, username: event.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                  />
+                </label>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Full Name
+                  <input
+                    value={draft.name}
+                    onChange={(event) => setDraft((value) => ({ ...value, name: event.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Phone Number
+                  <input
+                    value={draft.phone}
+                    onChange={(event) => setDraft((value) => ({ ...value, phone: event.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                  />
+                </label>
+
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Location / City
+                  <input
+                    value={draft.location}
+                    onChange={(event) => setDraft((value) => ({ ...value, location: event.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                  />
+                </label>
+              </div>
+
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Profile Picture Display
+                <input
+                  type="file"
+                  onChange={(event) => {
+                    const file = event.target.files ? event.target.files[0] : null;
+                    setDraft((value) => ({ ...value, photo: file }));
+                    if (file) {
+                      setPhotoPreview(URL.createObjectURL(file));
+                    } else {
+                      setPhotoPreview(null);
+                    }
+                  }}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-500 font-medium outline-none focus:bg-white focus:border-amber-500 transition"
+                />
+              </label>
+
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Professional Title / Designation
+                <input
+                  value={draft.headline}
+                  onChange={(event) => setDraft((value) => ({ ...value, headline: event.target.value }))}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                />
+              </label>
+
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Biography / Career Overview
+                <textarea
+                  value={draft.about}
+                  onChange={(event) => setDraft((value) => ({ ...value, about: event.target.value }))}
+                  rows={4}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition resize-none"
+                />
+              </label>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={() => setEditOpen(false)}
+                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditor}
+                disabled={isSaving}
+                className="px-5 py-2 bg-[#1e3a5f] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+                type="button"
+              >
+                <Save size={14} />
+                {isSaving ? "Saving Changes..." : "Save Profile"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer onNavigate={onNavigate} />
-    </>
+    </div>
   );
 }

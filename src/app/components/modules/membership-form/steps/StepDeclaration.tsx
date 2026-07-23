@@ -23,7 +23,12 @@ export function StepDeclaration() {
   return (
     <div className="mf-step">
       <div className="mf-step__header">
-        <h3 className="mf-step__title">Declaration of Rights</h3>
+        <h3 className="mf-step__title flex items-center gap-2">
+          Declaration of Rights
+          <abbr title="Declare that you are the lawful owner of the films and authorize Cinefil to represent and protect your rights." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
         <p className="mf-step__subtitle">Please read and accept all declarations to proceed.</p>
       </div>
 

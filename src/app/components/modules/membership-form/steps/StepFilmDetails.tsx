@@ -56,8 +56,13 @@ export function StepFilmDetails() {
     <div className="mf-step">
       <div className="mf-step__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
         <div>
-          <h3 className="mf-step__title">Repertoire Details</h3>
-          <p className="mf-step__subtitle">Add details of the films you own or hold rights to.</p>
+          <h3 className="mf-step__title flex items-center gap-2">
+            Repertoire Details
+            <abbr title="Enter the details of the films you own, including title, language, date of release, cast, and remarks." style={{ cursor: "help", textDecoration: "none" }}>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+            </abbr>
+          </h3>
+          <p className="mf-step__subtitle">{isProducer ? "Add details of the films you have produced." : "Add details of the films in which rights are held/acquired."}</p>
         </div>
         <div style={{ display: "flex", gap: "10px", flexShrink: 0 }}>
           <a
@@ -76,7 +81,7 @@ export function StepFilmDetails() {
       </div>
 
       <div className="mf-info-box mf-info-box--neutral" style={{ marginBottom: "20px", fontSize: "12px" }}>
-        <strong>Excel format:</strong> Film Title, Language, Year of Release, Star Cast, Producer Name, Director Name, Duration, Ownership Type. Document columns are optional in Excel.
+        <strong>Excel format:</strong> Film Title, Language, Date of Release, Star Cast, Remarks.
       </div>
       
       {isNoFilmApp && films.length > 0 && (
@@ -109,6 +114,18 @@ export function StepFilmDetails() {
                 />
               </div>
 
+              {/* Language */}
+              <div>
+                <label className="mf-label">Language</label>
+                <input value={film.language} onChange={(e) => handleFilmChange(index, 'language', e.target.value)} className="mf-input" placeholder="e.g. Hindi" />
+              </div>
+
+              {/* Date of Release */}
+              <div>
+                <label className="mf-label">Date of Release</label>
+                <input type="date" value={film.release_date || ''} onChange={(e) => handleFilmChange(index, 'release_date', e.target.value)} className="mf-input" />
+              </div>
+
               {/* Star Cast — Tag-style input */}
               <div>
                 <label className="mf-label">Star Cast</label>
@@ -133,73 +150,10 @@ export function StepFilmDetails() {
                 </div>
               </div>
 
-              {/* Basic info */}
-              <div>
-                <label className="mf-label">Language</label>
-                <input value={film.language} onChange={(e) => handleFilmChange(index, 'language', e.target.value)} className="mf-input" placeholder="e.g. Hindi" />
-              </div>
-              <div>
-                <label className="mf-label">Year of Release</label>
-                <input value={film.year} onChange={(e) => handleFilmChange(index, 'year', e.target.value)} className="mf-input" placeholder="YYYY" />
-              </div>
-              <div>
-                <label className="mf-label">Producer Name</label>
-                <input value={film.producer_name} onChange={(e) => handleFilmChange(index, 'producer_name', e.target.value)} className="mf-input" placeholder="Producer Name" />
-              </div>
-              <div>
-                <label className="mf-label">Director Name</label>
-                <input value={film.director_name} onChange={(e) => handleFilmChange(index, 'director_name', e.target.value)} className="mf-input" placeholder="Director Name" />
-              </div>
-              <div>
-                <label className="mf-label">Duration</label>
-                <input value={film.duration} onChange={(e) => handleFilmChange(index, 'duration', e.target.value)} className="mf-input" placeholder="e.g. 120 mins" />
-              </div>
-
-              {/* Ownership type */}
+              {/* Remarks */}
               <div className="mf-field--span">
-                <label className="mf-label">Ownership Type</label>
-                <div className="mf-radio-group" style={{ marginTop: "6px", gridTemplateColumns: "1fr", gap: "8px" }}>
-                  {options.map((option) => (
-                    <div
-                      key={option}
-                      className={`mf-radio-card ${(film.ownership_type || []).includes(option) ? "mf-radio-card--selected" : ""}`}
-                      onClick={() => handleOwnershipTypeChange(index, option)}
-                      style={{ padding: "10px 14px" }}
-                    >
-                      <div className="mf-radio-card__indicator" />
-                      <span className="mf-radio-card__label">{option}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Document uploads */}
-              <div>
-                <label className="mf-label">Censor Certificate</label>
-                <input type="file" id={`censor-${index}`} className="mf-hidden-input" onChange={(e) => handleFilmChange(index, 'censor_certificate', e.target.files?.[0] || null)} />
-                <label htmlFor={`censor-${index}`} className={`mf-upload ${film.censor_certificate || film.existing_censor_certificate_url ? "mf-upload--has-file" : ""}`} style={{ padding: "12px" }}>
-                  {film.censor_certificate ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>{film.censor_certificate.name}</span></> : 
-                   film.existing_censor_certificate_url ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>Existing Document Uploaded</span><a href={getBackendFileUrl(film.existing_censor_certificate_url)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", marginLeft: "auto", color: "#3b82f6", zIndex: 10 }} onClick={(e) => e.stopPropagation()}>View</a></> :
-                   <><Upload size={16} className="mf-upload__icon" /><span className="mf-upload__text" style={{ fontSize: "12px" }}>Upload file</span></>}
-                </label>
-              </div>
-              <div>
-                <label className="mf-label">Copyright Certificate <span className="mf-label__hint">(optional)</span></label>
-                <input type="file" id={`copyright-${index}`} className="mf-hidden-input" onChange={(e) => handleFilmChange(index, 'copyright_certificate', e.target.files?.[0] || null)} />
-                <label htmlFor={`copyright-${index}`} className={`mf-upload ${film.copyright_certificate || film.existing_copyright_certificate_url ? "mf-upload--has-file" : ""}`} style={{ padding: "12px" }}>
-                  {film.copyright_certificate ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>{film.copyright_certificate.name}</span></> : 
-                   film.existing_copyright_certificate_url ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>Existing Document Uploaded</span><a href={getBackendFileUrl(film.existing_copyright_certificate_url)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", marginLeft: "auto", color: "#3b82f6", zIndex: 10 }} onClick={(e) => e.stopPropagation()}>View</a></> :
-                   <><Upload size={16} className="mf-upload__icon" /><span className="mf-upload__text" style={{ fontSize: "12px" }}>Upload file</span></>}
-                </label>
-              </div>
-              <div>
-                <label className="mf-label">Ownership Documents</label>
-                <input type="file" id={`ownership-${index}`} className="mf-hidden-input" onChange={(e) => handleFilmChange(index, 'ownership_document', e.target.files?.[0] || null)} />
-                <label htmlFor={`ownership-${index}`} className={`mf-upload ${film.ownership_document || film.existing_ownership_document_url ? "mf-upload--has-file" : ""}`} style={{ padding: "12px" }}>
-                  {film.ownership_document ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>{film.ownership_document.name}</span></> : 
-                   film.existing_ownership_document_url ? <><Check size={14} style={{ color: "#059669" }} /><span className="mf-upload__filename" style={{ fontSize: "12px" }}>Existing Document Uploaded</span><a href={getBackendFileUrl(film.existing_ownership_document_url)} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", marginLeft: "auto", color: "#3b82f6", zIndex: 10 }} onClick={(e) => e.stopPropagation()}>View</a></> :
-                   <><Upload size={16} className="mf-upload__icon" /><span className="mf-upload__text" style={{ fontSize: "12px" }}>Upload file</span></>}
-                </label>
+                <label className="mf-label">Remarks</label>
+                <input value={film.remarks || ''} onChange={(e) => handleFilmChange(index, 'remarks', e.target.value)} className="mf-input" placeholder="Enter remarks" />
               </div>
             </div>
           </div>

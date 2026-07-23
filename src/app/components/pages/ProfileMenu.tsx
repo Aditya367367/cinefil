@@ -83,6 +83,8 @@ export function ProfileMenu({ currentPage, onNavigate, dark = false, showLabel =
 
   const isOfficer = user?.is_membership_executive || user?.is_rights_verification_officer || user?.is_legal_officer || user?.is_ceo_authorised_officer || user?.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(user?.role || '');
 
+  const isMember = user?.is_member === true || user?.membership_status === 'approved' || user?.role === 'member';
+
   const mainRoleDisplay = () => {
     if (!user) return "";
     if (user.is_ceo_authorised_officer || user.role === 'ceo') return "CEO / Authorised Officer";
@@ -104,7 +106,7 @@ export function ProfileMenu({ currentPage, onNavigate, dark = false, showLabel =
   }> = [
       { label: "Home", page: "home", icon: <Home size={16} />, section: "Navigation" },
       { label: "Governance", page: "governance", icon: <Scale size={16} />, section: "Navigation" },
-      { label: "Member Dashboard", page: "member-dashboard", icon: <LayoutDashboard size={16} />, section: "Member" },
+      ...((isMember || !isOfficer) ? [{ label: "Member Dashboard", page: "member-dashboard" as Page, icon: <LayoutDashboard size={16} />, section: "Member" }] : []),
       ...(isOfficer ? [{ label: officerDashboardLabel, page: "officer-dashboard" as Page, icon: <LayoutDashboard size={16} />, section: "Member" }] : []),
       { label: "Profile", page: "profile", icon: <UserRound size={16} />, section: "Member" },
       { label: "Films", page: "films", icon: <Film size={16} />, section: "Member" },
@@ -234,19 +236,21 @@ export function ProfileMenu({ currentPage, onNavigate, dark = false, showLabel =
                   <span className="font-semibold">{t("Films")}</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    onNavigate("member-dashboard/payments");
-                    setOpen(false);
-                  }}
-                  className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm transition-all hover:bg-white/5"
-                  style={{
-                    color: currentPage === "member-dashboard/payments" ? "var(--cinefil-gold-active)" : dark ? "rgba(255,255,255,0.82)" : "rgb(30 41 59)"
-                  }}
-                >
-                  <ReceiptText size={16} className={dark ? "text-white/60" : "text-slate-500"} />
-                  <span className="font-semibold">{t("Payments")}</span>
-                </button>
+                {user?.is_prime && (
+                  <button
+                    onClick={() => {
+                      onNavigate("member-dashboard/payments");
+                      setOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm transition-all hover:bg-white/5"
+                    style={{
+                      color: currentPage === "member-dashboard/payments" ? "var(--cinefil-gold-active)" : dark ? "rgba(255,255,255,0.82)" : "rgb(30 41 59)"
+                    }}
+                  >
+                    <ReceiptText size={16} className={dark ? "text-white/60" : "text-slate-500"} />
+                    <span className="font-semibold">{t("Payments")}</span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => {

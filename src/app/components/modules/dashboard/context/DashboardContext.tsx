@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { filmService } from "@/services/filmService";
+import { memberService } from "../../../../../services/memberService";
 import { useAuth } from "../../../../../context/AuthContext";
 import { API_ROOT } from "../../../../../services/api";
 import { useActorSearch, useFilmSearch, useRightHolderMemberSearch } from "../../../../../hooks/useSearch";
@@ -15,6 +16,7 @@ export interface FilmItem {
   release_year: number;
   release_date?: string;
   censor_certificate_no?: string;
+  stream_link?: string;
   cast?: Array<{ id: number; actor_name: string; character_name: string }>;
   documents?: Array<{ id: number; document_type?: string; file_name?: string; file_url?: string }>;
   right_holders?: Array<{
@@ -61,6 +63,9 @@ export interface DashboardContextType {
   user: any;
   isMember: boolean;
   isPendingMember: boolean;
+  application: any;
+  isUnderReview: boolean;
+  isPrime: boolean;
 
   filmsList: FilmItem[];
   setFilmsList: React.Dispatch<React.SetStateAction<FilmItem[]>>;
@@ -91,12 +96,8 @@ export interface DashboardContextType {
   newFilmCast: any[];
   setNewFilmCast: React.Dispatch<React.SetStateAction<any[]>>;
   
-  newFilmProducerName: string;
-  setNewFilmProducerName: React.Dispatch<React.SetStateAction<string>>;
-  newFilmDirectorName: string;
-  setNewFilmDirectorName: React.Dispatch<React.SetStateAction<string>>;
-  newFilmDuration: string;
-  setNewFilmDuration: React.Dispatch<React.SetStateAction<string>>;
+  newFilmRemarks: string;
+  setNewFilmRemarks: React.Dispatch<React.SetStateAction<string>>;
 
   censorDocFile: File | null;
   setCensorDocFile: React.Dispatch<React.SetStateAction<File | null>>;
@@ -189,12 +190,14 @@ export interface DashboardContextType {
   handleDeleteFilm: (film: FilmItem) => void;
   handleConfirmDelete: () => Promise<void>;
   handleCreateRightHolder: () => Promise<void>;
+  upgradeToPrime: () => Promise<void>;
+  isFilmComplete: (film: any) => boolean;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children, role, initialSection = "home" }: { children: ReactNode; role: DashboardRole; initialSection?: DashboardSection }) {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { showSnackbar } = useSnackbar();
   const [section, setSection] = useState<DashboardSection>(initialSection);
 
@@ -260,9 +263,7 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
   const [newFilmRightHolderPercentage, setNewFilmRightHolderPercentage] = useState<string>("");
   const [editingFilm, setEditingFilm] = useState<FilmItem | null>(null);
 
-  const [newFilmProducerName, setNewFilmProducerName] = useState("");
-  const [newFilmDirectorName, setNewFilmDirectorName] = useState("");
-  const [newFilmDuration, setNewFilmDuration] = useState("");
+  const [newFilmRemarks, setNewFilmRemarks] = useState("");
 
   const [censorDocFile, setCensorDocFile] = useState<File | null>(null);
   const [censorDocName, setCensorDocName] = useState("");
@@ -315,11 +316,24 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     }
   }, [user?.member_id, user?.full_name]);
 
+  const [application, setApplication] = useState<any>(null);
+
+  const isPrime = user?.is_prime === true || user?.is_member_prime === true || application?.status === 'approved';
+  const isUnderReview = ['kyc_under_review', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review'].includes(application?.status);
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const filmsRes = await filmService.getFilmsPaginated({ page: filmsPage, page_size: filmsPageSize });
       const royaltiesRes = await filmService.getMyRoyalties();
+      const appsRes = await memberService.getApplications();
+
+      if (appsRes.success && appsRes.applications && appsRes.applications.length > 0) {
+        const activeApp = appsRes.applications.find((app: any) => 
+          ['approved', 'associate_member', 'kyc_under_review', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review'].includes(app.status)
+        ) || appsRes.applications[0];
+        setApplication(activeApp);
+      }
 
       if (filmsRes.results) {
         setFilmsList(filmsRes.results);
@@ -382,10 +396,7 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     setFilmSharedWithNames("");
     setFilmSharePercentage("");
     setShowFilmModal(false);
-
-    setNewFilmProducerName("");
-    setNewFilmDirectorName("");
-    setNewFilmDuration("");
+    setNewFilmRemarks("");
 
     setCensorDocFile(null);
     setCensorDocName("");
@@ -522,8 +533,16 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
   };
 
   const handleCreateFilm = async () => {
-    if (!newFilmTitle.trim()) return showSnackbar("Film title is required.", "error");
-    if (!newFilmReleaseYear.trim() || Number.isNaN(Number(newFilmReleaseYear))) return showSnackbar("Valid release year is required.", "error");
+    const isPrime = user?.is_prime === true;
+    if (isPrime) {
+      if (!newFilmTitle.trim()) return showSnackbar("Film title is required for Prime members.", "error");
+      if (!newFilmLanguage.trim()) return showSnackbar("Film language is required for Prime members.", "error");
+      if (!newFilmReleaseDate.trim()) return showSnackbar("Release date is required for Prime members.", "error");
+      if (!newFilmCertificate.trim()) return showSnackbar("Censor certificate number is required for Prime members.", "error");
+      if (!censorDocFile) return showSnackbar("Censor certificate document is required to be uploaded for Prime members.", "error");
+    } else {
+      if (!newFilmTitle.trim()) return showSnackbar("Film title is required.", "error");
+    }
 
     if (filmSharedWithNames.trim()) {
       const percentageValue = filmSharePercentage ? parseFloat(filmSharePercentage) : null;
@@ -543,21 +562,19 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       const filmData: any = { 
         title: newFilmTitle, 
         language: newFilmLanguage, 
-        release_year: Number(newFilmReleaseYear), 
         censor_certificate_no: newFilmCertificate,
-        producer_name: newFilmProducerName,
-        director_name: newFilmDirectorName,
-        duration: newFilmDuration
+        remarks: newFilmRemarks
       };
-      if (newFilmReleaseDate) filmData.release_date = newFilmReleaseDate;
+      if (newFilmReleaseDate) {
+        filmData.release_date = newFilmReleaseDate;
+        filmData.release_year = Number(newFilmReleaseDate.split('-')[0]);
+      }
 
       const film = await filmService.createFilm(filmData);
       setFilmsList((prev) => [film, ...prev]);
       await syncFilmCast(film.id, newFilmCast);
       const rightHolderWarning = await syncFilmRightHolder(film.id);
       await saveFilmDocument(film.id, 'censor_certificate', censorDocFile, censorDocId);
-      await saveFilmDocument(film.id, 'copyright_certificate', copyrightDocFile, copyrightDocId);
-      await saveFilmDocument(film.id, 'ownership_document', ownershipDocFile, ownershipDocId);
 
       if (filmSharedWithNames.trim()) {
         const percentageValue = filmSharePercentage ? parseFloat(filmSharePercentage) : null;
@@ -602,9 +619,7 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       setNewFilmReleaseYear(filmDetails.release_year?.toString() || "");
       setNewFilmCertificate(filmDetails.censor_certificate_no || "");
       setNewFilmReleaseDate(filmDetails.release_date || "");
-      setNewFilmProducerName(filmDetails.producer_name || "");
-      setNewFilmDirectorName(filmDetails.director_name || "");
-      setNewFilmDuration(filmDetails.duration || "");
+      setNewFilmRemarks(filmDetails.remarks || "");
 
       const censorDoc = documentResults.find((d: any) => {
         const type = d.document_type?.toLowerCase() || "";
@@ -669,13 +684,22 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       }
     } catch (e) {
       console.error("Error fetching film details", e);
-      setEditingFilm(film); setNewFilmTitle(film.title); setNewFilmLanguage(film.language || ""); setNewFilmReleaseYear(film.release_year?.toString() || ""); setNewFilmCertificate(film.censor_certificate_no || ""); setNewFilmReleaseDate(film.release_date || "");
+      setEditingFilm(film); setNewFilmTitle(film.title); setNewFilmLanguage(film.language || ""); setNewFilmReleaseYear(film.release_year?.toString() || ""); setNewFilmCertificate(film.censor_certificate_no || ""); setNewFilmReleaseDate(film.release_date || ""); setNewFilmRemarks(film.remarks || "");
     }
   };
 
   const handleUpdateFilm = async () => {
     if (!editingFilm) return;
-    if (!newFilmTitle.trim()) return showSnackbar("Film title is required.", "error");
+    const isPrime = user?.is_prime === true;
+    if (isPrime) {
+      if (!newFilmTitle.trim()) return showSnackbar("Film title is required for Prime members.", "error");
+      if (!newFilmLanguage.trim()) return showSnackbar("Film language is required for Prime members.", "error");
+      if (!newFilmReleaseDate.trim()) return showSnackbar("Release date is required for Prime members.", "error");
+      if (!newFilmCertificate.trim()) return showSnackbar("Censor certificate number is required for Prime members.", "error");
+      if (!censorDocFile && !censorDocUrl) return showSnackbar("Censor certificate document is required to be uploaded for Prime members.", "error");
+    } else {
+      if (!newFilmTitle.trim()) return showSnackbar("Film title is required.", "error");
+    }
 
     if (filmSharedWithNames.trim()) {
       const percentageValue = filmSharePercentage ? parseFloat(filmSharePercentage) : null;
@@ -695,13 +719,13 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       const filmData: any = { 
         title: newFilmTitle, 
         language: newFilmLanguage, 
-        release_year: Number(newFilmReleaseYear), 
         censor_certificate_no: newFilmCertificate,
-        producer_name: newFilmProducerName,
-        director_name: newFilmDirectorName,
-        duration: newFilmDuration
+        remarks: newFilmRemarks
       };
-      if (newFilmReleaseDate) filmData.release_date = newFilmReleaseDate;
+      if (newFilmReleaseDate) {
+        filmData.release_date = newFilmReleaseDate;
+        filmData.release_year = Number(newFilmReleaseDate.split('-')[0]);
+      }
 
       const updatedFilm = await filmService.updateFilm(editingFilm.id, filmData);
       setFilmsList((prev) => prev.map((f) => f.id === editingFilm.id ? updatedFilm : f));
@@ -709,8 +733,6 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       await syncFilmCast(editingFilm.id, newFilmCast);
       const rightHolderWarning = await syncFilmRightHolder(editingFilm.id);
       await saveFilmDocument(editingFilm.id, 'censor_certificate', censorDocFile, censorDocId);
-      await saveFilmDocument(editingFilm.id, 'copyright_certificate', copyrightDocFile, copyrightDocId);
-      await saveFilmDocument(editingFilm.id, 'ownership_document', ownershipDocFile, ownershipDocId);
 
       if (filmSharedWithNames.trim()) {
         const percentageValue = filmSharePercentage ? parseFloat(filmSharePercentage) : null;
@@ -778,16 +800,44 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     }
   };
 
+  const isFilmComplete = (film: any) => {
+    const hasCensorCertNo = !!film.censor_certificate_no;
+    const hasCensorCertDoc = film.documents?.some((doc: any) => {
+      const type = doc.document_type?.toLowerCase() || "";
+      return type === 'censor_certificate' || type === 'censor certificate' || type.includes('censor');
+    });
+
+    return (
+      !!film.title &&
+      !!film.language &&
+      !!film.release_date &&
+      hasCensorCertNo &&
+      hasCensorCertDoc
+    );
+  };
+
+  const upgradeToPrime = async () => {
+    const incompleteFilm = filmsList.find(f => !isFilmComplete(f));
+    if (incompleteFilm) {
+      showSnackbar("Please complete all film details (including Censor Certificate & Censor Certificate Number) for your film first before upgrading to Prime.", "error");
+      setSection("films");
+      setIsViewOnly(false);
+      await handleEditFilm(incompleteFilm);
+      return;
+    }
+
+    setSection("membership-details");
+  };
+
   const handleFilmsPageChange = (newPage: number) => setFilmsPage(newPage);
 
   const value: DashboardContextType = {
-    role, section, changeSection, isLoading, user, isMember, isPendingMember,
+    role, section, changeSection, isLoading, user, isMember, isPendingMember, application, isUnderReview, isPrime,
     filmsList, setFilmsList, royaltyDistributions, filmsTotalCount, filmsPage, filmsPageSize, handleFilmsPageChange,
     castMembers, documents, rightHolders, setRightHolders, filmShares, royaltyDetails,
     newFilmTitle, setNewFilmTitle, newFilmLanguage, setNewFilmLanguage, newFilmReleaseYear, setNewFilmReleaseYear,
     newFilmCertificate, setNewFilmCertificate, newFilmReleaseDate, setNewFilmReleaseDate, newFilmCast, setNewFilmCast,
-    
-    newFilmProducerName, setNewFilmProducerName, newFilmDirectorName, setNewFilmDirectorName, newFilmDuration, setNewFilmDuration,
+    newFilmRemarks, setNewFilmRemarks,
     censorDocFile, setCensorDocFile, censorDocName, setCensorDocName, censorDocUrl, setCensorDocUrl, censorDocId, setCensorDocId,
     copyrightDocFile, setCopyrightDocFile, copyrightDocName, setCopyrightDocName, copyrightDocUrl, setCopyrightDocUrl, copyrightDocId, setCopyrightDocId,
     ownershipDocFile, setOwnershipDocFile, ownershipDocName, setOwnershipDocName, ownershipDocUrl, setOwnershipDocUrl, ownershipDocId, setOwnershipDocId,
@@ -801,7 +851,7 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     rightHolderPercentage, setRightHolderPercentage, rightHolderFormError, rightHolderFormSuccess, rightHolderSubmitting,
     selectedFinancialYearFilter, setSelectedFinancialYearFilter, showDeleteModal, setShowDeleteModal, filmToDelete,
     loadActorOptions, onCreateActor, loadFilmOptions, onCreateFilm, loadRightHolderMemberOptions, onCreateRightHolderMember,
-    fetchData, resetFilmForm, resetRightHolderForm, handleCreateFilm, handleEditFilm, handleUpdateFilm, handleCancelEdit, handleDeleteFilm, handleConfirmDelete, handleCreateRightHolder
+    fetchData, resetFilmForm, resetRightHolderForm, handleCreateFilm, handleEditFilm, handleUpdateFilm, handleCancelEdit, handleDeleteFilm, handleConfirmDelete, handleCreateRightHolder, upgradeToPrime, isFilmComplete
   };
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;

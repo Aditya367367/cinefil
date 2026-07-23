@@ -1,9 +1,9 @@
 import React from "react";
-import { Home, Film, IndianRupee, ShieldCheck, User } from "lucide-react";
+import { Home, Film, IndianRupee, ShieldCheck, User, Crown, Clock } from "lucide-react";
 import { useDashboard } from "../context/DashboardContext";
 
 export function DashboardSidebar() {
-  const { section, changeSection, user } = useDashboard();
+  const { section, changeSection, user, isPrime, isUnderReview } = useDashboard();
   const isMember = user?.is_member === true || user?.role === 'member';
 
   const title = "Member Dashboard";
@@ -21,7 +21,22 @@ export function DashboardSidebar() {
     >
       <div>
         <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-blue-300/80">Dashboard Suite</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-blue-300/80">Dashboard Suite</p>
+            {isPrime ? (
+              <span className="bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Crown size={12} className="text-emerald-300" /> Prime Member
+              </span>
+            ) : isUnderReview ? (
+              <span className="bg-blue-500/20 border border-blue-400/40 text-blue-300 text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Clock size={12} className="text-blue-300" /> In Progress
+              </span>
+            ) : isMember ? (
+              <span className="bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                Associate
+              </span>
+            ) : null}
+          </div>
           <h2 className="mt-2 text-xl font-black text-white tracking-tight">{title}</h2>
           <p className="mt-2 text-xs leading-relaxed text-white/70 font-medium">{subtitle}</p>
         </div>
@@ -49,17 +64,19 @@ export function DashboardSidebar() {
             <Film size={16} />
             <span>Films</span>
           </button>
-          <button
-            onClick={() => changeSection("payments")}
-            className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-              section === "payments" 
-                ? "text-white bg-white/15 shadow-sm" 
-                : "text-white/60 hover:bg-white/5 hover:text-white"
-            }`}
-          >
-            <IndianRupee size={16} />
-            <span>Payment</span>
-          </button>
+          {user?.is_prime && (
+            <button
+              onClick={() => changeSection("payments")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                section === "payments" 
+                  ? "text-white bg-white/15 shadow-sm" 
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <IndianRupee size={16} />
+              <span>Payment</span>
+            </button>
+          )}
           <button
             onClick={() => changeSection("membership-details")}
             className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${

@@ -22,7 +22,7 @@ import { ProfilePage } from "./components/pages/ProfilePage";
 import { GovernancePage } from "./components/pages/GovernancePage";
 import { OfficerDashboardPage } from "./components/pages/OfficerDashboardPage";
 import { AuthProvider, useAuth } from "../context/AuthContext";
-import { SnackbarProvider } from "./contexts/SnackbarContext";
+import { SnackbarProvider, useSnackbar } from "./contexts/SnackbarContext";
 import { LoadingScreen } from "./components/pages/LoadingScreen";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -120,6 +120,7 @@ function MainApp() {
   const [currentPage, setCurrentPage] = useState<Page | string>(() => pathToPage(window.location.pathname));
   const { isAuthenticated, isLoading, user } = useAuth();
   const [isPageLoading, setIsPageLoading] = useState(false);
+  const { showSnackbar } = useSnackbar();
 
   const navigate = (page: Page | string) => {
     console.log("=== NAVIGATION DEBUG ===");
@@ -151,13 +152,18 @@ function MainApp() {
     }
   }, [currentPage]);
 
+  const isOfficer = user?.is_membership_executive || user?.is_rights_verification_officer || user?.is_legal_officer || user?.is_ceo_authorised_officer || user?.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(user?.role || '');
+
   // Auth routing protection
   useEffect(() => {
     if (!isLoading) {
       const isMember = user?.is_member === true || user?.membership_status === 'approved' || user?.role === 'member';
-      const isOfficer = user?.is_membership_executive || user?.is_rights_verification_officer || user?.is_legal_officer || user?.is_ceo_authorised_officer || user?.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(user?.role || '');
 
-      if (isAuthenticated && currentPage === 'login') {
+      if (isAuthenticated && isOfficer) {
+        if (!currentPage.startsWith('officer-dashboard')) {
+          navigate('officer-dashboard');
+        }
+      } else if (isAuthenticated && currentPage === 'login') {
         if (isOfficer) {
           navigate('officer-dashboard');
         } else if (isMember) {
@@ -170,12 +176,16 @@ function MainApp() {
         navigate('login');
       } else if (isAuthenticated && currentPage === 'member-dashboard' && !isMember && !isOfficer) {
         // Redirect non-approved members away from dashboard
+        showSnackbar("you are not a member please fill the form first to get membership and access the dashboard", "error");
         navigate('membership-form');
       } else if (isAuthenticated && currentPage === 'officer-dashboard' && !isOfficer) {
         navigate('membership-form');
+      } else if (isAuthenticated && currentPage === 'member-dashboard/payments' && !user?.is_prime) {
+        showSnackbar("Payments section is only accessible for Prime Members.", "error");
+        navigate('member-dashboard');
       }
     }
-  }, [isAuthenticated, currentPage, isLoading, user]);
+  }, [isAuthenticated, currentPage, isLoading, user, isOfficer]);
 
   if (isLoading || isPageLoading) {
 
@@ -188,7 +198,7 @@ function MainApp() {
       <main className="flex-1">
         {renderPage(currentPage, navigate)}
       </main>
-      {currentPage !== 'login' && currentPage !== 'forgot-password' && currentPage !== 'change-password' && !currentPage.startsWith('mentor-dashboard') && !currentPage.startsWith('member-dashboard') && !currentPage.startsWith('officer-dashboard') && !currentPage.startsWith('profile') && (
+      {currentPage !== 'login' && currentPage !== 'forgot-password' && currentPage !== 'change-password' && !currentPage.startsWith('mentor-dashboard') && !currentPage.startsWith('member-dashboard') && !currentPage.startsWith('officer-dashboard') && !currentPage.startsWith('profile') && !isOfficer && (
         <Footer onNavigate={navigate} />
       )}
       <CookieConsent />

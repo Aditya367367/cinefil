@@ -53,7 +53,12 @@ export function StepAuthorizedRep() {
     <div className="mf-step">
       <div className="mf-step__header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <h3 className="mf-step__title">Authorized Representative</h3>
+          <h3 className="mf-step__title flex items-center gap-2">
+            Authorized Representative
+            <abbr title="Provide the name, designation, contact info, PAN/Aadhar, and authority letter for the representative authorized to act on behalf of the entity." style={{ cursor: "help", textDecoration: "none" }}>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+            </abbr>
+          </h3>
           <p className="mf-step__subtitle">Details of the person authorized to act on behalf of the applicant.</p>
         </div>
         <button type="button" onClick={nextStep} className="mf-btn mf-btn--outline mf-btn--small" style={{ flexShrink: 0 }}>

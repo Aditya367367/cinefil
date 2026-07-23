@@ -4,8 +4,8 @@ import { useMembershipForm } from "../context/MembershipFormContext";
 import { SkipTestingButton } from "../components/SkipTestingButton";
 
 const CATEGORIES = [
-  { id: "producer_member", label: "Producer Member" },
-  { id: "other_member", label: "Other Member (Negative Rights Holder)" },
+  { id: "producer_member", label: "PRODUCER" },
+  { id: "other_member", label: "OTHER OWNER (Video Publisher / Negative Rights Holder)" },
 ];
 
 const APPLICANT_TYPES = [
@@ -33,7 +33,12 @@ export function StepMembershipCategory() {
   return (
     <div className="mf-step">
       <div className="mf-step__header">
-        <h3 className="mf-step__title">Membership Details</h3>
+        <h3 className="mf-step__title flex items-center gap-2">
+          Membership Details
+          <abbr title="Select your membership category (Producer or Other Member) and applicant type (Individual, Firm, LLP, Company, etc.)." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
         <p className="mf-step__subtitle">Select your membership category and applicant type to get started.</p>
       </div>
 

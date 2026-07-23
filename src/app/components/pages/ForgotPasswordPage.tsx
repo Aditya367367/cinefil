@@ -5,6 +5,7 @@ import { useSnackbar } from "../../contexts/SnackbarContext";
 import { useTranslation } from "../../contexts/LanguageContext";
 import { authService } from "../../../services/authService";
 import bgImage from "../../../imports/bg image.png";
+import LogoImage from "../../../imports/Cinefil-New-Logo-Small-Header-150x150.png";
 
 interface ForgotPasswordPageProps {
   onNavigate: (page: Page) => void;
@@ -219,10 +220,27 @@ export function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps) {
       </div>
 
       {/* Left Column: Vector Illustration */}
-      <div className="block relative overflow-hidden order-2 lg:order-1 h-64 lg:h-auto">
+      <div className="block relative overflow-hidden order-2 lg:order-1 h-64 lg:h-auto min-h-[400px]">
         <div className="absolute top-[-10%] left-[-10%] w-[35rem] h-[35rem] rounded-full bg-indigo-50/60 z-0" />
         <div className="absolute bottom-[-15%] right-[-5%] w-[25rem] h-[25rem] rounded-full bg-amber-50/40 z-0" />
         
+        {/* Clickable Big Logo overlay linking to Home */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 bg-slate-900/30 backdrop-blur-[2px]">
+          <button
+            onClick={() => onNavigate("home")}
+            className="flex flex-col items-center justify-center p-8 bg-white/95 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-105 transition-all duration-300 border border-white/20 group cursor-pointer"
+          >
+            <img
+              src={LogoImage}
+              alt="Cinefil Logo"
+              className="w-32 h-32 object-contain transition-transform duration-300 group-hover:rotate-3"
+            />
+            <span className="mt-3 text-xs font-bold uppercase tracking-widest text-[var(--cinefil-navy)] group-hover:text-[var(--cinefil-gold)] transition-colors">
+              Go to Home
+            </span>
+          </button>
+        </div>
+
         <img
           src={bgImage}
           alt="Cinefil Sign In illustration"

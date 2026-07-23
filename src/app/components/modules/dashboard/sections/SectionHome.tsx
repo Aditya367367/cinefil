@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart3, LayoutDashboard, Users, ListChecks, ChevronRight } from "lucide-react";
+import { BarChart3, LayoutDashboard, Users, ListChecks, ChevronRight, Crown, Lock, AlertTriangle } from "lucide-react";
 import { useDashboard } from "../context/DashboardContext";
 
 export function SectionHome() {
@@ -8,7 +8,11 @@ export function SectionHome() {
     royaltyDistributions, 
     filmsList, 
     filmShares, 
-    changeSection 
+    changeSection,
+    user,
+    upgradeToPrime,
+    isPrime,
+    isUnderReview
   } = useDashboard();
 
   if (!isMember) return null;
@@ -25,6 +29,60 @@ export function SectionHome() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {isPrime ? (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
+              <Crown size={22} className="text-emerald-700" />
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-emerald-900 flex items-center gap-2">
+                Prime Member <span className="bg-emerald-600 text-white text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full">Active</span>
+              </h4>
+              <p className="mt-1 text-xs text-emerald-800 leading-relaxed">
+                You are a verified Prime Member of CINEFIL India. You are eligible for full royalty administration and quarterly distribution of royalties.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : isUnderReview ? (
+        <div className="rounded-2xl border border-blue-200 bg-blue-50/90 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-800">
+              <Lock size={20} className="text-blue-700" />
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-blue-900 flex items-center gap-2">
+                Prime Membership Request: <span className="bg-blue-600 text-white text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full">In Progress (Locked)</span>
+              </h4>
+              <p className="mt-1 text-xs text-blue-800 leading-relaxed font-medium">
+                Your application to upgrade to Prime Membership has been submitted and is currently being verified by CINEFIL officers. <strong className="font-bold underline">You cannot change or edit any application details or registered films until your Prime Membership request is approved.</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+              <AlertTriangle size={20} className="text-amber-700" />
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-amber-900">Associate Membership Upgrade Required</h4>
+              <p className="mt-1 text-xs text-amber-800 leading-relaxed">
+                You are currently registered as an Associate Member. Entitlement to quarterly distribution of royalties shall accrue only upon admission as a Prime Member. To upgrade to Prime Membership, please provide the required supporting documents—including Censor Certificates, devolution of title documents, film links, and other verification files.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={upgradeToPrime}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition"
+          >
+            Upgrade to Prime Member
+          </button>
+        </div>
+      )}
+
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
           <div key={card.label} className="rounded-lg border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">

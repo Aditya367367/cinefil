@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell, CheckSquare, FileText, LayoutDashboard, Globe } from "lucide-react";
+import { Bell, CheckSquare, FileText, LayoutDashboard, Globe, LogOut } from "lucide-react";
 import { ProfileMenu } from "./ProfileMenu";
 import { useAuth } from "../../../context/AuthContext";
 import { notificationService } from "../../../services/notificationService";
@@ -42,8 +42,17 @@ interface NotificationItem {
 }
 
 export function Navbar({ currentPage, onNavigate }: NavbarProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const { language, setLanguage, t } = useTranslation();
+
+  const handleLogoutClick = async () => {
+    try {
+      await logout();
+      onNavigate("home" as Page);
+    } catch (e) {
+      console.error("Logout failed", e);
+    }
+  };
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -145,6 +154,8 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
   const isOfficer = user?.is_membership_executive || user?.is_rights_verification_officer || user?.is_legal_officer || user?.is_ceo_authorised_officer || user?.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(user?.role || '');
 
+  const isMember = user?.is_member === true || user?.membership_status === 'approved' || user?.role === 'member';
+
   const officerDashboardLabel = user?.is_ceo_authorised_officer || user?.role === 'ceo' ? 'CEO Dashboard' :
     user?.is_membership_executive || user?.role === 'membership_executive' ? 'Executive Dashboard' :
       user?.is_legal_officer || user?.role === 'legal_officer' ? 'Legal Dashboard' :
@@ -163,7 +174,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
     >
       <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <button
-          onClick={() => onNavigate("home")}
+          onClick={() => onNavigate(isOfficer ? "officer-dashboard" : "home")}
           className="flex items-center gap-3 transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-white/20 rounded-lg p-1"
           aria-label="Go to home"
         >
@@ -213,9 +224,10 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               )}
             </div>
 
-            <button onClick={() => onNavigate("contact")} className={`hover:text-white transition-colors ${currentPage === 'contact' ? 'text-white font-bold' : ''}`}>{t("Contact")}</button>
+
             <button onClick={() => onNavigate("schemes")} className={`hover:text-white transition-colors ${currentPage === 'schemes' ? 'text-white font-bold' : ''}`}>{t("Schemes")}</button>
             <button onClick={() => onNavigate("films")} className={`hover:text-white transition-colors ${currentPage === 'films' ? 'text-white font-bold' : ''}`}>{t("Works")}</button>
+            <button onClick={() => onNavigate("contact")} className={`hover:text-white transition-colors ${currentPage === 'contact' ? 'text-white font-bold' : ''}`}>{t("Contact")}</button>
           </div>
         )}
 
@@ -240,7 +252,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             </>
           )}
 
-          {isAuthenticated && (
+          {isAuthenticated && isMember && !isOfficer && (
             <button
               onClick={() => onNavigate("member-dashboard")}
               className="hidden lg:inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -254,7 +266,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {isAuthenticated && isOfficer && (
             <button
               onClick={() => onNavigate("officer-dashboard")}
-              className="inline-flex items-center gap-2 rounded-lg border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/10 px-4 py-2 text-sm font-medium text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/20 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)]/50 hidden lg:inline-flex"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/10 px-4 py-2 text-sm font-medium text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/20 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)]/50"
               aria-label="Officer Dashboard"
             >
               <LayoutDashboard size={16} />
@@ -271,7 +283,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               aria-label="Membership Form"
             >
               <FileText size={16} />
-              <span className="hidden sm:inline">Membership Form</span>
+              <span className="hidden sm:inline">Membership Application</span>
             </button>
           )}
 
@@ -344,9 +356,20 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               )}
             </div>
           )}
-          <div className={!isAuthenticated ? "lg:hidden" : ""}>
-            <ProfileMenu currentPage={currentPage} onNavigate={onNavigate} dark />
-          </div>
+          {isAuthenticated && isOfficer ? (
+            <button
+              onClick={handleLogoutClick}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-3.5 py-2 text-xs font-bold text-rose-400 transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 cursor-pointer"
+              aria-label="Logout"
+            >
+              <LogOut size={14} />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          ) : (
+            <div className={!isAuthenticated ? "lg:hidden" : ""}>
+              <ProfileMenu currentPage={currentPage} onNavigate={onNavigate} dark />
+            </div>
+          )}
         </div>
       </div>
     </nav >

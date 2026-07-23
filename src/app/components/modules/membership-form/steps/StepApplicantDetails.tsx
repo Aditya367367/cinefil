@@ -23,6 +23,7 @@ export function StepApplicantDetails() {
   const { showSnackbar } = useSnackbar();
   const {
     applicantName, setApplicantName,
+    companyName, setCompanyName,
     applicantEmail, setApplicantEmail,
     cinLlp, setCinLlp,
     gstNumber, setGstNumber,
@@ -163,11 +164,145 @@ export function StepApplicantDetails() {
     }
   };
 
+  const [errors, setErrors] = useState({
+    applicantName: "",
+    panNumberField: "",
+    registeredAddress: "",
+    city: "",
+    stateField: "",
+    country: "",
+    pinCode: "",
+  });
+
+  const STATES = [
+    "Andaman and Nicobar Islands",
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chandigarh",
+    "Chhattisgarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jammu and Kashmir",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Ladakh",
+    "Lakshadweep",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Puducherry",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal"
+  ];
+
+  React.useEffect(() => {
+    if (!country) {
+      setCountry("India");
+    }
+  }, [country, setCountry]);
+
+  const validateField = (name: string, value: string) => {
+    let errMsg = "";
+    if (value.trim() === "") {
+      errMsg = "This field is required.";
+    } else {
+      switch (name) {
+        case "applicantName":
+          if (value.trim().length < 2) {
+            errMsg = "Name must be at least 2 characters.";
+          }
+          break;
+        case "panNumberField":
+          if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+            errMsg = "Invalid PAN format. Example: ABCDE1234F";
+          }
+          break;
+        case "registeredAddress":
+          if (!/^[A-Za-z0-9\s#,\-\/\.]{5,255}$/.test(value)) {
+            errMsg = "Please provide a complete address.";
+          }
+          break;
+        case "city":
+          if (!/^[A-Za-z\s-]{2,100}$/.test(value)) {
+            errMsg = "City name must contain only letters.";
+          }
+          break;
+        case "stateField":
+          if (value.trim() === "") {
+            errMsg = "Please select a valid state.";
+          }
+          break;
+        case "country":
+          if (value.trim() === "") {
+            errMsg = "Please select a valid country.";
+          }
+          break;
+        case "pinCode":
+          if (!/^[1-9][0-9]{5}$/.test(value)) {
+            errMsg = "Pin Code must be a valid 6-digit number.";
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    setErrors(prev => ({ ...prev, [name]: errMsg }));
+    return errMsg === "";
+  };
+
+  const handleContinue = () => {
+    if (!isEmailVerified || !isMobileVerified) {
+      showSnackbar("Please verify both email and mobile OTP before proceeding.", "error");
+      return;
+    }
+
+    const isNameValid = validateField("applicantName", applicantName);
+    const isPanValid = validateField("panNumberField", panNumberField);
+    const isAddressValid = validateField("registeredAddress", registeredAddress);
+    const isCityValid = validateField("city", city);
+    const isStateValid = validateField("stateField", stateField);
+    const isCountryValid = validateField("country", country);
+    const isPinValid = validateField("pinCode", pinCode);
+
+    if (isNameValid && isPanValid && isAddressValid && isCityValid && isStateValid && isCountryValid && isPinValid) {
+      nextStep();
+    } else {
+      showSnackbar("Please correct the errors in your details before continuing.", "error");
+    }
+  };
+
   return (
     <div className="mf-step">
       <div className="mf-step__header">
-        <h3 className="mf-step__title">Personal Information</h3>
+        <h3 className="mf-step__title flex items-center gap-2">
+          Personal Information
+          <abbr title="Enter your company name, registration number, PAN/GST number, registered/correspondence addresses, and contact details." style={{ cursor: "help", textDecoration: "none" }}>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
+          </abbr>
+        </h3>
         <p className="mf-step__subtitle">Tell us about yourself and your company setup.</p>
+      </div>
+
+      <div className="mf-info-box" style={{ marginBottom: "16px", background: "rgba(59, 130, 246, 0.1)", borderLeft: "4px solid #3b82f6", padding: "12px", borderRadius: "4px", fontSize: "13px", lineHeight: "1.5", color: "#1e3a8a" }}>
+        <strong>PAN Restriction Notice:</strong> One PAN - One Application - One Member. A distinct PAN shall constitute a distinct applicant for all purposes; each PAN of a Producer or Other Owner shall file one application covering all cinematograph films produced or owned by it, irrespective of the Banner(s).
       </div>
 
       {otpError && (
@@ -178,13 +313,31 @@ export function StepApplicantDetails() {
 
       <div className="mf-grid">
         {/* Name */}
-        <div>
-          <label className="mf-label">Name of the Applicant / Entity <span className="mf-label__req">*</span></label>
-          <input value={applicantName} onChange={(e) => setApplicantName(e.target.value)} className="mf-input" placeholder="Full name or company name" />
+        <div className="mf-form-group">
+          <label className="mf-label">Name of the Applicant <span className="mf-label__req">*</span></label>
+          <input 
+            value={applicantName} 
+            onChange={(e) => {
+              setApplicantName(e.target.value);
+              validateField("applicantName", e.target.value);
+            }} 
+            onBlur={(e) => validateField("applicantName", e.target.value)}
+            className={`mf-input ${errors.applicantName ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            placeholder="Full name or individual name" 
+          />
+          {errors.applicantName && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.applicantName}</p>
+          )}
+        </div>
+
+        {/* Company Name */}
+        <div className="mf-form-group">
+          <label className="mf-label">Name of the Company / Firm / Banner <span className="mf-label__hint">(Optional)</span></label>
+          <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="mf-input" placeholder="Company, firm or banner name" />
         </div>
 
         {/* Email with OTP */}
-        <div>
+        <div className="mf-form-group">
           <label className="mf-label">Email Address <span className="mf-label__req">*</span></label>
           <div style={{ display: "flex", gap: "8px" }}>
             <input
@@ -215,71 +368,8 @@ export function StepApplicantDetails() {
           )}
         </div>
 
-        {/* CIN */}
-        <div>
-          <label className="mf-label">CIN / LLPIN <span className="mf-label__hint">(if applicable)</span></label>
-          <input value={cinLlp} onChange={(e) => setCinLlp(e.target.value)} className="mf-input" placeholder="CIN / LLPIN" />
-        </div>
-
-        {/* GST */}
-        <div>
-          <label className="mf-label">GST Number</label>
-          <input value={gstNumber} onChange={(e) => setGstNumber(formatGstNumber(e.target.value))} className="mf-input" placeholder="GST Number" />
-        </div>
-
-        {/* PAN */}
-        <div>
-          <label className="mf-label">PAN Number</label>
-          <input value={panNumberField} onChange={(e) => setPanNumberField(formatPanNumber(e.target.value))} className="mf-input" placeholder="PAN Number" />
-        </div>
-
-        {/* DOB */}
-        <div>
-          <label className="mf-label">Date of Incorporation / Birth</label>
-          <input type="date" value={dobIncorporation} onChange={(e) => setDobIncorporation(e.target.value)} className="mf-input" />
-        </div>
-
-        {/* Addresses */}
-        <div className="mf-field--span">
-          <label className="mf-label">Registered Office Address</label>
-          <textarea value={registeredAddress} onChange={(e) => setRegisteredAddress(e.target.value)} rows={2} className="mf-textarea" placeholder="Complete registered address" />
-        </div>
-
-        <div className="mf-field--span">
-          <label className="mf-label">Correspondence Address</label>
-          <textarea value={correspondenceAddress} onChange={(e) => setCorrespondenceAddress(e.target.value)} rows={2} className="mf-textarea" placeholder="Correspondence address (if different)" />
-        </div>
-
-        {/* Location */}
-        <div>
-          <label className="mf-label">City</label>
-          <input value={city} onChange={(e) => setCity(e.target.value)} className="mf-input" placeholder="City" />
-        </div>
-        <div>
-          <label className="mf-label">State</label>
-          <input value={stateField} onChange={(e) => setStateField(e.target.value)} className="mf-input" placeholder="State" />
-        </div>
-        <div>
-          <label className="mf-label">Country</label>
-          <input value={country} onChange={(e) => setCountry(e.target.value)} className="mf-input" placeholder="Country" />
-        </div>
-        <div>
-          <label className="mf-label">Pin Code</label>
-          <input value={pinCode} onChange={(e) => setPinCode(e.target.value)} className="mf-input" placeholder="Pin Code" />
-        </div>
-
-        {/* Contact */}
-        <div>
-          <label className="mf-label">Website <span className="mf-label__hint">(optional)</span></label>
-          <input value={website} onChange={(e) => setWebsite(e.target.value)} className="mf-input" placeholder="https://example.com" />
-        </div>
-        <div>
-          <label className="mf-label">Telephone <span className="mf-label__hint">(optional)</span></label>
-          <input value={telephoneNumber} onChange={(e) => setTelephoneNumber(e.target.value)} className="mf-input" placeholder="Telephone Number" />
-        </div>
-
         {/* Mobile with OTP */}
-        <div>
+        <div className="mf-form-group">
           <label className="mf-label">Mobile Number <span className="mf-label__req">*</span></label>
           <div style={{ display: "flex", gap: "8px" }}>
             <input
@@ -308,6 +398,119 @@ export function StepApplicantDetails() {
             </div>
           )}
         </div>
+
+        {/* PAN */}
+        <div className="mf-form-group">
+          <label className="mf-label">PAN Number <span className="mf-label__req">*</span></label>
+          <input 
+            value={panNumberField} 
+            onChange={(e) => {
+              const formatted = formatPanNumber(e.target.value);
+              setPanNumberField(formatted);
+              validateField("panNumberField", formatted);
+            }} 
+            onBlur={(e) => validateField("panNumberField", e.target.value)}
+            className={`mf-input ${errors.panNumberField ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            placeholder="PAN Number" 
+          />
+          {errors.panNumberField && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.panNumberField}</p>
+          )}
+        </div>
+
+        {/* Addresses */}
+        <div className="mf-field--span mf-form-group">
+          <label className="mf-label">Address <span className="mf-label__req">*</span></label>
+          <textarea 
+            value={registeredAddress} 
+            onChange={(e) => {
+              setRegisteredAddress(e.target.value);
+              validateField("registeredAddress", e.target.value);
+            }} 
+            onBlur={(e) => validateField("registeredAddress", e.target.value)}
+            rows={2} 
+            className={`mf-textarea ${errors.registeredAddress ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            placeholder="Complete address" 
+          />
+          {errors.registeredAddress && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.registeredAddress}</p>
+          )}
+        </div>
+
+        {/* Location */}
+        <div className="mf-form-group">
+          <label className="mf-label">City <span className="mf-label__req">*</span></label>
+          <input 
+            value={city} 
+            onChange={(e) => {
+              setCity(e.target.value);
+              validateField("city", e.target.value);
+            }} 
+            onBlur={(e) => validateField("city", e.target.value)}
+            className={`mf-input ${errors.city ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            placeholder="City" 
+          />
+          {errors.city && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.city}</p>
+          )}
+        </div>
+
+        <div className="mf-form-group">
+          <label className="mf-label">State <span className="mf-label__req">*</span></label>
+          <select 
+            value={stateField} 
+            onChange={(e) => {
+              setStateField(e.target.value);
+              validateField("stateField", e.target.value);
+            }} 
+            onBlur={(e) => validateField("stateField", e.target.value)}
+            className={`mf-input ${errors.stateField ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+          >
+            <option value="">Select State</option>
+            {STATES.map((st) => (
+              <option key={st} value={st}>{st}</option>
+            ))}
+          </select>
+          {errors.stateField && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.stateField}</p>
+          )}
+        </div>
+
+        <div className="mf-form-group">
+          <label className="mf-label">Country <span className="mf-label__req">*</span></label>
+          <select 
+            value={country} 
+            onChange={(e) => {
+              setCountry(e.target.value);
+              validateField("country", e.target.value);
+            }} 
+            onBlur={(e) => validateField("country", e.target.value)}
+            className={`mf-input ${errors.country ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+          >
+            <option value="India">India</option>
+            <option value="Other">Other</option>
+          </select>
+          {errors.country && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.country}</p>
+          )}
+        </div>
+
+        <div className="mf-form-group">
+          <label className="mf-label">Pin Code <span className="mf-label__req">*</span></label>
+          <input 
+            value={pinCode} 
+            onChange={(e) => {
+              setPinCode(e.target.value);
+              validateField("pinCode", e.target.value);
+            }} 
+            onBlur={(e) => validateField("pinCode", e.target.value)}
+            className={`mf-input ${errors.pinCode ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            placeholder="Pin Code" 
+          />
+          {errors.pinCode && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{errors.pinCode}</p>
+          )}
+        </div>
       </div>
 
       <div className="mf-actions">
@@ -318,7 +521,7 @@ export function StepApplicantDetails() {
         ) : <div />}
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <SkipTestingButton />
-          <button type="button" onClick={nextStep} className="mf-btn mf-btn--next">
+          <button type="button" onClick={handleContinue} className="mf-btn mf-btn--next">
             Continue <ChevronRight size={16} />
           </button>
         </div>
