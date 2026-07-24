@@ -98,7 +98,7 @@ interface OtpInputProps {
   disabled?: boolean;
 }
 
-function OtpInput({ value, onChange, length = 6, disabled = false }: OtpInputProps) {
+function OtpInput({ value, onChange, length = 4, disabled = false }: OtpInputProps) {
   const inputsRef = React.useRef<HTMLInputElement[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
@@ -232,8 +232,8 @@ const EditableMobileField = ({
       setErrorMsg("OTP has expired. Please send a new OTP.");
       return;
     }
-    if (!otp || otp.length !== 6) {
-      setErrorMsg("Please enter a valid 6-digit OTP.");
+    if (!otp || otp.length !== 4) {
+      setErrorMsg("Please enter a valid 4-digit OTP.");
       return;
     }
     setIsVerifying(true);
@@ -329,7 +329,7 @@ const EditableMobileField = ({
               </div>
               <button 
                 onClick={handleVerifyAndSave} 
-                disabled={isVerifying || timer <= 0 || otp.length !== 6}
+                disabled={isVerifying || timer <= 0 || otp.length !== 4}
                 className="w-full rounded-md bg-emerald-500 py-2 text-xs font-bold text-white hover:bg-emerald-600 transition flex items-center justify-center gap-1 disabled:opacity-50"
               >
                 {isVerifying ? "Verifying..." : "Verify & Save"}
@@ -811,7 +811,7 @@ export function SectionMembershipDetails() {
               label="PAN Number" 
               value={application.pan_number} 
               onSave={(val) => handleFieldSave('pan_number', val)} 
-              readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
+              readOnly={true}
             />
             {application.company_name && (
               <EditableField 

@@ -19,6 +19,24 @@ const formatGstNumber = (val: string) => {
   return val.replace(/[^A-Za-z0-9]/g, "").toUpperCase().substring(0, 15);
 };
 
+
+const getErrorString = (err: any): string => {
+  if (!err) return "";
+  if (typeof err === "string") return err;
+  if (typeof err === "object") {
+    if (err.message) return String(err.message);
+    if (err.error) return getErrorString(err.error);
+    const keys = Object.keys(err);
+    if (keys.length > 0) {
+      const firstVal = err[keys[0]];
+      if (Array.isArray(firstVal)) return String(firstVal[0]);
+      if (typeof firstVal === "object") return getErrorString(firstVal);
+      return String(firstVal);
+    }
+  }
+  return String(err);
+};
+
 export function StepApplicantDetails() {
   const { showSnackbar } = useSnackbar();
   const {
@@ -54,6 +72,8 @@ export function StepApplicantDetails() {
   const [sendingMobileOtp, setSendingMobileOtp] = useState(false);
   const [verifyingMobileOtp, setVerifyingMobileOtp] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [panTakenError, setPanTakenError] = useState("");
+  const [isCheckingPan, setIsCheckingPan] = useState(false);
 
   const handleVerifyEmail = async () => {
     if (!applicantEmail) return;
@@ -70,7 +90,7 @@ export function StepApplicantDetails() {
         setEmailOtpVisible(true);
         setOtpError("");
       } else {
-        const errorMsg = res.error || "Failed to send OTP.";
+        const errorMsg = getErrorString(res.error) || "Failed to send OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
         setEmailOtpVisible(false);
@@ -85,8 +105,8 @@ export function StepApplicantDetails() {
   };
 
   const handleConfirmEmailOtp = async () => {
-    if (!emailOtp || emailOtp.length !== 6) {
-      setOtpError("Please enter a valid 6-digit OTP.");
+    if (!emailOtp || emailOtp.length !== 4) {
+      setOtpError("Please enter a valid 4-digit OTP.");
       return;
     }
     setVerifyingEmailOtp(true);
@@ -102,11 +122,11 @@ export function StepApplicantDetails() {
             showSnackbar("Draft application resumed successfully!", "success");
         }
       } else {
-        setOtpError(res.error || "Invalid OTP.");
+        setOtpError(getErrorString(res.error) || "Invalid OTP.");
       }
     } catch (err: any) {
       console.error("Error verifying email OTP:", err);
-      setOtpError(err.response?.data?.error || "Verification failed.");
+      setOtpError(getErrorString(err.response?.data?.error) || "Verification failed.");
     } finally {
       setVerifyingEmailOtp(false);
     }
@@ -122,7 +142,7 @@ export function StepApplicantDetails() {
         setMobileOtpVisible(true);
         setOtpError("");
       } else {
-        const errorMsg = res.error || "Failed to send OTP.";
+        const errorMsg = getErrorString(res.error) || "Failed to send OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
         setMobileOtpVisible(false);
@@ -137,8 +157,8 @@ export function StepApplicantDetails() {
   };
 
   const handleConfirmMobileOtp = async () => {
-    if (!mobileOtp || mobileOtp.length !== 6) {
-      setOtpError("Please enter a valid 6-digit OTP.");
+    if (!mobileOtp || mobileOtp.length !== 4) {
+      setOtpError("Please enter a valid 4-digit OTP.");
       return;
     }
     setVerifyingMobileOtp(true);
@@ -154,11 +174,11 @@ export function StepApplicantDetails() {
             showSnackbar("Draft application resumed successfully!", "success");
         }
       } else {
-        setOtpError(res.error || "Invalid OTP.");
+        setOtpError(getErrorString(res.error) || "Invalid OTP.");
       }
     } catch (err: any) {
       console.error("Error verifying mobile OTP:", err);
-      setOtpError(err.response?.data?.error || "Verification failed.");
+      setOtpError(getErrorString(err.response?.data?.error) || "Verification failed.");
     } finally {
       setVerifyingMobileOtp(false);
     }
@@ -218,6 +238,32 @@ export function StepApplicantDetails() {
       setCountry("India");
     }
   }, [country, setCountry]);
+
+  // Debounced check for PAN availability
+  React.useEffect(() => {
+    const formatted = panNumberField.trim().toUpperCase();
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formatted)) {
+      setPanTakenError("");
+      return;
+    }
+    setIsCheckingPan(true);
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const res = await memberService.checkAvailability(undefined, undefined, formatted);
+        if (res.success && res.pan_taken) {
+          setPanTakenError("This PAN is already taken. Use a new PAN.");
+        } else {
+          setPanTakenError("");
+        }
+      } catch (err) {
+        setPanTakenError("");
+      } finally {
+        setIsCheckingPan(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [panNumberField]);
 
   const validateField = (name: string, value: string) => {
     let errMsg = "";
@@ -281,6 +327,16 @@ export function StepApplicantDetails() {
     const isStateValid = validateField("stateField", stateField);
     const isCountryValid = validateField("country", country);
     const isPinValid = validateField("pinCode", pinCode);
+
+    if (panTakenError) {
+      showSnackbar(panTakenError, "error");
+      return;
+    }
+
+    if (isCheckingPan) {
+      showSnackbar("Checking PAN availability...", "info");
+      return;
+    }
 
     if (isNameValid && isPanValid && isAddressValid && isCityValid && isStateValid && isCountryValid && isPinValid) {
       nextStep();
@@ -360,7 +416,7 @@ export function StepApplicantDetails() {
           </div>
           {emailOtpVisible && !isEmailVerified && (
             <div className="mf-otp-row">
-              <input type="text" value={emailOtp} onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))} className="mf-input" placeholder="Enter 6-digit OTP" maxLength={6} style={{ flex: 1 }} />
+              <input type="text" value={emailOtp} onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))} className="mf-input" placeholder="Enter 4-digit OTP" maxLength={4} style={{ flex: 1 }} />
               <button type="button" onClick={handleConfirmEmailOtp} disabled={verifyingEmailOtp} className="mf-btn mf-btn--confirm">
                 {verifyingEmailOtp ? <Loader2 size={14} className="mf-spin" /> : "Confirm"}
               </button>
@@ -391,7 +447,7 @@ export function StepApplicantDetails() {
           </div>
           {mobileOtpVisible && !isMobileVerified && (
             <div className="mf-otp-row">
-              <input type="text" value={mobileOtp} onChange={(e) => setMobileOtp(e.target.value.replace(/\D/g, ''))} className="mf-input" placeholder="Enter 6-digit OTP" maxLength={6} style={{ flex: 1 }} />
+              <input type="text" value={mobileOtp} onChange={(e) => setMobileOtp(e.target.value.replace(/\D/g, ''))} className="mf-input" placeholder="Enter 4-digit OTP" maxLength={4} style={{ flex: 1 }} />
               <button type="button" onClick={handleConfirmMobileOtp} disabled={verifyingMobileOtp} className="mf-btn mf-btn--confirm">
                 {verifyingMobileOtp ? <Loader2 size={14} className="mf-spin" /> : "Confirm"}
               </button>
@@ -410,11 +466,14 @@ export function StepApplicantDetails() {
               validateField("panNumberField", formatted);
             }} 
             onBlur={(e) => validateField("panNumberField", e.target.value)}
-            className={`mf-input ${errors.panNumberField ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
+            className={`mf-input ${errors.panNumberField || panTakenError ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} 
             placeholder="PAN Number" 
           />
           {errors.panNumberField && (
             <p className="text-red-500 text-xs mt-1 font-medium">{errors.panNumberField}</p>
+          )}
+          {panTakenError && (
+            <p className="text-red-500 text-xs mt-1 font-medium">{panTakenError}</p>
           )}
         </div>
 

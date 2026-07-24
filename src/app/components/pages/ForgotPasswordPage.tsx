@@ -160,8 +160,9 @@ export function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps) {
                     type="text"
                     required
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder={t("Enter verification OTP ...") || t("OTP")}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').substring(0, 4))}
+                    placeholder={t("Enter 4-digit verification OTP ...") || t("OTP")}
+                    maxLength={4}
                     className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
                   />
                 </div>

@@ -108,9 +108,9 @@ export const memberService = {
     }
   },
 
-  async checkAvailability(email?: string, mobile?: string) {
+  async checkAvailability(email?: string, mobile?: string, pan?: string) {
     try {
-      const response = await api.post('/auth/check-availability/', { email, mobile });
+      const response = await api.post('/auth/check-availability/', { email, mobile, pan });
       return response.data;
     } catch (err: any) {
       return err.response?.data || { success: false, error: "Failed to check availability" };

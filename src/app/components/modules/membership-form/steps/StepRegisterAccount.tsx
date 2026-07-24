@@ -5,6 +5,23 @@ import { useAuth } from "../../../../../context/AuthContext";
 import { memberService } from "../../../../../services/memberService";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
+const getErrorString = (err: any): string => {
+  if (!err) return "";
+  if (typeof err === "string") return err;
+  if (typeof err === "object") {
+    if (err.message) return String(err.message);
+    if (err.error) return getErrorString(err.error);
+    const keys = Object.keys(err);
+    if (keys.length > 0) {
+      const firstVal = err[keys[0]];
+      if (Array.isArray(firstVal)) return String(firstVal[0]);
+      if (typeof firstVal === "object") return getErrorString(firstVal);
+      return String(firstVal);
+    }
+  }
+  return String(err);
+};
+
 interface OtpInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -12,7 +29,7 @@ interface OtpInputProps {
   disabled?: boolean;
 }
 
-function OtpInput({ value, onChange, length = 6, disabled = false }: OtpInputProps) {
+function OtpInput({ value, onChange, length = 4, disabled = false }: OtpInputProps) {
   const inputsRef = useRef<HTMLInputElement[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
@@ -246,7 +263,7 @@ export function StepRegisterAccount() {
         setIsRegistered(true);
         showSnackbar("Account created and verified successfully!", "success");
       } else {
-        let errorMsg = res.error || "Failed to create account.";
+        let errorMsg = getErrorString(res.error) || "Failed to create account.";
         if (res.errors) {
           if (res.errors.email) {
             errorMsg = "This email address is already registered. Please login to continue.";
@@ -282,7 +299,7 @@ export function StepRegisterAccount() {
         setEmailTimer(600); // 10 minutes countdown
         showSnackbar("OTP sent to your email address.", "success");
       } else {
-        const errorMsg = res.error || "Failed to send email OTP.";
+        const errorMsg = getErrorString(res.error) || "Failed to send email OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
       }
@@ -298,8 +315,8 @@ export function StepRegisterAccount() {
       setOtpError("Email OTP has expired. Please resend a new OTP.");
       return;
     }
-    if (!emailOtp || emailOtp.length !== 6) {
-      setOtpError("Please enter a valid 6-digit email OTP.");
+    if (!emailOtp || emailOtp.length !== 4) {
+      setOtpError("Please enter a valid 4-digit email OTP.");
       return;
     }
     setVerifyingEmailOtp(true);
@@ -312,7 +329,7 @@ export function StepRegisterAccount() {
         setEmailOtp("");
         showSnackbar("Email verified successfully!", "success");
       } else {
-        const errorMsg = res.error || "Invalid email OTP.";
+        const errorMsg = getErrorString(res.error) || "Invalid email OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
       }
@@ -339,7 +356,7 @@ export function StepRegisterAccount() {
         setMobileTimer(600); // 10 minutes countdown
         showSnackbar("OTP sent to your mobile number.", "success");
       } else {
-        const errorMsg = res.error || "Failed to send mobile OTP.";
+        const errorMsg = getErrorString(res.error) || "Failed to send mobile OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
       }
@@ -355,8 +372,8 @@ export function StepRegisterAccount() {
       setOtpError("Mobile OTP has expired. Please resend a new OTP.");
       return;
     }
-    if (!mobileOtp || mobileOtp.length !== 6) {
-      setOtpError("Please enter a valid 6-digit mobile OTP.");
+    if (!mobileOtp || mobileOtp.length !== 4) {
+      setOtpError("Please enter a valid 4-digit mobile OTP.");
       return;
     }
     setVerifyingMobileOtp(true);
@@ -369,7 +386,7 @@ export function StepRegisterAccount() {
         setMobileOtp("");
         showSnackbar("Mobile number verified successfully!", "success");
       } else {
-        const errorMsg = res.error || "Invalid mobile OTP.";
+        const errorMsg = getErrorString(res.error) || "Invalid mobile OTP.";
         setOtpError(errorMsg);
         showSnackbar(errorMsg, "error");
       }
@@ -484,7 +501,7 @@ export function StepRegisterAccount() {
                   <button
                     type="button"
                     onClick={handleVerifyEmailOtp}
-                    disabled={verifyingEmailOtp || emailTimer <= 0 || emailOtp.length !== 6}
+                    disabled={verifyingEmailOtp || emailTimer <= 0 || emailOtp.length !== 4}
                     className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {verifyingEmailOtp ? <Loader2 size={12} className="animate-spin" /> : null}
@@ -566,7 +583,7 @@ export function StepRegisterAccount() {
                   <button
                     type="button"
                     onClick={handleVerifyMobileOtp}
-                    disabled={verifyingMobileOtp || mobileTimer <= 0 || mobileOtp.length !== 6}
+                    disabled={verifyingMobileOtp || mobileTimer <= 0 || mobileOtp.length !== 4}
                     className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {verifyingMobileOtp ? <Loader2 size={12} className="animate-spin" /> : null}

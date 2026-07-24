@@ -44,7 +44,7 @@ export interface MembershipFormContextType {
   startedAsGuest: boolean;
   currentStepKey: string;
   activeSteps: string[];
-  nextStep: () => void;
+  nextStep: () => void | Promise<void>;
   prevStep: () => void;
 
   // Base details
@@ -560,7 +560,58 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const nextStep = () => {
+  const formatValidationErrors = (errors: any) => {
+    if (typeof errors === 'string') return errors;
+    try {
+      const firstKey = Object.keys(errors)[0];
+      const messages = errors[firstKey];
+      const message = Array.isArray(messages) ? messages[0] : messages;
+      const formattedKey = firstKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      return `${formattedKey}: ${message}`;
+    } catch (e) {
+      return "Validation failed on one or more fields.";
+    }
+  };
+
+  const saveStepData = async () => {
+    // Only save if authenticated
+    if (!isAuthenticated) return true;
+
+    setSubmitting(true);
+    try {
+      const formData = buildApplicationFormData(false);
+      let response;
+      if (applicationId) {
+        response = await memberService.updateApplication(Number(applicationId), formData);
+      } else {
+        response = await memberService.submitApplication(formData);
+      }
+
+      if (response.success) {
+        if (response.application && response.application.id) {
+          setApplicationId(response.application.id.toString());
+        }
+        return true;
+      } else {
+        const errorMsg = response.errors ? formatValidationErrors(response.errors) : (response.error || "Failed to save details");
+        showSnackbar(errorMsg, "error");
+        return false;
+      }
+    } catch (err: any) {
+      console.error(err);
+      const errData = err.response?.data;
+      if (errData && errData.errors) {
+        showSnackbar(formatValidationErrors(errData.errors), "error");
+      } else {
+        showSnackbar(errData?.error || "An error occurred while saving details.", "error");
+      }
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const nextStep = async () => {
     if (currentStepKey === "register") {
       if (!isAuthenticated) {
         showSnackbar("Please complete account registration first.", "error");
@@ -677,6 +728,13 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       }
     }
     
+    if (currentStepKey !== "fee") {
+      const saveSuccess = await saveStepData();
+      if (!saveSuccess) {
+        return;
+      }
+    }
+
     if (step < totalSteps) {
       setStep(step + 1);
     }
@@ -692,6 +750,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     const formData = new FormData();
     if (isFinalSubmission) {
       formData.append('is_final_submission', 'true');
+    } else {
+      formData.append('status', 'draft');
     }
     const typeId = parseInt(selectedType);
     if (!isNaN(typeId)) {
@@ -924,20 +984,6 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       setSubmitting(false);
     }
   };
-
-  const formatValidationErrors = (errors: any) => {
-    if (typeof errors === 'string') return errors;
-    try {
-      const firstKey = Object.keys(errors)[0];
-      const messages = errors[firstKey];
-      const message = Array.isArray(messages) ? messages[0] : messages;
-      const formattedKey = firstKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      return `${formattedKey}: ${message}`;
-    } catch (e) {
-      return "Validation failed on one or more fields.";
-    }
-  };
-
 
   const handleAnimationComplete = () => {
     setShowCongratulations(false);
