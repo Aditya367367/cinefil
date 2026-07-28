@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { filmService } from "@/services/filmService";
 import { memberService } from "../../../../../services/memberService";
 import { useAuth } from "../../../../../context/AuthContext";
-import { API_ROOT } from "../../../../../services/api";
+import api, { API_ROOT } from "../../../../../services/api";
 import { useActorSearch, useFilmSearch, useRightHolderMemberSearch } from "../../../../../hooks/useSearch";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 
@@ -348,18 +348,18 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       }
 
       const [castRes, docRes, holderRes, shareRes, royaltyDetailRes] = await Promise.all([
-        fetch(`${API_ROOT}/cast-members/`, { credentials: 'include' }),
-        fetch(`${API_ROOT}/documents/`, { credentials: 'include' }),
-        fetch(`${API_ROOT}/right-holders/`, { credentials: 'include' }),
-        fetch(`${API_ROOT}/film-shares/`, { credentials: 'include' }),
-        fetch(`${API_ROOT}/royalty-details/`, { credentials: 'include' })
+        api.get('/cast-members/'),
+        api.get('/documents/'),
+        api.get('/right-holders/'),
+        api.get('/film-shares/'),
+        api.get('/royalty-details/')
       ]);
 
-      if (castRes.ok) setCastMembers((await castRes.json()).results || await castRes.json());
-      if (docRes.ok) setDocuments((await docRes.json()).results || await docRes.json());
-      if (holderRes.ok) setRightHolders((await holderRes.json()).results || await holderRes.json());
-      if (shareRes.ok) setFilmShares((await shareRes.json()).results || await shareRes.json());
-      if (royaltyDetailRes.ok) setRoyaltyDetails((await royaltyDetailRes.json()).results || await royaltyDetailRes.json());
+      setCastMembers(castRes.data.results || castRes.data);
+      setDocuments(docRes.data.results || docRes.data);
+      setRightHolders(holderRes.data.results || holderRes.data);
+      setFilmShares(shareRes.data.results || shareRes.data);
+      setRoyaltyDetails(royaltyDetailRes.data.results || royaltyDetailRes.data);
     } catch (e) {
       console.error("Error fetching dashboard data", e);
     } finally {
@@ -438,38 +438,47 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     };
 
     if (documentId) {
-      const res = await fetch(`${API_ROOT}/documents/${documentId}/`, {
-        method: "PUT",
-        credentials: "include",
-        body: buildFormData()
-      });
-      if (res.ok) return;
-      if (res.status !== 404) throw new Error(await res.text());
+      try {
+        await api.put(`/documents/${documentId}/`, buildFormData(), {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return;
+      } catch (err: any) {
+        if (err.response?.status !== 404) {
+          throw new Error(err.response?.data ? JSON.stringify(err.response.data) : "Failed to update document");
+        }
+      }
     }
 
-    const res = await fetch(`${API_ROOT}/documents/`, {
-      method: "POST",
-      credentials: "include",
-      body: buildFormData()
-    });
-    if (!res.ok) throw new Error(await res.text());
+    try {
+      await api.post(`/documents/`, buildFormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    } catch (err: any) {
+      throw new Error(err.response?.data ? JSON.stringify(err.response.data) : "Failed to save document");
+    }
   };
 
   const syncFilmCast = async (filmId: number, castOptions: any[]) => {
-    const existingCastRes = await fetch(`${API_ROOT}/cast-members/?member_film=${filmId}`, { credentials: "include" });
-    if (existingCastRes.ok) {
-      const existingCastData = await existingCastRes.json();
-      const existingCastResults = existingCastData.results || existingCastData;
+    try {
+      const existingCastRes = await api.get(`/cast-members/?member_film=${filmId}`);
+      const existingCastResults = existingCastRes.data.results || existingCastRes.data;
       for (const existingCast of existingCastResults) {
-        await fetch(`${API_ROOT}/cast-members/${existingCast.id}/`, { method: "DELETE", credentials: "include" });
+        await api.delete(`/cast-members/${existingCast.id}/`);
       }
+    } catch (e) {
+      console.error("Error cleaning existing cast", e);
     }
     for (const actorOption of castOptions) {
-      const castRes = await fetch(`${API_ROOT}/cast-members/`, {
-        method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member_film: filmId, actor_id: Number(actorOption.value), character_name: actorOption.label }),
-      });
-      if (!castRes.ok) throw new Error(await castRes.text());
+      try {
+        await api.post(`/cast-members/`, {
+          member_film: filmId,
+          actor_id: Number(actorOption.value),
+          character_name: actorOption.label
+        });
+      } catch (err: any) {
+        throw new Error(err.response?.data ? JSON.stringify(err.response.data) : "Failed to add cast member");
+      }
     }
   };
 
@@ -478,19 +487,25 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
     const percentageValue = newFilmRightHolderPercentage ? parseFloat(newFilmRightHolderPercentage) : null;
     if (percentageValue !== null && (Number.isNaN(percentageValue) || percentageValue > 100)) throw new Error("Ownership percentage cannot exceed 100.");
 
-    const existingHolderRes = await fetch(`${API_ROOT}/right-holders/?member_film=${filmId}`, { credentials: "include" });
-    if (existingHolderRes.ok) {
-      const existingHolderData = await existingHolderRes.json();
-      const existingHolderResults = existingHolderData.results || existingHolderData;
+    try {
+      const existingHolderRes = await api.get(`/right-holders/?member_film=${filmId}`);
+      const existingHolderResults = existingHolderRes.data.results || existingHolderRes.data;
       for (const existingHolder of existingHolderResults) {
-        await fetch(`${API_ROOT}/right-holders/${existingHolder.id}/`, { method: "DELETE", credentials: "include" });
+        await api.delete(`/right-holders/${existingHolder.id}/`);
       }
+    } catch (e) {
+      console.error("Error cleaning existing right holder", e);
     }
-    const holderRes = await fetch(`${API_ROOT}/right-holders/`, {
-      method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ member_film: filmId, member: Number(newFilmRightHolderMember.value), rights_holder_type: newFilmRightHolderType, ownership_percentage: percentageValue }),
-    });
-    if (!holderRes.ok) throw new Error(await holderRes.text());
+    try {
+      await api.post(`/right-holders/`, {
+        member_film: filmId,
+        member: Number(newFilmRightHolderMember.value),
+        rights_holder_type: newFilmRightHolderType,
+        ownership_percentage: percentageValue
+      });
+    } catch (err: any) {
+      throw new Error(err.response?.data ? JSON.stringify(err.response.data) : "Failed to sync right holder");
+    }
     return null;
   };
 
@@ -504,32 +519,36 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
 
     setRightHolderSubmitting(true);
     try {
-      const response = await fetch(`${API_ROOT}/right-holders/`, {
-        method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member_film: Number(rightHolderFilm.value), member: Number(rightHolderMember.value), rights_holder_type: rightHolderType, ownership_percentage: percentageValue }),
+      const response = await api.post(`/right-holders/`, {
+        member_film: Number(rightHolderFilm.value),
+        member: Number(rightHolderMember.value),
+        rights_holder_type: rightHolderType,
+        ownership_percentage: percentageValue
       });
-      if (!response.ok) throw new Error(await response.text());
-      const created = await response.json();
-      setRightHolders((prev) => [created, ...prev]);
+      setRightHolders((prev) => [response.data, ...prev]);
       resetRightHolderForm();
       setRightHolderFormSuccess("Right holder added successfully.");
     } catch (e: any) {
-      setRightHolderFormError(e.message || "Failed to add right holder.");
+      setRightHolderFormError(e.response?.data ? JSON.stringify(e.response.data) : (e.message || "Failed to add right holder."));
     } finally {
       setRightHolderSubmitting(false);
     }
   };
 
   const fetchFilmRelations = async (filmId: number) => {
-    const [castRes, docRes] = await Promise.all([
-      fetch(`${API_ROOT}/cast-members/?member_film=${filmId}`, { credentials: "include" }),
-      fetch(`${API_ROOT}/documents/?member_film=${filmId}`, { credentials: "include" }),
-    ]);
-    const [castData, docData] = await Promise.all([
-      castRes.ok ? castRes.json() : Promise.resolve([]),
-      docRes.ok ? docRes.json() : Promise.resolve([]),
-    ]);
-    return { cast: castData?.results || castData || [], documents: docData?.results || docData || [] };
+    try {
+      const [castRes, docRes] = await Promise.all([
+        api.get(`/cast-members/?member_film=${filmId}`),
+        api.get(`/documents/?member_film=${filmId}`),
+      ]);
+      return {
+        cast: castRes.data?.results || castRes.data || [],
+        documents: docRes.data?.results || docRes.data || []
+      };
+    } catch (e) {
+      console.error("Error fetching film relations", e);
+      return { cast: [], documents: [] };
+    }
   };
 
   const handleCreateFilm = async () => {
@@ -583,13 +602,12 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
         const names = filmSharedWithNames.split(',').map(n => n.trim()).filter(n => n);
         for (const name of names) {
           try {
-            const shareResponse = await fetch(`${API_ROOT}/film-shares/`, {
-              method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ film: film.id, shared_with_name: name, share_percentage: percentageValue }),
+            const shareResponse = await api.post(`/film-shares/`, {
+              film: film.id,
+              shared_with_name: name,
+              share_percentage: percentageValue
             });
-            if (!shareResponse.ok) throw new Error(await shareResponse.text());
-            const createdShare = await shareResponse.json();
-            setFilmShares((prev) => [createdShare, ...prev]);
+            setFilmShares((prev) => [shareResponse.data, ...prev]);
           } catch (e: any) {
             console.error(`Failed to create film share for ${name}:`, e);
           }
@@ -669,17 +687,16 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
       setRightHolderPercentage(holderResults[0]?.ownership_percentage?.toString() || "");
       setShowFilmModal(true);
 
-      const shareRes = await fetch(`${API_ROOT}/film-shares/?film=${film.id}`, { credentials: "include" });
-      if (shareRes.ok) {
-        const shareData = await shareRes.json();
-        const shareResults = shareData.results || shareData;
+      try {
+        const shareRes = await api.get(`/film-shares/?film=${film.id}`);
+        const shareResults = shareRes.data.results || shareRes.data;
         if (shareResults.length > 0) {
           setFilmSharedWithNames(shareResults.map((s: any) => s.shared_with_name).filter((n: any) => n).join(', '));
           setFilmSharePercentage(shareResults[0].share_percentage?.toString() || "");
         } else {
           setFilmSharedWithNames(""); setFilmSharePercentage("");
         }
-      } else {
+      } catch (e) {
         setFilmSharedWithNames(""); setFilmSharePercentage("");
       }
     } catch (e) {
@@ -738,24 +755,25 @@ export function DashboardProvider({ children, role, initialSection = "home" }: {
         const percentageValue = filmSharePercentage ? parseFloat(filmSharePercentage) : null;
         if (percentageValue !== null && (Number.isNaN(percentageValue) || percentageValue < 0 || percentageValue > 100)) return showSnackbar("Share percentage must be between 0 and 100.", "error");
 
-        const existingShareRes = await fetch(`${API_ROOT}/film-shares/?film=${editingFilm.id}`, { credentials: "include" });
-        if (existingShareRes.ok) {
-          const existingShareData = await existingShareRes.json();
-          for (const existingShare of (existingShareData.results || existingShareData)) {
-            await fetch(`${API_ROOT}/film-shares/${existingShare.id}/`, { method: "DELETE", credentials: "include" });
+        try {
+          const existingShareRes = await api.get(`/film-shares/?film=${editingFilm.id}`);
+          const existingShareResults = existingShareRes.data.results || existingShareRes.data;
+          for (const existingShare of existingShareResults) {
+            await api.delete(`/film-shares/${existingShare.id}/`);
           }
+        } catch (e) {
+          console.error("Error cleaning existing shares", e);
         }
 
         const names = filmSharedWithNames.split(',').map(n => n.trim()).filter(n => n);
         for (const name of names) {
           try {
-            const shareResponse = await fetch(`${API_ROOT}/film-shares/`, {
-              method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ film: editingFilm.id, shared_with_name: name, share_percentage: percentageValue }),
+            const shareResponse = await api.post(`/film-shares/`, {
+              film: editingFilm.id,
+              shared_with_name: name,
+              share_percentage: percentageValue
             });
-            if (!shareResponse.ok) throw new Error(await shareResponse.text());
-            const createdShare = await shareResponse.json();
-            setFilmShares((prev) => [createdShare, ...prev]);
+            setFilmShares((prev) => [shareResponse.data, ...prev]);
           } catch (e: any) {
             console.error(`Failed to create film share for ${name}:`, e);
           }

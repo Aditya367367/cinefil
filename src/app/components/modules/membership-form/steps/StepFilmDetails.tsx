@@ -83,7 +83,7 @@ export function StepFilmDetails() {
       <div className="mf-info-box mf-info-box--neutral" style={{ marginBottom: "20px", fontSize: "12px" }}>
         <strong>Excel format:</strong> Film Title, Language, Date of Release, Star Cast, Remarks.
       </div>
-      
+
       {isNoFilmApp && films.length > 0 && (
         <div className="mf-info-box mf-info-box--warning" style={{ marginBottom: "20px", fontSize: "13px", backgroundColor: "#fffbeb", borderColor: "#fef3c7", color: "#92400e" }}>
           <strong>Notice:</strong> The films listed below were present in your previous submission (including the one you just deleted from your dashboard). Please remove any films you no longer own, add your new film(s), and submit.
