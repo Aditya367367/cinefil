@@ -7,7 +7,7 @@ import { governanceService } from "../../../services/governanceService";
 interface DocItem {
   id: number;
   title: string;
-  document_type: string;
+  document_type?: string | null;
   file: string;
   thumbnail?: string;
   version?: string;
@@ -101,7 +101,7 @@ export function GovernancePage() {
     if (doc.file && doc.file !== "#") {
       window.open(doc.file, "_blank", "noopener,noreferrer");
     } else {
-      alert(`Opening preview instance for standard document framework placeholder: ${doc.title}`);
+      alert(`Opening preview instance for standard document framework placeholder: ${doc.title || "Document"}`);
     }
   };
 
@@ -115,7 +115,7 @@ export function GovernancePage() {
       link.click();
       document.body.removeChild(link);
     } else {
-      alert(`Initiating digital package download workflow tracking placeholder for: ${doc.title}`);
+      alert(`Initiating digital package download workflow tracking placeholder for: ${doc.title || "Document"}`);
     }
   };
 
@@ -179,7 +179,8 @@ export function GovernancePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12">
               {documents.map((doc) => {
-                const imageUrl = doc.thumbnail || DOCUMENT_TYPE_IMAGES[doc.document_type] || "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?auto=format&fit=crop&w=900&q=80";
+                const docTypeKey = doc.document_type || "default";
+                const imageUrl = doc.thumbnail || DOCUMENT_TYPE_IMAGES[docTypeKey] || "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?auto=format&fit=crop&w=900&q=80";
 
                 return (
                   <div
@@ -190,13 +191,13 @@ export function GovernancePage() {
                       <div className="relative h-32 sm:h-40 bg-slate-900 overflow-hidden">
                         <img
                           src={imageUrl}
-                          alt={doc.title}
+                          alt={doc.title || "Governance Document"}
                           className="h-full w-full object-cover opacity-85 transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                         <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-white/95 backdrop-blur-xs border border-slate-200 text-slate-800 text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs uppercase tracking-wider">
-                          {doc.document_type.replace('_', ' ')}
+                          {doc.document_type?.replace(/_/g, ' ') ?? "Document"}
                         </div>
                       </div>
 
@@ -207,7 +208,7 @@ export function GovernancePage() {
                             className="text-[10px] sm:text-xs font-bold text-slate-900 tracking-tight line-clamp-2 leading-tight"
                             style={{ fontFamily: "var(--font-heading)" }}
                           >
-                            {doc.title}
+                            {doc.title || "Untitled Document"}
                           </h3>
                         </div>
 
@@ -228,15 +229,6 @@ export function GovernancePage() {
                         <Eye size={12} className="w-3 h-3 sm:w-3 sm:h-3" />
                         Preview
                       </button>
-                      {/* <button
-                        onClick={() => handleDownload(doc)}
-                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-[10px] uppercase tracking-wider font-bold text-white transition-opacity hover:opacity-95 shadow-2xs"
-                        style={{ backgroundColor: "var(--cinefil-navy)" }}
-                        type="button"
-                      >
-                        <Download size={12} />
-                        Download
-                      </button> */}
                     </div>
                   </div>
                 );
