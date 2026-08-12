@@ -32,7 +32,7 @@ export function StepKycDocuments() {
     { id: "pan-card", label: "PAN Card", required: true, file: panCard, existingUrl: existingPanCardUrl, handler: makeUploadHandler("panCard", setPanCard) },
     { id: "board-res", label: "Authority Letter or Board Resolution", hint: "Mandatory for entities", required: !isIndividual, file: boardResolution, existingUrl: existingBoardResolutionUrl, handler: makeUploadHandler("boardResolution", setBoardResolution) },
     { id: "passport-photo-1", label: "Passport-Size Photograph 1", required: true, file: passportPhoto, existingUrl: existingPassportPhotoUrl, handler: makeUploadHandler("passportPhoto", setPassportPhoto) },
-    { id: "passport-photo-2", label: "Passport-Size Photograph 2", required: true, file: passportPhoto2, existingUrl: existingPassportPhoto2Url, handler: makeUploadHandler("passportPhoto2", setPassportPhoto2) },
+    // { id: "passport-photo-2", label: "Passport-Size Photograph 2", required: true, file: passportPhoto2, existingUrl: existingPassportPhoto2Url, handler: makeUploadHandler("passportPhoto2", setPassportPhoto2) },
   ];
 
   return (

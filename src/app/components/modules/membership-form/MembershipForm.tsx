@@ -107,6 +107,9 @@ function MembershipFormInner() {
   if (pendingApplication) {
     return (
       <div className="mf-page">
+        {showCongratulations && (
+          <CongratulationsAnimation onComplete={handleAnimationComplete} />
+        )}
         <PageBanner title="APPLICATION STATUS" subtitle="Your membership application is currently under review." />
         <div className="mf-container max-w-3xl mx-auto mt-12">
           <div className="mb-6 p-8 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 font-medium text-center shadow-lg">

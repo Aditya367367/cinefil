@@ -7,17 +7,17 @@ import { API_ROOT } from "../../../../../services/api";
 import { useAuth } from "../../../../../context/AuthContext";
 import { authService } from "../../../../../services/authService";
 
-const EditableField = ({ 
-  label, 
-  value, 
-  onSave, 
+const EditableField = ({
+  label,
+  value,
+  onSave,
   type = "text",
   readOnly = false,
   isDate = false
-}: { 
-  label: string, 
-  value: any, 
-  onSave?: (val: any) => Promise<void>, 
+}: {
+  label: string,
+  value: any,
+  onSave?: (val: any) => Promise<void>,
   type?: string,
   readOnly?: boolean,
   isDate?: boolean
@@ -48,7 +48,7 @@ const EditableField = ({
   return (
     <div className="flex flex-col gap-1 border-b border-gray-100 pb-3">
       <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
-      
+
       {isEditing ? (
         <div className="flex items-center gap-2">
           <input
@@ -58,15 +58,15 @@ const EditableField = ({
             className="flex-1 rounded-md border border-blue-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isSaving}
           />
-          <button 
-            onClick={handleSave} 
+          <button
+            onClick={handleSave}
             disabled={isSaving}
             className="rounded-md bg-emerald-500 p-1.5 text-white hover:bg-emerald-600 transition"
           >
             <Check size={16} />
           </button>
-          <button 
-            onClick={() => { setIsEditing(false); setEditValue(value || ""); }} 
+          <button
+            onClick={() => { setIsEditing(false); setEditValue(value || ""); }}
             disabled={isSaving}
             className="rounded-md bg-gray-200 p-1.5 text-gray-700 hover:bg-gray-300 transition"
           >
@@ -77,7 +77,7 @@ const EditableField = ({
         <div className="flex items-center justify-between group">
           <span className="text-sm font-medium text-gray-900 break-all">{displayValue || <span className="text-gray-400 italic">Not provided</span>}</span>
           {!readOnly && (
-            <button 
+            <button
               onClick={() => setIsEditing(true)}
               className="text-blue-600 sm:text-gray-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:text-blue-700 transition p-1.5 rounded-lg bg-blue-50 sm:bg-transparent border border-blue-200/60 sm:border-0 shrink-0"
               title="Edit field"
@@ -105,7 +105,7 @@ function OtpInput({ value, onChange, length = 4, disabled = false }: OtpInputPro
     if (disabled) return;
     const val = e.target.value.replace(/\D/g, "");
     if (!val) return;
-    
+
     const newValue = value.split("");
     newValue[idx] = val[val.length - 1];
     const updated = newValue.join("");
@@ -165,14 +165,14 @@ function OtpInput({ value, onChange, length = 4, disabled = false }: OtpInputPro
   );
 }
 
-const EditableMobileField = ({ 
-  label, 
-  value, 
+const EditableMobileField = ({
+  label,
+  value,
   onSave,
   readOnly = false
-}: { 
-  label: string, 
-  value: string, 
+}: {
+  label: string,
+  value: string,
   onSave: (val: string) => Promise<void>,
   readOnly?: boolean
 }) => {
@@ -267,7 +267,7 @@ const EditableMobileField = ({
   return (
     <div className="flex flex-col gap-1 border-b border-gray-100 pb-3">
       <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
-      
+
       {isEditing ? (
         <div className="space-y-3 mt-1">
           <div className="flex items-center gap-2">
@@ -283,16 +283,16 @@ const EditableMobileField = ({
               disabled={isSendingOtp || isVerifying || otpVisible}
             />
             {!otpVisible ? (
-              <button 
-                onClick={handleSendOtp} 
+              <button
+                onClick={handleSendOtp}
                 disabled={isSendingOtp || !newMobile || newMobile.length !== 10}
                 className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-900 hover:bg-amber-600 transition disabled:opacity-50"
               >
                 {isSendingOtp ? "Sending..." : "Send OTP"}
               </button>
             ) : null}
-            <button 
-              onClick={handleCancel} 
+            <button
+              onClick={handleCancel}
               disabled={isSendingOtp || isVerifying}
               className="rounded-md bg-gray-200 p-1.5 text-gray-700 hover:bg-gray-300 transition"
             >
@@ -327,8 +327,8 @@ const EditableMobileField = ({
                   Resend OTP
                 </button>
               </div>
-              <button 
-                onClick={handleVerifyAndSave} 
+              <button
+                onClick={handleVerifyAndSave}
                 disabled={isVerifying || timer <= 0 || otp.length !== 4}
                 className="w-full rounded-md bg-emerald-500 py-2 text-xs font-bold text-white hover:bg-emerald-600 transition flex items-center justify-center gap-1 disabled:opacity-50"
               >
@@ -345,7 +345,7 @@ const EditableMobileField = ({
         <div className="flex items-center justify-between group">
           <span className="text-sm font-medium text-gray-900 break-all">{value || <span className="text-gray-400 italic">Not provided</span>}</span>
           {!readOnly && (
-            <button 
+            <button
               onClick={() => setIsEditing(true)}
               className="text-blue-600 sm:text-gray-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:text-blue-700 transition p-1.5 rounded-lg bg-blue-50 sm:bg-transparent border border-blue-200/60 sm:border-0 shrink-0"
               title="Edit field"
@@ -359,18 +359,18 @@ const EditableMobileField = ({
   );
 };
 
-const DocumentLink = ({ 
-  label, 
-  url, 
-  fieldKey, 
-  onUpload, 
-  readOnly = false 
-}: { 
-  label: string, 
-  url: string | null | undefined, 
-  fieldKey?: string, 
-  onUpload?: (field: string, file: File) => Promise<void>, 
-  readOnly?: boolean 
+const DocumentLink = ({
+  label,
+  url,
+  fieldKey,
+  onUpload,
+  readOnly = false
+}: {
+  label: string,
+  url: string | null | undefined,
+  fieldKey?: string,
+  onUpload?: (field: string, file: File) => Promise<void>,
+  readOnly?: boolean
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputId = `upload-${fieldKey}`;
@@ -393,9 +393,9 @@ const DocumentLink = ({
       <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</span>
       <div className="flex items-center gap-3">
         {url ? (
-          <a 
-            href={url.startsWith('http') ? url : `${API_ROOT.replace('/api/v1', '')}${url}`} 
-            target="_blank" 
+          <a
+            href={url.startsWith('http') ? url : `${API_ROOT.replace('/api/v1', '')}${url}`}
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
           >
@@ -404,18 +404,18 @@ const DocumentLink = ({
         ) : (
           <span className="text-sm font-medium text-gray-400 italic">Not uploaded</span>
         )}
-        
+
         {!readOnly && fieldKey && onUpload && (
           <div className="ml-auto">
-            <input 
-              type="file" 
-              id={fileInputId} 
-              className="hidden" 
-              onChange={handleFileChange} 
+            <input
+              type="file"
+              id={fileInputId}
+              className="hidden"
+              onChange={handleFileChange}
               disabled={isUploading}
               accept=".pdf,.jpg,.jpeg,.png"
             />
-            <label 
+            <label
               htmlFor={fileInputId}
               className="cursor-pointer inline-flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 px-2.5 py-1 text-xs font-bold text-gray-700 transition border border-gray-200"
             >
@@ -429,8 +429,8 @@ const DocumentLink = ({
 };
 
 export function SectionMembershipDetails() {
-  const { 
-    user, 
+  const {
+    user,
     isMember,
     filmsList,
     changeSection,
@@ -441,7 +441,7 @@ export function SectionMembershipDetails() {
   } = useDashboard();
   const { refreshProfile } = useAuth();
   const { showSnackbar } = useSnackbar();
-  
+
   const [application, setApplication] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRequestingPrime, setIsRequestingPrime] = useState(false);
@@ -454,10 +454,10 @@ export function SectionMembershipDetails() {
         const appsRes = await memberService.getApplications();
         if (appsRes.success && appsRes.applications) {
           // Find any active or approved application
-          const activeApp = appsRes.applications.find((app: any) => 
+          const activeApp = appsRes.applications.find((app: any) =>
             ['approved', 'associate_member', 'kyc_under_review', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review'].includes(app.status)
           ) || appsRes.applications[0];
-          
+
           if (activeApp) {
             // Fetch full details
             const detailRes = await memberService.getApplicationDetail(activeApp.id);
@@ -482,20 +482,9 @@ export function SectionMembershipDetails() {
     try {
       const formData = new FormData();
       formData.append(field, value);
-      
-      const res = await fetch(`${API_ROOT}/membership-applications/${application.id}/`, {
-        method: "PATCH",
-        credentials: "include",
-        body: formData
-      });
-      
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to update field");
-      }
-      
-      const updatedApp = await res.json();
-      setApplication(updatedApp.application);
+
+      const updatedApp = await memberService.updateApplication(application.id, formData);
+      setApplication(updatedApp.application || updatedApp);
       showSnackbar("Updated successfully", "success");
     } catch (e: any) {
       showSnackbar(e.message || "Failed to update field", "error");
@@ -532,20 +521,9 @@ export function SectionMembershipDetails() {
     try {
       const formData = new FormData();
       formData.append(field, file);
-      
-      const res = await fetch(`${API_ROOT}/membership-applications/${application.id}/`, {
-        method: "PATCH",
-        credentials: "include",
-        body: formData
-      });
-      
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to upload document");
-      }
-      
-      const updatedApp = await res.json();
-      setApplication(updatedApp.application);
+
+      const updatedApp = await memberService.updateApplication(application.id, formData);
+      setApplication(updatedApp.application || updatedApp);
       showSnackbar("Document uploaded successfully", "success");
     } catch (e: any) {
       showSnackbar(e.message || "Failed to upload document", "error");
@@ -565,24 +543,14 @@ export function SectionMembershipDetails() {
 
     setIsRequestingPrime(true);
     try {
-      const res = await fetch(`${API_ROOT}/members/upgrade-prime/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to request Prime Membership");
-      }
+      const data = await memberService.upgradeToPrime();
       showSnackbar("Prime Membership upgrade request submitted successfully!", "success");
       await fetchData();
-      
+
       // Reload application details
       const appsRes = await memberService.getApplications();
       if (appsRes.success && appsRes.applications) {
-        const activeApp = appsRes.applications.find((app: any) => 
+        const activeApp = appsRes.applications.find((app: any) =>
           ['approved', 'associate_member', 'kyc_under_review', 'ownership_verification', 'legal_scrutiny', 'ceo_review', 'membership_committee_review'].includes(app.status)
         ) || appsRes.applications[0];
         if (activeApp) {
@@ -625,19 +593,18 @@ export function SectionMembershipDetails() {
 
   const requiredPrimeDocs = [
     { key: "pan_card", label: "PAN Card" },
-    { key: "passport_photo", label: "Passport-Size Photograph 1" },
-    { key: "passport_photo_2", label: "Passport-Size Photograph 2" },
+    { key: "passport_photo", label: "Passport-Size Photograph" },
     ...(!isIndividual ? [
       { key: "board_resolution", label: "Authority Letter or Board Resolution" }
     ] : [])
   ];
 
-  const incompleteFields = application 
-    ? requiredPrimeFields.filter(fld => !application[fld.key]) 
+  const incompleteFields = application
+    ? requiredPrimeFields.filter(fld => !application[fld.key])
     : [];
 
-  const incompleteDocs = application 
-    ? requiredPrimeDocs.filter(doc => !application[doc.key]) 
+  const incompleteDocs = application
+    ? requiredPrimeDocs.filter(doc => !application[doc.key])
     : [];
 
   const incompleteFilms = filmsList.filter(f => !isFilmComplete(f));
@@ -739,7 +706,7 @@ export function SectionMembershipDetails() {
                 <AlertTriangle size={15} className="text-red-600 shrink-0" />
                 <span>To become a Prime Member, all required fields and KYC documents must be complete. Please fill/upload the following:</span>
               </p>
-              
+
               {incompleteFields.length > 0 && (
                 <div className="mt-2">
                   <p className="font-bold underline">Missing Fields (please edit/fill them in the sections below):</p>
@@ -748,7 +715,7 @@ export function SectionMembershipDetails() {
                   </ul>
                 </div>
               )}
-              
+
               {incompleteDocs.length > 0 && (
                 <div className="mt-2">
                   <p className="font-bold underline">Missing Documents (please upload them in the KYC Documents section below):</p>
@@ -757,7 +724,7 @@ export function SectionMembershipDetails() {
                   </ul>
                 </div>
               )}
-              
+
               <p className="text-[11px] text-amber-700 italic mt-2">Please complete these fields and documents, then you can proceed to Prime Membership.</p>
             </div>
           ) : (
@@ -788,36 +755,36 @@ export function SectionMembershipDetails() {
             )}
           </h4>
           <div className="space-y-4">
-            <EditableField 
-              label="Username" 
-              value={user?.username} 
-              onSave={handleUsernameSave} 
+            <EditableField
+              label="Username"
+              value={user?.username}
+              onSave={handleUsernameSave}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
             <EditableField label="Applicant Email" value={application.applicant_email} readOnly />
-            <EditableField 
-              label="Applicant Name" 
-              value={application.applicant_name} 
-              onSave={(val) => handleFieldSave('applicant_name', val)} 
+            <EditableField
+              label="Applicant Name"
+              value={application.applicant_name}
+              onSave={(val) => handleFieldSave('applicant_name', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableMobileField 
-              label="Mobile Number" 
-              value={application.mobile_number} 
-              onSave={(val) => handleFieldSave('mobile_number', val)} 
+            <EditableMobileField
+              label="Mobile Number"
+              value={application.mobile_number}
+              onSave={(val) => handleFieldSave('mobile_number', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="PAN Number" 
-              value={application.pan_number} 
-              onSave={(val) => handleFieldSave('pan_number', val)} 
+            <EditableField
+              label="PAN Number"
+              value={application.pan_number}
+              onSave={(val) => handleFieldSave('pan_number', val)}
               readOnly={true}
             />
             {application.company_name && (
-              <EditableField 
-                label="Company / Banner Name" 
-                value={application.company_name} 
-                onSave={(val) => handleFieldSave('company_name', val)} 
+              <EditableField
+                label="Company / Banner Name"
+                value={application.company_name}
+                onSave={(val) => handleFieldSave('company_name', val)}
                 readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
               />
             )}
@@ -833,34 +800,34 @@ export function SectionMembershipDetails() {
             )}
           </h4>
           <div className="space-y-4">
-            <EditableField 
-              label="Account Holder Name" 
-              value={application.account_holder_name} 
-              onSave={(val) => handleFieldSave('account_holder_name', val)} 
+            <EditableField
+              label="Account Holder Name"
+              value={application.account_holder_name}
+              onSave={(val) => handleFieldSave('account_holder_name', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="Bank Name" 
-              value={application.bank_name} 
-              onSave={(val) => handleFieldSave('bank_name', val)} 
+            <EditableField
+              label="Bank Name"
+              value={application.bank_name}
+              onSave={(val) => handleFieldSave('bank_name', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="Branch Name" 
-              value={application.branch_name} 
-              onSave={(val) => handleFieldSave('branch_name', val)} 
+            <EditableField
+              label="Branch Name"
+              value={application.branch_name}
+              onSave={(val) => handleFieldSave('branch_name', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="Account Number" 
-              value={application.account_number} 
-              onSave={(val) => handleFieldSave('account_number', val)} 
+            <EditableField
+              label="Account Number"
+              value={application.account_number}
+              onSave={(val) => handleFieldSave('account_number', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="IFSC Code" 
-              value={application.ifsc_code} 
-              onSave={(val) => handleFieldSave('ifsc_code', val)} 
+            <EditableField
+              label="IFSC Code"
+              value={application.ifsc_code}
+              onSave={(val) => handleFieldSave('ifsc_code', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
           </div>
@@ -875,34 +842,34 @@ export function SectionMembershipDetails() {
             )}
           </h4>
           <div className="grid gap-x-8 gap-y-4 md:grid-cols-2">
-            <EditableField 
-              label="Registered Address" 
-              value={application.registered_address} 
-              onSave={(val) => handleFieldSave('registered_address', val)} 
+            <EditableField
+              label="Registered Address"
+              value={application.registered_address}
+              onSave={(val) => handleFieldSave('registered_address', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="City" 
-              value={application.city} 
-              onSave={(val) => handleFieldSave('city', val)} 
+            <EditableField
+              label="City"
+              value={application.city}
+              onSave={(val) => handleFieldSave('city', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="State" 
-              value={application.state} 
-              onSave={(val) => handleFieldSave('state', val)} 
+            <EditableField
+              label="State"
+              value={application.state}
+              onSave={(val) => handleFieldSave('state', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="Country" 
-              value={application.country} 
-              onSave={(val) => handleFieldSave('country', val)} 
+            <EditableField
+              label="Country"
+              value={application.country}
+              onSave={(val) => handleFieldSave('country', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
-            <EditableField 
-              label="Pin Code" 
-              value={application.pin_code} 
-              onSave={(val) => handleFieldSave('pin_code', val)} 
+            <EditableField
+              label="Pin Code"
+              value={application.pin_code}
+              onSave={(val) => handleFieldSave('pin_code', val)}
               readOnly={user?.is_member_prime || user?.is_prime || isUnderReview}
             />
           </div>
@@ -910,15 +877,14 @@ export function SectionMembershipDetails() {
 
         {/* KYC Documents */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:col-span-2">
-          <h4 className="mb-4 text-lg font-bold text-gray-900 border-b pb-2">KYC Documents</h4>
+          <h4 className="mb-4 text-lg font-bold text-gray-900 border-b pb-2">KYC & Title Documents</h4>
           <div className="grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             <DocumentLink label="PAN Card" url={application.pan_card} fieldKey="pan_card" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            <DocumentLink label="Passport-Size Photograph 1" url={application.passport_photo} fieldKey="passport_photo" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            <DocumentLink label="Passport-Size Photograph 2" url={application.passport_photo_2} fieldKey="passport_photo_2" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            <DocumentLink label="Probate" url={application.probate} fieldKey="probate" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            <DocumentLink label="Letter of Administration" url={application.letter_of_administration} fieldKey="letter_of_administration" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            <DocumentLink label="Devolution of Title" url={application.devolution_of_title} fieldKey="devolution_of_title" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
-            
+            <DocumentLink label="Passport-Size Photograph" url={application.passport_photo} fieldKey="passport_photo" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
+            <DocumentLink label="Probate (Optional)" url={application.probate} fieldKey="probate" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
+            <DocumentLink label="Letter of Administration (Optional)" url={application.letter_of_administration} fieldKey="letter_of_administration" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
+            <DocumentLink label="Devolution of Title (Optional)" url={application.devolution_of_title} fieldKey="devolution_of_title" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
+
             {!isIndividual && (
               <DocumentLink label="Authority Letter or Board Resolution" url={application.board_resolution} fieldKey="board_resolution" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
             )}

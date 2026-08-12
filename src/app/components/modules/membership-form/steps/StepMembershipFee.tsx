@@ -65,14 +65,14 @@ export function StepMembershipFee() {
   const annualFeeAmount = activeType ? parseFee(activeType.annual_fee) : 5000;
   const totalFee = joiningFeeAmount + annualFeeAmount;
 
-  const currentApp = applications?.find((app: any) => 
+  const currentApp = applications?.find((app: any) =>
     app.status === 'associate_member' || (applicationId && app.id === Number(applicationId))
   );
 
   const isAlreadyPaid = !!(currentApp && (
-    currentApp.status === 'associate_member' || 
-    currentApp.status === 'paid_no_receipt' || 
-    currentApp.payment_status === 'successful' || 
+    currentApp.status === 'associate_member' ||
+    currentApp.status === 'paid_no_receipt' ||
+    currentApp.payment_status === 'successful' ||
     currentApp.payment_status === 'captured'
   ));
 
@@ -97,11 +97,11 @@ export function StepMembershipFee() {
       // 1. Submit form first to get application ID
       const formData = buildApplicationFormData();
       const appRes = await memberService.submitApplication(formData);
-      
+
       if (!appRes.success) {
         throw new Error(appRes.error || "Failed to submit application.");
       }
-      
+
       const applicationId = appRes.application.id;
       setApplicationId(applicationId);
 
@@ -149,7 +149,7 @@ export function StepMembershipFee() {
               application_id: applicationId,
             });
 
-             if (verifyRes.success) {
+            if (verifyRes.success) {
               showSnackbar("Payment verified successfully! Registered as Associate Member.", "success");
               setPaymentStatus("success");
               if (verifyRes.application) {
@@ -158,6 +158,7 @@ export function StepMembershipFee() {
                   return [...filtered, verifyRes.application];
                 });
               }
+              setShowCongratulations(true);
             } else {
               throw new Error(verifyRes.error || "Signature verification failed.");
             }
@@ -237,7 +238,7 @@ export function StepMembershipFee() {
     tempDiv.style.width = '800px';
     tempDiv.style.boxSizing = 'border-box';
     tempDiv.style.padding = '40px';
-    
+
     wrapper.appendChild(tempDiv);
     document.body.appendChild(wrapper);
 
@@ -260,7 +261,7 @@ export function StepMembershipFee() {
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    
+
     (window as any).html2pdf().set(opt).from(element).save().then(() => {
       document.body.removeChild(wrapperElement);
       showSnackbar("Receipt downloaded successfully as PDF!", "success");
@@ -288,6 +289,7 @@ export function StepMembershipFee() {
             return [...filtered, verifyRes.application];
           });
         }
+        setShowCongratulations(true);
       } else {
         throw new Error(verifyRes.error || "Sandbox signature verification failed.");
       }
@@ -402,7 +404,7 @@ export function StepMembershipFee() {
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center", maxWidth: "600px", margin: "0 auto" }}>
-            <button
+            {/* <button
               type="button"
               onClick={downloadReceipt}
               className="mf-btn mf-btn--prev"
@@ -410,11 +412,11 @@ export function StepMembershipFee() {
             >
               <Download size={18} />
               Download Receipt
-            </button>
+            </button> */}
 
             {isAuthenticated ? (
               <>
-                <button
+                {/* <button
                   type="button"
                   disabled={upgrading}
                   onClick={handleUpgradeToPrime}
@@ -441,7 +443,7 @@ export function StepMembershipFee() {
                   ) : (
                     "Upgrade to Prime"
                   )}
-                </button>
+                </button> */}
                 <button
                   type="button"
                   onClick={() => window.location.href = "/member-dashboard"}
@@ -484,7 +486,7 @@ export function StepMembershipFee() {
               </button>
             )}
           </div>
-          
+
           {!isAuthenticated && (
             <p style={{ fontSize: "12px", color: "#64748b", marginTop: "16px" }}>
               Please check your registered email for your account login credentials to access your dashboard and manage your films.

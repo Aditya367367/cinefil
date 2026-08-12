@@ -163,7 +163,7 @@ export interface MembershipFormContextType {
   existingRepAuthorityLetterUrl?: string | null;
   existingCanceledCheckUrl?: string | null;
   existingGstCertificateUrl?: string | null;
-  
+
   // Existing Ownership URLs
   existingProducerOwnershipDeclarationUrl?: string | null;
   existingAssignmentAgreementUrl?: string | null;
@@ -384,7 +384,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const [agreementSigningOption, setAgreementSigningOption] = useState<string>("no_dsc");
   const [agreementSignedDocument, setAgreementSignedDocument] = useState<File | null>(null);
   const [existingAgreementSignedDocumentUrl, setExistingAgreementSignedDocumentUrl] = useState<string | null>(null);
-  
+
   const [passportPhoto, setPassportPhoto] = useState<File | null>(null);
   const [passportPhoto2, setPassportPhoto2] = useState<File | null>(null);
   const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<string | null>(null);
@@ -690,10 +690,10 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         showSnackbar("Please upload Passport Photograph 1.", "error");
         return;
       }
-      if (!passportPhoto2 && !existingPassportPhoto2Url) {
-        showSnackbar("Please upload Passport Photograph 2.", "error");
-        return;
-      }
+      // if (!passportPhoto2 && !existingPassportPhoto2Url) {
+      //   showSnackbar("Please upload Passport Photograph 2.", "error");
+      //   return;
+      // }
       if (documentErrors.panCard || documentErrors.boardResolution || documentErrors.passportPhoto || documentErrors.passportPhoto2) {
         showSnackbar("Please fix document errors before proceeding.", "error");
         return;
@@ -713,8 +713,18 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       }
     }
     if (currentStepKey === "agreement") {
-      if (!agreementAccepted || !digitalSignature.trim() || !signaturePlace.trim() || !signatureDate) {
-        showSnackbar("Please accept the agreement and provide your digital signature, place, and date.", "error");
+      const isScan = agreementSigningOption === "scan";
+      const hasSignatureOrDoc = isScan
+        ? Boolean(agreementSignedDocument || existingAgreementSignedDocumentUrl)
+        : Boolean(digitalSignature.trim());
+
+      if (!agreementAccepted || !hasSignatureOrDoc || !signaturePlace.trim() || !signatureDate) {
+        showSnackbar(
+          isScan
+            ? "Please accept the agreement, upload signed copy, and provide place and date."
+            : "Please accept the agreement and provide your digital signature, place, and date.",
+          "error"
+        );
         return;
       }
       const d = new Date();
@@ -727,7 +737,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
         return;
       }
     }
-    
+
     if (currentStepKey !== "fee") {
       const saveSuccess = await saveStepData();
       if (!saveSuccess) {
@@ -955,7 +965,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     setSubmitting(true);
     try {
       const formData = buildApplicationFormData(true);
-      
+
       let response;
       if (applicationId) {
         response = await memberService.updateApplication(Number(applicationId), formData);
@@ -992,7 +1002,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   // Populate form with draft application data
   const loadDraftApplication = (draftData: any) => {
     if (!draftData) return;
-    
+
     // Auto-fill applicant details
     if (draftData.applicant_name) setApplicantName(draftData.applicant_name);
     if (draftData.cin_llpin) setCinLlp(draftData.cin_llpin);
@@ -1008,14 +1018,14 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.website) setWebsite(draftData.website);
     if (draftData.telephone_number) setTelephoneNumber(draftData.telephone_number);
     if (draftData.mobile_number) {
-        setMobileNumber(draftData.mobile_number);
-        setIsMobileVerified(true);
+      setMobileNumber(draftData.mobile_number);
+      setIsMobileVerified(true);
     }
     if (draftData.applicant_email) {
-        setApplicantEmail(draftData.applicant_email);
-        setIsEmailVerified(true);
+      setApplicantEmail(draftData.applicant_email);
+      setIsEmailVerified(true);
     }
-    
+
     // Selected Type
     if (draftData.membership_type) {
       setSelectedType(draftData.membership_type.toString());
@@ -1063,7 +1073,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.rep_aadhar) setRepAadhar(draftData.rep_aadhar);
     if (draftData.rep_pan) setRepPan(draftData.rep_pan);
     if (draftData.rep_authority_letter) setExistingRepAuthorityLetterUrl(draftData.rep_authority_letter);
-    
+
     // Bank Details
     if (draftData.account_holder_name) setAccountHolderName(draftData.account_holder_name);
     if (draftData.bank_name) setBankName(draftData.bank_name);
@@ -1089,7 +1099,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.passport_photo_2) {
       setExistingPassportPhoto2Url(draftData.passport_photo_2);
     }
-    
+
     // KYC Documents
     if (draftData.pan_card) setExistingPanCardUrl(draftData.pan_card);
     if (draftData.certificate_of_incorporation) setExistingCertificateOfIncorporationUrl(draftData.certificate_of_incorporation);
@@ -1105,7 +1115,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.producer_ownership_declaration) setExistingProducerOwnershipDeclarationUrl(draftData.producer_ownership_declaration);
     if (draftData.assignment_agreement) setExistingAssignmentAgreementUrl(draftData.assignment_agreement);
     if (draftData.other_ownership_declaration) setExistingOtherOwnershipDeclarationUrl(draftData.other_ownership_declaration);
-    
+
     // Declarations
     if (draftData.declare_lawful_owner !== undefined) setDeclareLawfulOwner(draftData.declare_lawful_owner);
     if (draftData.authorize_cinefil !== undefined) setAuthorizeCinefil(draftData.authorize_cinefil);
@@ -1114,18 +1124,18 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     if (draftData.digital_signature) setDigitalSignature(draftData.digital_signature);
     if (draftData.signature_place) setSignaturePlace(draftData.signature_place);
     if (draftData.signature_date) setSignatureDate(draftData.signature_date);
-    
+
     // Receipt
     if (draftData.payments && Array.isArray(draftData.payments) && draftData.payments.length > 0) {
-        const payment = draftData.payments[draftData.payments.length - 1]; // Use latest payment
-        if (payment.receipt) {
-            setExistingPaymentReceiptUrl(payment.receipt);
-        }
+      const payment = draftData.payments[draftData.payments.length - 1]; // Use latest payment
+      if (payment.receipt) {
+        setExistingPaymentReceiptUrl(payment.receipt);
+      }
     }
-    
+
     // Set the application ID so submitting will update it
     if (draftData.id) {
-        setApplicationId(draftData.id);
+      setApplicationId(draftData.id);
     }
   };
 

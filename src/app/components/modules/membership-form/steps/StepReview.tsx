@@ -111,10 +111,10 @@ export const StepReview = () => {
       value instanceof File
         ? value.name
         : typeof value === "boolean"
-        ? value
-          ? "Yes"
-          : null
-        : value?.toString().trim() || null;
+          ? value
+            ? "Yes"
+            : null
+          : value?.toString().trim() || null;
 
     const isEmpty = resolved === null || resolved === undefined || resolved === "";
 
@@ -393,8 +393,8 @@ export const StepReview = () => {
           {!isIndividual && (
             <FileRow label="Authority Letter or Board Resolution" file={boardResolution} existingUrl={existingBoardResolutionUrl} required />
           )}
-          <FileRow label="Passport-Size Photograph 1" file={passportPhoto} existingUrl={existingPassportPhotoUrl} required />
-          <FileRow label="Passport-Size Photograph 2" file={passportPhoto2} existingUrl={existingPassportPhoto2Url} required />
+          <FileRow label="Passport-Size Photograph" file={passportPhoto} existingUrl={existingPassportPhotoUrl} required />
+          {/* <FileRow label="Passport-Size Photograph 2" file={passportPhoto2} existingUrl={existingPassportPhoto2Url} required /> */}
         </SectionCard>
       )}
 

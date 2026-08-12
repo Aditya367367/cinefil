@@ -28,6 +28,21 @@
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
+
+      // Handle 429 Rate Limit: parse wait time and throw friendly message
+      if (error.response?.status === 429) {
+        const detail: string = error.response?.data?.detail || "";
+        const match = detail.match(/(\d+)\s*second/i);
+        const seconds = match ? parseInt(match[1], 10) : null;
+        let friendlyMsg = "You've made too many requests. Please wait before trying again.";
+        if (seconds !== null) {
+          const retryAt = new Date(Date.now() + seconds * 1000);
+          const timeStr = retryAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          friendlyMsg = `Too many requests. Please try again at ${timeStr}.`;
+        }
+        return Promise.reject(new Error(friendlyMsg));
+      }
+
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         try {

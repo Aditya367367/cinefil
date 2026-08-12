@@ -453,8 +453,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                 <div className="p-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {renderDocumentLink("PAN Card", selectedApp.pan_card)}
                   {renderDocumentLink("Authority Letter / Board Resolution", selectedApp.board_resolution)}
-                  {renderDocumentLink("Passport Photograph 1", selectedApp.passport_photo)}
-                  {renderDocumentLink("Passport Photograph 2", selectedApp.passport_photo_2)}
+                  {renderDocumentLink("Passport Photograph", selectedApp.passport_photo)}
                 </div>
                 {renderSectionReviewInput("Step 4: KYC Documents")}
               </div>

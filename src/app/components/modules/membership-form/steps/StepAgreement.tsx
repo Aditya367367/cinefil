@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, Check, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Upload, Printer } from "lucide-react";
 import { useMembershipForm } from "../context/MembershipFormContext";
 import { SkipTestingButton } from "../components/SkipTestingButton";
 
@@ -65,14 +65,12 @@ export function StepAgreement() {
   };
 
   const isScanOption = agreementSigningOption === "scan";
-  
-  const canProceed = agreementAccepted && 
-    (isScanOption 
-      ? ((agreementSignedDocument || existingAgreementSignedDocumentUrl) &&
-         (passportPhoto || existingPassportPhotoUrl) &&
-         (passportPhoto2 || existingPassportPhoto2Url))
-      : digitalSignature.trim()) && 
-    signaturePlace.trim() && 
+
+  const canProceed = agreementAccepted &&
+    (isScanOption
+      ? Boolean(agreementSignedDocument || existingAgreementSignedDocumentUrl)
+      : digitalSignature.trim()) &&
+    signaturePlace.trim() &&
     signatureDate;
 
   return (
@@ -88,11 +86,11 @@ export function StepAgreement() {
       </div>
 
       {/* Agreement content */}
-      <div className="mf-agreement-scroll">
+      <div className="mf-agreement-scroll" id="printable-agreement">
         <div style={{ background: "rgba(16, 185, 129, 0.1)", borderLeft: "4px solid #10b981", padding: "12px", borderRadius: "4px", fontSize: "14px", fontWeight: "600", color: "#065f46", marginBottom: "16px" }}>
           Notice: CINEFIL will bear all expenses.
         </div>
-        
+
         {isProducer ? (
           <>
             <p style={{ fontWeight: 700, marginBottom: "12px", textAlign: "center" }}>ANNEXURE A — AUTHORISATION AND LICENSING AGREEMENT FOR PRODUCER</p>
@@ -205,14 +203,14 @@ export function StepAgreement() {
       {/* Signing Option Selection */}
       <span className="mf-section-label">Signature Method</span>
       <div className="mf-radio-group" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "20px" }}>
-        <div
+        {/* <div
           className={`mf-radio-card ${agreementSigningOption === "dsc" ? "mf-radio-card--selected" : ""}`}
           onClick={() => setAgreementSigningOption("dsc")}
           style={{ padding: "12px" }}
         >
           <div className="mf-radio-card__indicator" />
           <span className="mf-radio-card__label" style={{ fontSize: "13px" }}>Digitally Sign (Aadhar eSign / DSC)</span>
-        </div>
+        </div> */}
         <div
           className={`mf-radio-card ${agreementSigningOption === "no_dsc" ? "mf-radio-card--selected" : ""}`}
           onClick={() => setAgreementSigningOption("no_dsc")}
@@ -234,7 +232,52 @@ export function StepAgreement() {
       {/* Conditional Fields based on choice */}
       <div className="mf-grid" style={{ gridTemplateColumns: "1fr" }}>
         {isScanOption ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginBottom: "16px" }}>
+            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: "16px", borderRadius: "8px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyBetween: "space-between", gap: "12px" }}>
+              <div style={{ flex: 1, minWidth: "240px" }}>
+                <p style={{ fontWeight: 700, fontSize: "14px", color: "#1e293b", margin: 0 }}>Print Annexure Document</p>
+                <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>Print out this agreement, physically sign it, and upload the scanned copy below.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const printContent = document.getElementById("printable-agreement");
+                  if (!printContent) {
+                    window.print();
+                    return;
+                  }
+                  const win = window.open("", "_blank");
+                  if (win) {
+                    win.document.write(`
+                      <html>
+                        <head>
+                          <title>Annexure Agreement - CINEFIL</title>
+                          <style>
+                            body { font-family: sans-serif; padding: 30px; font-size: 13px; line-height: 1.6; color: #1e293b; }
+                            h1, h2, h3, p { margin-bottom: 12px; }
+                            @media print {
+                              body { padding: 0; }
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          ${printContent.innerHTML}
+                        </body>
+                      </html>
+                    `);
+                    win.document.close();
+                    win.focus();
+                    win.print();
+                    win.close();
+                  }
+                }}
+                className="mf-btn"
+                style={{ background: "#1e293b", color: "#ffffff", padding: "8px 16px", fontSize: "13px", display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "6px", cursor: "pointer", border: "none", fontWeight: 600 }}
+              >
+                <Printer size={16} /> Print Annexure Document
+              </button>
+            </div>
+
             <div>
               <label className="mf-label">Signed Agreement Copy <span className="mf-label__req">*</span></label>
               <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleAgreementSignedDocumentUpload} className="mf-hidden-input" id="agreement-signed-doc" />
@@ -256,8 +299,8 @@ export function StepAgreement() {
               {documentErrors.agreementSignedDocument && <p className="mf-error">{documentErrors.agreementSignedDocument}</p>}
             </div>
 
-            <div>
-              <label className="mf-label">Passport Photo 1 <span className="mf-label__req">*</span></label>
+            {/* <div>
+              <label className="mf-label">Passport Photo <span className="mf-label__req">*</span></label>
               <input type="file" accept=".jpg,.jpeg,.png" onChange={handlePassportPhotoUpload} className="mf-hidden-input" id="passport-photo-1" />
               <label htmlFor="passport-photo-1" className={`mf-upload ${passportPhoto || existingPassportPhotoUrl ? "mf-upload--has-file" : ""}`}>
                 {passportPhoto ? (
@@ -275,9 +318,9 @@ export function StepAgreement() {
                 )}
               </label>
               {documentErrors.passportPhoto && <p className="mf-error">{documentErrors.passportPhoto}</p>}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label className="mf-label">Passport Photo 2 <span className="mf-label__req">*</span></label>
               <input type="file" accept=".jpg,.jpeg,.png" onChange={handlePassportPhoto2Upload} className="mf-hidden-input" id="passport-photo-2" />
               <label htmlFor="passport-photo-2" className={`mf-upload ${passportPhoto2 || existingPassportPhoto2Url ? "mf-upload--has-file" : ""}`}>
@@ -296,7 +339,7 @@ export function StepAgreement() {
                 )}
               </label>
               {documentErrors.passportPhoto2 && <p className="mf-error">{documentErrors.passportPhoto2}</p>}
-            </div>
+            </div> */}
           </div>
         ) : (
           <div style={{ marginBottom: "16px" }}>
@@ -314,10 +357,26 @@ export function StepAgreement() {
             <input value={signaturePlace} onChange={(e) => setSignaturePlace(e.target.value)} className="mf-input" placeholder="e.g. Mumbai" />
           </div>
           <div>
-            <label className="mf-label">Date <span className="mf-label__req">*</span></label>
-            <input 
-              type="date" 
-              value={signatureDate} 
+            <div className="flex items-center justify-between mb-1">
+              <label className="mf-label" style={{ marginBottom: 0 }}>Date <span className="mf-label__req">*</span></label>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = new Date();
+                  const year = d.getFullYear();
+                  const month = String(d.getMonth() + 1).padStart(2, '0');
+                  const day = String(d.getDate()).padStart(2, '0');
+                  setSignatureDate(`${year}-${month}-${day}`);
+                }}
+                className="text-xs font-bold text-amber-600 hover:text-amber-700 hover:underline cursor-pointer"
+                style={{ fontSize: '12px', color: '#d97706', fontWeight: 600, background: 'none', border: 'none', padding: 0 }}
+              >
+                Today
+              </button>
+            </div>
+            <input
+              type="date"
+              value={signatureDate}
               min={(() => {
                 const d = new Date();
                 const year = d.getFullYear();
@@ -325,8 +384,8 @@ export function StepAgreement() {
                 const day = String(d.getDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
               })()}
-              onChange={(e) => setSignatureDate(e.target.value)} 
-              className="mf-input" 
+              onChange={(e) => setSignatureDate(e.target.value)}
+              className="mf-input"
             />
           </div>
         </div>

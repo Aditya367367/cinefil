@@ -120,7 +120,7 @@ export function SectionFilms() {
             </h1>
           </div>
         </div>
-        
+
         {isMember && (
           <button
             onClick={() => {
@@ -149,7 +149,7 @@ export function SectionFilms() {
               : "Submit a membership application from the membership page to gain access."}
           </p>
           <button
-            onClick={() => { /* Assume handled by parent or context, for now we will link to /membership-form */ window.location.href='/membership-form'; }}
+            onClick={() => { /* Assume handled by parent or context, for now we will link to /membership-form */ window.location.href = '/membership-form'; }}
             className="mt-4 inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-xs sm:text-sm font-bold text-gray-900 transition hover:bg-gray-100 border border-gray-200 shadow-2xs"
           >
             {isPendingMember ? "View membership status" : "Open membership application"}
@@ -216,25 +216,22 @@ export function SectionFilms() {
             <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl self-start sm:self-auto">
               <button
                 onClick={() => setStatusFilter("all")}
-                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                  statusFilter === "all" ? "bg-white text-gray-900 shadow-2xs" : "text-gray-500 hover:text-gray-900"
-                }`}
+                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${statusFilter === "all" ? "bg-white text-gray-900 shadow-2xs" : "text-gray-500 hover:text-gray-900"
+                  }`}
               >
                 All ({filmsList.length})
               </button>
               <button
                 onClick={() => setStatusFilter("complete")}
-                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                  statusFilter === "complete" ? "bg-white text-emerald-700 shadow-2xs" : "text-gray-500 hover:text-gray-900"
-                }`}
+                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${statusFilter === "complete" ? "bg-white text-emerald-700 shadow-2xs" : "text-gray-500 hover:text-gray-900"
+                  }`}
               >
                 Complete ({completeCount})
               </button>
               <button
                 onClick={() => setStatusFilter("incomplete")}
-                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                  statusFilter === "incomplete" ? "bg-white text-rose-700 shadow-2xs" : "text-gray-500 hover:text-gray-900"
-                }`}
+                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${statusFilter === "incomplete" ? "bg-white text-rose-700 shadow-2xs" : "text-gray-500 hover:text-gray-900"
+                  }`}
               >
                 Incomplete ({incompleteCount})
               </button>
@@ -495,11 +492,10 @@ export function SectionFilms() {
                           <button
                             key={pageNum}
                             onClick={() => handleFilmsPageChange(pageNum)}
-                            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                              filmsPage === pageNum
-                                ? 'bg-blue-600 text-white'
-                                : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                            }`}
+                            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${filmsPage === pageNum
+                              ? 'bg-blue-600 text-white'
+                              : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                              }`}
                           >
                             {pageNum}
                           </button>
@@ -633,16 +629,7 @@ export function SectionFilms() {
                   />
                 </label>
 
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                  Censor Certificate Number <span className="text-red-500">*</span>
-                  <input
-                    value={newFilmCertificate}
-                    onChange={(e) => setNewFilmCertificate(e.target.value)}
-                    disabled={isViewOnly}
-                    className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-mono font-semibold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
-                    placeholder="Certificate number"
-                  />
-                </label>
+
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -688,6 +675,16 @@ export function SectionFilms() {
                   />
                 </label>
               </div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                Censor Certificate Number <span className="text-red-500">*</span>
+                <input
+                  value={newFilmCertificate}
+                  onChange={(e) => setNewFilmCertificate(e.target.value)}
+                  disabled={isViewOnly}
+                  className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-mono font-semibold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
+                  placeholder="Certificate number"
+                />
+              </label>
 
               <div className="border-t border-gray-100 pt-4">
                 {/* Censor Certificate */}
@@ -695,10 +692,10 @@ export function SectionFilms() {
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Censor Certificate <span className="text-red-500">*</span></span>
                   {isViewOnly ? (
                     censorDocUrl ? (
-                      <a 
+                      <a
                         href={getBackendFileUrl(censorDocUrl)}
-                        target="_blank" 
-                        rel="noopener noreferrer" 
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="mt-1.5 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition border border-blue-200"
                       >
                         View Document
@@ -708,14 +705,14 @@ export function SectionFilms() {
                     )
                   ) : (
                     <div className="mt-1.5 space-y-1.5">
-                      <input 
-                        type="file" 
-                        id="censor-doc-upload" 
-                        className="hidden" 
-                        onChange={(e) => setCensorDocFile(e.target.files?.[0] || null)} 
+                      <input
+                        type="file"
+                        id="censor-doc-upload"
+                        className="hidden"
+                        onChange={(e) => setCensorDocFile(e.target.files?.[0] || null)}
                       />
-                      <label 
-                        htmlFor="censor-doc-upload" 
+                      <label
+                        htmlFor="censor-doc-upload"
                         className="inline-flex w-full items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition border border-gray-200 cursor-pointer"
                       >
                         {censorDocFile ? censorDocFile.name : (censorDocName ? "Change file" : "Upload file")}
@@ -723,10 +720,10 @@ export function SectionFilms() {
                       {censorDocName && !censorDocFile && (
                         <div className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg p-1.5">
                           <span className="text-[10px] text-gray-500 truncate max-w-[120px]">{censorDocName}</span>
-                          <a 
+                          <a
                             href={getBackendFileUrl(censorDocUrl)}
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="text-[10px] font-bold text-blue-600 hover:underline"
                           >
                             View
@@ -741,49 +738,49 @@ export function SectionFilms() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-gray-200 bg-slate-50/60 p-4 space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-                  <Share2 size={13} />
-                  <span>Film Royalty Allocation Shares</span>
-                </p>
-                
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                    Share Names (Comma-Separated)
-                    <input
-                      type="text"
-                      value={filmSharedWithNames}
-                      onChange={(e) => setFilmSharedWithNames(e.target.value)}
-                      disabled={isViewOnly}
-                      className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-semibold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
-                      placeholder="e.g. Shyam Raj, Pooja Harish"
-                    />
-                  </label>
+              {/* <div className="rounded-xl border border-gray-200 bg-slate-50/60 p-4 space-y-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                    <Share2 size={13} />
+                    <span>Film Royalty Allocation Shares</span>
+                  </p>
 
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                    Share Percentage (Ownership)
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={filmSharePercentage}
-                      onChange={(e) => setFilmSharePercentage(e.target.value)}
-                      disabled={isViewOnly}
-                      className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-mono font-bold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
-                      placeholder="50"
-                    />
-                  </label>
-                </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Share Names (Comma-Separated)
+                      <input
+                        type="text"
+                        value={filmSharedWithNames}
+                        onChange={(e) => setFilmSharedWithNames(e.target.value)}
+                        disabled={isViewOnly}
+                        className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-semibold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
+                        placeholder="e.g. Shyam Raj, Pooja Harish"
+                      />
+                    </label>
 
-                <div className="block text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Shared By Manager Account
-                  <input
-                    value={user?.full_name || ""}
-                    disabled
-                    readOnly
-                    className="mt-1.5 w-full rounded-xl border border-gray-200 bg-gray-100 px-3.5 py-2.5 text-xs font-bold text-gray-500 outline-none normal-case tracking-normal"
-                  />
-                </div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Share Percentage (Ownership)
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={filmSharePercentage}
+                        onChange={(e) => setFilmSharePercentage(e.target.value)}
+                        disabled={isViewOnly}
+                        className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white disabled:bg-gray-50 px-3.5 py-2.5 text-xs font-mono font-bold text-gray-900 outline-none focus:border-blue-500 normal-case tracking-normal"
+                        placeholder="50"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="block text-xs font-bold uppercase tracking-wider text-gray-400">
+                    Shared By Manager Account
+                    <input
+                      value={user?.full_name || ""}
+                      disabled
+                      readOnly
+                      className="mt-1.5 w-full rounded-xl border border-gray-200 bg-gray-100 px-3.5 py-2.5 text-xs font-bold text-gray-500 outline-none normal-case tracking-normal"
+                    />
+                  </div>
 
                 {(() => {
                   const pct = parseFloat(filmSharePercentage) || 0;
@@ -797,14 +794,13 @@ export function SectionFilms() {
                     <div className="mt-4 pt-4 border-t border-gray-200/60">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Calculated Share Breakdown (Total: 100%)</p>
                       <div className="space-y-2">
-                        {/* Main right holder */}
                         <div className="flex items-center justify-between text-xs bg-blue-50/50 border border-blue-100/50 rounded-lg px-3 py-2">
                           <span className="font-semibold text-gray-800">{user?.full_name || "Main Member"} (Main Right Holder)</span>
                           <span className="font-mono font-bold text-blue-600">
                             {mainPct}%
                           </span>
                         </div>
-                        {/* Shared right holders */}
+                        
                         {namesList.map((name, idx) => (
                           <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
                             <span className="font-medium text-gray-700">{name} (Shared Holder)</span>
@@ -821,8 +817,8 @@ export function SectionFilms() {
                       )}
                     </div>
                   );
-                })()}
-              </div>
+                })()} */}
+              {/* </div> */}
 
               <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-2.5 text-xs font-bold uppercase tracking-wider">
                 {isViewOnly ? (
@@ -848,7 +844,7 @@ export function SectionFilms() {
                     >
                       Cancel
                     </button>
-                    
+
                     <button
                       onClick={async (e) => {
                         if (editingFilm) await handleUpdateFilm();
@@ -870,75 +866,78 @@ export function SectionFilms() {
             </div>
           </div>
         </div>
-      )}
+      )
+      }
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && filmToDelete && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transform transition-all duration-300 animate-scale-up">
-            <div className="bg-red-600 text-white px-6 py-4 flex items-center justify-between border-b border-red-700">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-white/20 text-white rounded-lg">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+      {
+        showDeleteModal && filmToDelete && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transform transition-all duration-300 animate-scale-up">
+              <div className="bg-red-600 text-white px-6 py-4 flex items-center justify-between border-b border-red-700">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-white/20 text-white rounded-lg">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider">
+                    Confirm Film Deletion
+                  </h3>
                 </div>
-                <h3 className="text-xs font-bold uppercase tracking-wider">
-                  Confirm Film Deletion
-                </h3>
-              </div>
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setFilmToDelete(null);
-                }}
-                className="text-white/70 hover:text-white p-1 hover:bg-white/10 rounded-lg transition-colors text-sm font-bold"
-                type="button"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <p className="text-sm font-bold text-red-900 mb-1">
-                  Warning: This action cannot be undone
-                </p>
-                {filmsList.length === 1 ? (
-                  <p className="text-xs text-red-700 leading-relaxed font-bold">
-                    WARNING: This is your last registered film. If you delete this film, your membership will be revoked because at least one film is required. You will lose access to the member dashboard until you submit a new film. All associated data will be removed.
-                  </p>
-                ) : (
-                  <p className="text-xs text-red-700 leading-relaxed">
-                    You are about to permanently delete the film <span className="font-bold">"{filmToDelete.title}"</span> from your catalog. All associated data including cast, documents, and right holders will be removed.
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 text-xs font-bold uppercase tracking-wider pt-2">
                 <button
-                  type="button"
                   onClick={() => {
                     setShowDeleteModal(false);
                     setFilmToDelete(null);
                   }}
-                  className="px-4 py-2.5 rounded-xl text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleConfirmDelete}
-                  className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-colors shadow-md"
+                  className="text-white/70 hover:text-white p-1 hover:bg-white/10 rounded-lg transition-colors text-sm font-bold"
                   type="button"
                 >
-                  Yes, Delete Film
+                  ✕
                 </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-sm font-bold text-red-900 mb-1">
+                    Warning: This action cannot be undone
+                  </p>
+                  {filmsList.length === 1 ? (
+                    <p className="text-xs text-red-700 leading-relaxed font-bold">
+                      WARNING: This is your last registered film. If you delete this film, your membership will be revoked because at least one film is required. You will lose access to the member dashboard until you submit a new film. All associated data will be removed.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-red-700 leading-relaxed">
+                      You are about to permanently delete the film <span className="font-bold">"{filmToDelete.title}"</span> from your catalog. All associated data including cast, documents, and right holders will be removed.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 text-xs font-bold uppercase tracking-wider pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeleteModal(false);
+                      setFilmToDelete(null);
+                    }}
+                    className="px-4 py-2.5 rounded-xl text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-colors shadow-md"
+                    type="button"
+                  >
+                    Yes, Delete Film
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
