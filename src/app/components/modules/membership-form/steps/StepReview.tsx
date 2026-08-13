@@ -322,12 +322,24 @@ export const StepReview = () => {
         >
           <DataRow
             label="Membership Categories"
-            value={membershipCategories.join(", ").replace(/_/g, " ") || null}
+            value={
+              membershipCategories
+                .join(", ")
+                .replace(/_/g, " ")
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase()) || null
+            }
             required
           />
           <DataRow
             label="Applicant Types"
-            value={applicantTypes.join(", ").replace(/_/g, " ") || null}
+            value={
+              applicantTypes
+                .join(", ")
+                .replace(/_/g, " ")
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase()) || null
+            }
             required
           />
         </SectionCard>

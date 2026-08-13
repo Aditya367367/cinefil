@@ -61,7 +61,7 @@ function MembershipFormInner() {
 
   if (loadingApplications) {
 
-  return (
+    return (
       <div className="mf-page">
         <PageBanner title="MEMBERSHIP FORM" subtitle="Loading application status..." />
         <div className="mf-container">
@@ -83,7 +83,7 @@ function MembershipFormInner() {
         <div className="mf-container max-w-3xl mx-auto mt-12">
           <div className="mb-6 p-8 rounded-xl border border-green-500/30 bg-green-500/10 text-green-500 font-medium text-center shadow-lg">
             <h2 className="text-2xl mb-2">Already a Member</h2>
-            <p>You are already a registered and approved member of Cinefil. You can manage your profile from your dashboard.</p>
+            {/* <p>You are already a registered and approved member of Cinefil. You can manage your profile from your dashboard.</p> */}
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ function MembershipFormInner() {
         <div className="mf-container max-w-3xl mx-auto mt-12">
           <div className="mb-6 p-8 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 font-medium text-center shadow-lg">
             <h2 className="text-2xl mb-2">Application Submitted</h2>
-            <p>You already have an active application (Status: <span className="uppercase font-bold">{pendingApplication.status.replace(/_/g, ' ')}</span>). You can review your application from your dashboard.</p>
+            {/* <p>You already have an active application (Status: <span className="uppercase font-bold">{pendingApplication.status.replace(/_/g, ' ')}</span>). You can review your application from your dashboard.</p> */}
           </div>
         </div>
       </div>
@@ -156,7 +156,7 @@ function MembershipFormInner() {
         <div className="mf-layout">
           {/* Left Sidebar: Vertical Stepper */}
           <ProgressBar />
-          
+
           {/* Right Area: Form Card */}
           <div className="mf-main-content">
             <div className="mf-card">

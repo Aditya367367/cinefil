@@ -391,7 +391,7 @@ export function StepMembershipFee() {
               Note - Upgradation to Prime Member
             </h4>
             <p style={{ fontSize: "13px", color: "#334155", lineHeight: "1.6", marginBottom: "12px", fontWeight: 600 }}>
-              You are successfully registered as Cinefil associate member. Your number is {membershipNumber} and until you upgrade to prime you no get royalty. Upgrade from here:
+              You have successfully registered as a Cinefil Associate Member. Your membership number is {membershipNumber}. You will not earn royalties until you upgrade to Prime.
             </p>
             <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.6", borderTop: "1px solid #e2e8f0", paddingTop: "12px" }}>
               <p style={{ marginBottom: "8px" }}>
