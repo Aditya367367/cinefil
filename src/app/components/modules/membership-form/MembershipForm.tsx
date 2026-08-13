@@ -31,6 +31,7 @@ function MembershipFormInner() {
     loadingApplications,
     currentStepKey,
     submitting,
+    skipStep,
   } = useMembershipForm();
 
   const { user } = useAuth();
@@ -169,6 +170,50 @@ function MembershipFormInner() {
               </div>
 
               <form onSubmit={handleSubmitApplication}>
+                {/* Developer-only skip button — remove condition below to restrict to admin only */}
+                {true && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '12px',
+                      zIndex: 50,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={skipStep}
+                      title="[DEV] Skip this step — no validation or save"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '5px 14px',
+                        borderRadius: '999px',
+                        border: '1px dashed #f59e0b',
+                        background: 'rgba(245,158,11,0.08)',
+                        color: '#f59e0b',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        letterSpacing: '0.03em',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseOver={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.18)';
+                      }}
+                      onMouseOut={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.08)';
+                      }}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                        <line x1="19" y1="3" x2="19" y2="21"/>
+                      </svg>
+                      DEV: Skip Step
+                    </button>
+                  </div>
+                )}
                 {renderStep()}
               </form>
             </div>

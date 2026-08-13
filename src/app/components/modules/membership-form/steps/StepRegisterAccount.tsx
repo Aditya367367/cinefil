@@ -107,7 +107,8 @@ export function StepRegisterAccount() {
     isEmailVerified, setIsEmailVerified,
     isMobileVerified, setIsMobileVerified,
     isAuthenticated,
-    nextStep
+    nextStep,
+    skipStep,
   } = useMembershipForm();
 
   // Registration inputs
@@ -652,7 +653,42 @@ export function StepRegisterAccount() {
             </div>
           )}
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-between items-center gap-3">
+            {/* DEV: Skip entire registration step */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsEmailVerified(true);
+                setIsMobileVerified(true);
+                setIsRegistered(true);
+                skipStep();
+              }}
+              title="[DEV] Skip registration — no account created"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '5px 14px',
+                borderRadius: '999px',
+                border: '1px dashed #f59e0b',
+                background: 'rgba(245,158,11,0.08)',
+                color: '#f59e0b',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                letterSpacing: '0.03em',
+                transition: 'all 0.2s',
+              }}
+              onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.18)'; }}
+              onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.08)'; }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+                <line x1="19" y1="3" x2="19" y2="21"/>
+              </svg>
+              DEV: Skip
+            </button>
+
             <button
               type="button"
               onClick={handleSignup}

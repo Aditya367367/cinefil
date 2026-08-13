@@ -46,6 +46,7 @@ export interface MembershipFormContextType {
   activeSteps: string[];
   nextStep: () => void | Promise<void>;
   prevStep: () => void;
+  skipStep: () => void;
 
   // Base details
   membershipTypes: MembershipTypeItem[];
@@ -756,6 +757,13 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Developer-only: skip current step without any validation or save
+  const skipStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    }
+  };
+
   const buildApplicationFormData = (isFinalSubmission = false): FormData => {
     const formData = new FormData();
     if (isFinalSubmission) {
@@ -1140,7 +1148,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const value: MembershipFormContextType = {
-    step, setStep, totalSteps, isProducer, startedAsGuest, currentStepKey, activeSteps, nextStep, prevStep,
+    step, setStep, totalSteps, isProducer, startedAsGuest, currentStepKey, activeSteps, nextStep, prevStep, skipStep,
     membershipTypes, selectedType, setSelectedType,
     applicantName, setApplicantName, cinLlp, setCinLlp, gstNumber, setGstNumber,
     panNumberField, setPanNumberField, dobIncorporation, setDobIncorporation,
