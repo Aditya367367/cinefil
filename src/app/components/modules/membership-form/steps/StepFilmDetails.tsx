@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronRight, ChevronLeft, PlusCircle, Trash2, Upload, Check, X } from "lucide-react";
-import { useMembershipForm } from "../context/MembershipFormContext";
+import { useMembershipForm, type Film } from "../context/MembershipFormContext";
 import { SkipTestingButton } from "../components/SkipTestingButton";
 import { getBackendFileUrl } from "../../../../../utils/fileUrl";
 
@@ -32,18 +32,58 @@ export function StepFilmDetails() {
     handleFilmChange(index, 'ownership_type', current.includes(option) ? [] : [option]);
   };
 
+  const addCastMembers = (index: number, rawInput = castInputs[index] || '') => {
+    const names = rawInput
+      .split(',')
+      .map((name) => name.trim())
+      .filter(Boolean);
+    if (!names.length) return;
+
+    const existing = films[index].cast || [];
+    const existingNames = new Set(
+      existing.map((castMember: any) => String(castMember.label || castMember.value || castMember).toLowerCase())
+    );
+    const newCast = [...existing];
+    names.forEach((name) => {
+      if (!existingNames.has(name.toLowerCase())) {
+        newCast.push({ value: name, label: name });
+        existingNames.add(name.toLowerCase());
+      }
+    });
+    handleFilmChange(index, 'cast', newCast);
+    setCastInputs((previous) => ({ ...previous, [index]: '' }));
+  };
+
   const handleCastKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      const name = (castInputs[index] || '').trim();
-      if (!name) return;
-      const existing = films[index].cast || [];
-      // Avoid duplicates
-      if (existing.some((c: any) => (c.label || c.value || c) === name)) return;
-      const newCast = [...existing, { value: name, label: name }];
-      handleFilmChange(index, 'cast', newCast);
-      setCastInputs(prev => ({ ...prev, [index]: '' }));
+      addCastMembers(index);
     }
+  };
+
+  const handleContinue = () => {
+    const filmsWithPendingCast: Film[] = films.map((film, index) => {
+      const pendingNames = (castInputs[index] || '')
+        .split(',')
+        .map((name) => name.trim())
+        .filter(Boolean);
+      if (!pendingNames.length) return film;
+
+      const cast = film.cast || [];
+      const existingNames = new Set(
+        cast.map((castMember: any) => String(castMember.label || castMember.value || castMember).toLowerCase())
+      );
+      const pendingCast = pendingNames
+        .filter((name) => !existingNames.has(name.toLowerCase()))
+        .map((name) => ({ value: name, label: name }));
+      return pendingCast.length ? { ...film, cast: [...cast, ...pendingCast] } : film;
+    });
+
+    filmsWithPendingCast.forEach((film, index) => {
+      if (film !== films[index]) handleFilmChange(index, 'cast', film.cast);
+    });
+    setCastInputs({});
+    nextStep(filmsWithPendingCast);
   };
 
   const removeCastMember = (filmIndex: number, castIndex: number) => {
@@ -145,9 +185,17 @@ export function StepFilmDetails() {
                     onChange={(e) => setCastInputs(prev => ({ ...prev, [index]: e.target.value }))}
                     onKeyDown={(e) => handleCastKeyDown(index, e)}
                     className="mf-tags-input__field"
-                    placeholder={film.cast && film.cast.length > 0 ? "Add more..." : "Type name & press Enter"}
+                    placeholder={film.cast && film.cast.length > 0 ? "Add more, comma-separated..." : "Enter cast names, comma-separated"}
                   />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => addCastMembers(index)}
+                  className="mf-btn mf-btn--small mf-btn--outline"
+                  style={{ marginTop: "8px" }}
+                >
+                  Add Cast
+                </button>
               </div>
 
               {/* Remarks */}
@@ -170,7 +218,7 @@ export function StepFilmDetails() {
         </button>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <SkipTestingButton />
-          <button type="button" onClick={nextStep} className="mf-btn mf-btn--next">
+          <button type="button" onClick={handleContinue} className="mf-btn mf-btn--next">
             Continue <ChevronRight size={16} />
           </button>
         </div>

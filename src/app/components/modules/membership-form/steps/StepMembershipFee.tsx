@@ -33,8 +33,9 @@ export function StepMembershipFee() {
 
   // Payment status state
   const [paymentStatus, setPaymentStatus] = useState<
-    "idle" | "submitting_form" | "creating_order" | "checkout_opened" | "verifying_payment" | "success" | "failed"
+    "idle" | "submitting_form" | "submitting_without_payment" | "creating_order" | "checkout_opened" | "verifying_payment" | "success" | "failed"
   >("idle");
+  const [completedApplication, setCompletedApplication] = useState<any>(null);
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockOrderDetails, setMockOrderDetails] = useState<any>(null);
 
@@ -65,16 +66,17 @@ export function StepMembershipFee() {
   const annualFeeAmount = activeType ? parseFee(activeType.annual_fee) : 5000;
   const totalFee = joiningFeeAmount + annualFeeAmount;
 
-  const currentApp = applications?.find((app: any) =>
+  const currentApp = completedApplication || applications?.find((app: any) =>
     app.status === 'associate_member' || (applicationId && app.id === Number(applicationId))
   );
 
-  const isAlreadyPaid = !!(currentApp && (
+  const isMembershipComplete = !!(currentApp && (
     currentApp.status === 'associate_member' ||
     currentApp.status === 'paid_no_receipt' ||
     currentApp.payment_status === 'successful' ||
     currentApp.payment_status === 'captured'
   ));
+  const isUnpaid = currentApp?.is_paid === false;
 
   // Helper to load Razorpay SDK dynamically
   const loadRazorpayScript = () => {
@@ -153,6 +155,7 @@ export function StepMembershipFee() {
               showSnackbar("Payment verified successfully! Registered as Associate Member.", "success");
               setPaymentStatus("success");
               if (verifyRes.application) {
+                setCompletedApplication(verifyRes.application);
                 setApplications((prev: any[]) => {
                   const filtered = prev.filter(app => app.id !== verifyRes.application.id);
                   return [...filtered, verifyRes.application];
@@ -192,6 +195,37 @@ export function StepMembershipFee() {
       console.error(error);
       const errMsg = error.response?.data?.error || error.message || "An error occurred during payment setup.";
       showSnackbar(errMsg, "error");
+      setPaymentStatus("failed");
+    }
+  };
+
+  const handleSubmitWithoutPayment = async () => {
+    try {
+      setPaymentStatus("submitting_without_payment");
+      const formData = buildApplicationFormData(true);
+      formData.append('submit_without_payment', 'true');
+
+      // Use the full submission endpoint even for an existing draft. It handles
+      // submitted film data and film documents before activating membership.
+      const response = await memberService.submitApplication(formData);
+
+      if (!response.success) {
+        throw new Error(response.error || "Unable to submit the application without payment.");
+      }
+
+      const application = response.application;
+      setApplicationId(String(application.id));
+      setCompletedApplication(application);
+      setApplications((previous: any[]) => [
+        ...previous.filter((item) => item.id !== application.id),
+        application,
+      ]);
+      setPaymentStatus("success");
+      setShowCongratulations(true);
+      showSnackbar("Associate membership activated. Your payment is marked as unpaid.", "success");
+    } catch (error: any) {
+      console.error(error);
+      showSnackbar(error.response?.data?.error || error.message || "Unable to submit the application.", "error");
       setPaymentStatus("failed");
     }
   };
@@ -310,6 +344,8 @@ export function StepMembershipFee() {
     switch (paymentStatus) {
       case "submitting_form":
         return "Saving application details...";
+      case "submitting_without_payment":
+        return "Activating associate membership without payment...";
       case "creating_order":
         return "Initializing transaction gateway...";
       case "checkout_opened":
@@ -341,7 +377,7 @@ export function StepMembershipFee() {
     }
   };
 
-  if (isAlreadyPaid || paymentStatus === "success") {
+  if (isMembershipComplete || paymentStatus === "success") {
     const membershipNumber = currentApp?.membership_number || "AM-Pending";
     return (
       <div className="mf-step" style={{ animation: "fadeIn 0.5s ease" }}>
@@ -357,8 +393,16 @@ export function StepMembershipFee() {
             Registration Successful!
           </h3>
           <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "24px" }}>
-            Your payment has been verified and your associate membership is now active.
+            {isUnpaid
+              ? "Your associate membership is active. Payment is currently marked as unpaid."
+              : "Your payment has been verified and your associate membership is now active."}
           </p>
+
+          {isUnpaid && (
+            <div style={{ maxWidth: "600px", margin: "0 auto 24px", padding: "14px 16px", borderRadius: "10px", background: "#fff7ed", border: "1px solid #fdba74", color: "#9a3412", fontSize: "13px", fontWeight: 600 }}>
+              Payment status: Unpaid. You retain Associate Member dashboard access and can request an upgrade to Prime Membership.
+            </div>
+          )}
 
           <div style={{
             background: "rgba(255, 255, 255, 0.8)",
@@ -592,6 +636,21 @@ export function StepMembershipFee() {
         </button>
         <p style={{ textAlign: "center", fontSize: "11px", color: "#94a3b8", marginTop: "8px" }}>
           Secure transaction encrypted with Razorpay.
+        </p>
+      </div>
+
+      <div style={{ marginTop: "16px", textAlign: "center" }}>
+        <button
+          type="button"
+          onClick={handleSubmitWithoutPayment}
+          disabled={paymentStatus !== "idle" && paymentStatus !== "failed"}
+          className="mf-btn mf-btn--prev"
+          style={{ width: "100%" }}
+        >
+          Submit Without Payment
+        </button>
+        <p style={{ fontSize: "11px", color: "#9a3412", marginTop: "8px" }}>
+          Your Associate Member access will be active, but your payment status will remain unpaid.
         </p>
       </div>
 

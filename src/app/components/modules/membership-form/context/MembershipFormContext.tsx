@@ -44,7 +44,7 @@ export interface MembershipFormContextType {
   startedAsGuest: boolean;
   currentStepKey: string;
   activeSteps: string[];
-  nextStep: () => void | Promise<void>;
+  nextStep: (filmsOverride?: Film[]) => void | Promise<void>;
   prevStep: () => void;
   skipStep: () => void;
 
@@ -253,7 +253,7 @@ export interface MembershipFormContextType {
   handleAnimationComplete: () => void;
   isAuthenticated: boolean;
   selectedMembershipType: MembershipTypeItem | undefined;
-  buildApplicationFormData: () => FormData;
+  buildApplicationFormData: (isFinalSubmission?: boolean, filmsOverride?: Film[]) => FormData;
   resetFormState: () => void;
   applications: any[];
   setApplications: React.Dispatch<React.SetStateAction<any[]>>;
@@ -518,9 +518,11 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   };
 
   const handleFilmChange = (index: number, field: keyof Film, value: any) => {
-    const newFilms = [...films];
-    newFilms[index][field] = value;
-    setFilms(newFilms);
+    setFilms((currentFilms) => {
+      const newFilms = [...currentFilms];
+      newFilms[index] = { ...newFilms[index], [field]: value };
+      return newFilms;
+    });
   };
 
   const addFilm = () => {
@@ -574,13 +576,13 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const saveStepData = async () => {
+  const saveStepData = async (filmsOverride?: Film[]) => {
     // Only save if authenticated
     if (!isAuthenticated) return true;
 
     setSubmitting(true);
     try {
-      const formData = buildApplicationFormData(false);
+      const formData = buildApplicationFormData(false, Array.isArray(filmsOverride) ? filmsOverride : undefined);
       let response;
       if (applicationId) {
         response = await memberService.updateApplication(Number(applicationId), formData);
@@ -612,7 +614,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const nextStep = async () => {
+  const nextStep = async (filmsOverride?: Film[]) => {
+    const submittedFilms = Array.isArray(filmsOverride) ? filmsOverride : undefined;
     if (currentStepKey === "register") {
       if (!isAuthenticated) {
         showSnackbar("Please complete account registration first.", "error");
@@ -701,7 +704,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       }
     }
     if (currentStepKey === "film") {
-      const isFilmsPartiallyFilled = films.some(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language);
+      const filmsToValidate = submittedFilms || films;
+      const isFilmsPartiallyFilled = filmsToValidate.some(f => f.title || (f.cast && f.cast.length > 0) || f.year || f.language);
       if (!isFilmsPartiallyFilled) {
         showSnackbar("Please complete all required fields, including at least one film.", "error");
         return;
@@ -740,7 +744,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
 
     if (currentStepKey !== "fee") {
-      const saveSuccess = await saveStepData();
+      const saveSuccess = await saveStepData(submittedFilms);
       if (!saveSuccess) {
         return;
       }
@@ -764,7 +768,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const buildApplicationFormData = (isFinalSubmission = false): FormData => {
+  const buildApplicationFormData = (isFinalSubmission = false, filmsOverride?: Film[]): FormData => {
     const formData = new FormData();
     if (isFinalSubmission) {
       formData.append('is_final_submission', 'true');
@@ -851,7 +855,8 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
       if (otherOwnershipDeclaration) formData.append('other_ownership_declaration', otherOwnershipDeclaration);
     }
 
-    const filmsData = films.map(f => ({
+    const filmsToSubmit = Array.isArray(filmsOverride) ? filmsOverride : films;
+    const filmsData = filmsToSubmit.map(f => ({
       title: typeof f.title === 'object' ? (f.title?.label || f.title?.value || '') : (f.title || ''),
       cast: f.cast?.map((c: any) => c.label || c.value || c),
       year: f.year,
@@ -864,7 +869,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     formData.append('films', JSON.stringify(filmsData));
 
     // Append files for each film dynamically
-    films.forEach((f, idx) => {
+    filmsToSubmit.forEach((f, idx) => {
       if (f.censor_certificate) formData.append(`films[${idx}][censor_certificate]`, f.censor_certificate);
       if (f.copyright_certificate) formData.append(`films[${idx}][copyright_certificate]`, f.copyright_certificate);
       if (f.ownership_document) formData.append(`films[${idx}][ownership_document]`, f.ownership_document);

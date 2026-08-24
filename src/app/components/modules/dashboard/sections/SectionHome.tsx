@@ -12,13 +12,15 @@ export function SectionHome() {
     user,
     upgradeToPrime,
     isPrime,
-    isUnderReview
+    isUnderReview,
+    application,
   } = useDashboard();
 
   if (!isMember) return null;
 
   const totalSettled = royaltyDistributions.reduce((acc, curr) => acc + parseFloat(curr.total_amount), 0);
   const filmCount = filmsList.length;
+  const isUnpaidAssociate = !isPrime && application?.status === 'associate_member' && application?.is_paid === false;
 
   const summaryCards = [
     { label: "Summary reports", value: royaltyDistributions.length.toString(), detail: "Active financial year summaries" },
@@ -29,6 +31,14 @@ export function SectionHome() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {isUnpaidAssociate && (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-xs">
+          <h4 className="text-sm font-bold text-orange-900">Membership fee unpaid</h4>
+          <p className="mt-1 text-xs text-orange-800 leading-relaxed">
+            You have full Associate Member dashboard access and can request an upgrade to Prime Membership. Your membership fee is currently marked unpaid.
+          </p>
+        </div>
+      )}
       {isPrime ? (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-start gap-3">

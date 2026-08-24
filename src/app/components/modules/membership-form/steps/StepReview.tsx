@@ -555,12 +555,18 @@ export const StepReview = () => {
       )}
 
       {/* ── Actions ─────────────────────────── */}
+      <div
+        className="mf-info-box mf-info-box--neutral"
+        style={{ marginBottom: "16px" }}
+      >
+        On the next step, you can pay with Razorpay or submit without payment. Either option activates Associate Member access; unpaid membership will be clearly marked in your dashboard.
+      </div>
       <div className="mf-actions">
         <button type="button" className="mf-btn mf-btn--prev" onClick={prevStep}>
           ← Back
         </button>
         <button type="button" className="mf-btn mf-btn--next" onClick={nextStep}>
-          Continue to Payment →
+          Continue to Payment Options →
         </button>
       </div>
     </div>
