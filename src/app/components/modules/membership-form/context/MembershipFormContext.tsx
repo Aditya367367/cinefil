@@ -143,6 +143,8 @@ export interface MembershipFormContextType {
   // Documents
   panCard: File | null;
   setPanCard: React.Dispatch<React.SetStateAction<File | null>>;
+  aadharCard: File | null;
+  setAadharCard: React.Dispatch<React.SetStateAction<File | null>>;
   certificateOfIncorporation: File | null;
   setCertificateOfIncorporation: React.Dispatch<React.SetStateAction<File | null>>;
   identityProof: File | null;
@@ -154,9 +156,11 @@ export interface MembershipFormContextType {
   documentErrors: { [key: string]: string };
   setDocumentErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
   validateDocument: (file: File) => string | null;
+  handleSubmitWithoutPayment: () => Promise<void>;
 
   // Existing KYC & Rep & Bank URLs
   existingPanCardUrl?: string | null;
+  existingAadharCardUrl?: string | null;
   existingCertificateOfIncorporationUrl?: string | null;
   existingIdentityProofUrl?: string | null;
   existingAddressProofUrl?: string | null;
@@ -290,6 +294,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
 
   // Existing document URL states
   const [existingPanCardUrl, setExistingPanCardUrl] = useState<string | null>(null);
+  const [existingAadharCardUrl, setExistingAadharCardUrl] = useState<string | null>(null);
   const [existingCertificateOfIncorporationUrl, setExistingCertificateOfIncorporationUrl] = useState<string | null>(null);
   const [existingIdentityProofUrl, setExistingIdentityProofUrl] = useState<string | null>(null);
   const [existingAddressProofUrl, setExistingAddressProofUrl] = useState<string | null>(null);
@@ -358,6 +363,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
   const [excelUploaded, setExcelUploaded] = useState(false);
 
   const [panCard, setPanCard] = useState<File | null>(null);
+  const [aadharCard, setAadharCard] = useState<File | null>(null);
   const [certificateOfIncorporation, setCertificateOfIncorporation] = useState<File | null>(null);
   const [identityProof, setIdentityProof] = useState<File | null>(null);
   const [addressProof, setAddressProof] = useState<File | null>(null);
@@ -827,6 +833,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
 
     if (panCard) formData.append('pan_card', panCard);
+    if (aadharCard) formData.append('aadhar_card', aadharCard);
     if (certificateOfIncorporation) formData.append('certificate_of_incorporation', certificateOfIncorporation);
     if (identityProof) formData.append('identity_proof', identityProof);
     if (addressProof) formData.append('address_proof', addressProof);
@@ -1008,6 +1015,37 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleSubmitWithoutPayment = async () => {
+    try {
+      setSubmitting(true);
+      const formData = buildApplicationFormData(true);
+      formData.append('submit_without_payment', 'true');
+
+      const response = await memberService.submitApplication(formData);
+
+      if (!response.success) {
+        throw new Error(response.error || "Unable to submit the application without payment.");
+      }
+
+      const application = response.application;
+      if (application) {
+        setApplicationId(String(application.id));
+        setApplications((previous: any[]) => [
+          ...previous.filter((item) => item.id !== application.id),
+          application,
+        ]);
+      }
+      setShowCongratulations(true);
+      showSnackbar("Associate membership activated! Your application was submitted successfully without payment.", "success");
+      setStep(totalSteps);
+    } catch (error: any) {
+      console.error(error);
+      showSnackbar(error.response?.data?.error || error.message || "Unable to submit the application.", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleAnimationComplete = () => {
     setShowCongratulations(false);
   };
@@ -1115,6 +1153,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
 
     // KYC Documents
     if (draftData.pan_card) setExistingPanCardUrl(draftData.pan_card);
+    if (draftData.aadhar_card) setExistingAadharCardUrl(draftData.aadhar_card);
     if (draftData.certificate_of_incorporation) setExistingCertificateOfIncorporationUrl(draftData.certificate_of_incorporation);
     if (draftData.identity_proof) setExistingIdentityProofUrl(draftData.identity_proof);
     if (draftData.address_proof) setExistingAddressProofUrl(draftData.address_proof);
@@ -1178,7 +1217,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     membershipCategories, setMembershipCategories, applicantTypes, setApplicantTypes,
     otherApplicantType, setOtherApplicantType,
     submitting, showCongratulations, setShowCongratulations, loadingTypes, loadingApplications,
-    panCard, setPanCard, certificateOfIncorporation, setCertificateOfIncorporation,
+    panCard, setPanCard, aadharCard, setAadharCard, certificateOfIncorporation, setCertificateOfIncorporation,
     identityProof, setIdentityProof, addressProof, setAddressProof,
     boardResolution, setBoardResolution, documentErrors, setDocumentErrors,
     validateDocument,
@@ -1186,7 +1225,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     totalFilmsOwned, setTotalFilmsOwned, producerOwnershipDeclaration, setProducerOwnershipDeclaration,
     natureOfOwnership, setNatureOfOwnership, assignmentAgreement, setAssignmentAgreement,
     otherOwnershipDeclaration, setOtherOwnershipDeclaration,
-    existingPanCardUrl, existingCertificateOfIncorporationUrl, existingIdentityProofUrl, existingAddressProofUrl, existingBoardResolutionUrl,
+    existingPanCardUrl, existingAadharCardUrl, existingCertificateOfIncorporationUrl, existingIdentityProofUrl, existingAddressProofUrl, existingBoardResolutionUrl,
     existingRepAuthorityLetterUrl, existingCanceledCheckUrl, existingGstCertificateUrl,
     existingProducerOwnershipDeclarationUrl, existingAssignmentAgreementUrl, existingOtherOwnershipDeclarationUrl,
     films, setFilms, excelUploaded, setExcelUploaded,
@@ -1198,7 +1237,7 @@ export function MembershipFormProvider({ children }: { children: ReactNode }) {
     isEmailVerified, setIsEmailVerified, isMobileVerified, setIsMobileVerified,
     handleFilmChange, addFilm, removeFilm, handleExcelUpload,
     onCreateFilm, onCreateActor, handleCreateFilm, handleCreateActor,
-    handleSubmitApplication, handleAnimationComplete,
+    handleSubmitApplication, handleSubmitWithoutPayment, handleAnimationComplete,
     isAuthenticated, selectedMembershipType,
     buildApplicationFormData, resetFormState,
     applications, setApplications,

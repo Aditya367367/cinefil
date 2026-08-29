@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { User, ShieldCheck, HelpCircle, ChevronRight } from "lucide-react";
+import { User, ShieldCheck, ChevronRight, Award } from "lucide-react";
 import { PageBanner } from "./PageBanner";
 import { SectionHeader } from "./SectionHeader";
 import { memberService } from "../../../services/memberService";
+import { SpotlightCard } from "../../../components/ui/SpotlightCard";
 
 interface BoardMember {
   id: number;
@@ -40,7 +41,8 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
     let isMounted = true;
     setLoading(true);
 
-    memberService.getTeams()
+    memberService
+      .getTeams()
       .then((res) => {
         if (!isMounted) return;
         const teams = Array.isArray(res) ? res : res.results || [];
@@ -64,20 +66,18 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
         }
       })
       .catch((err) => {
-        console.error("Failed to load live governing board directory, utilizing secure fallbacks:", err);
+        console.error("Failed to load governing board:", err);
         if (isMounted) {
           setBoardMembers(DEFAULT_BOARD_MEMBERS);
         }
       })
       .finally(() => {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       });
 
     const timer = setTimeout(() => {
       setMinimumLoading(false);
-    }, 1500);
+    }, 1000);
 
     return () => {
       isMounted = false;
@@ -86,111 +86,92 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
   }, []);
 
   return (
-    <div style={{ fontFamily: "var(--font-body)" }} className="bg-slate-50 min-h-screen">
+    <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] min-h-screen">
       <PageBanner
-        title="GOVERNING COUNCIL & BOARD"
-        subtitle="Distinguished industry leadership overseeing structural operations and execution pipelines."
+        title="GOVERNING BOARD"
+        subtitle="Eminent film producers and council leaders steering the statutory administration of CINEFIL India."
+        badge="Executive Leadership"
       />
 
-      <section className="py-16 bg-white border-b border-slate-200">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            title="Governing Council & Board"
-            subtitle="The leadership authority commanding long-term strategy, portfolio enforcement, and structural operational oversight across CINEFIL."
+            title="Board of Directors & Council Members"
+            subtitle="The elected leadership safeguarding rights, establishing public performance policies, and ensuring transparent royalty allocations."
+            badge="Governing Body"
           />
-          {/* 
-          {isLiveRegistry && !loading && (
-            <div className="max-w-xl mx-auto mb-10 p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-[11px] font-semibold flex items-center gap-2.5 shadow-2xs justify-center animate-fade-in">
-              <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
-              <span>Verified Identity Registry Live Feed Sync Complete</span>
-            </div>
-          )} */}
 
           {loading || minimumLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-8 mt-10">
-              {[...Array(10)].map((_, index) => (
-                <div key={index} className="flex flex-col items-center text-center bg-white border border-slate-100 rounded-none p-4 shadow-xs min-h-[260px]">
-                  <div className="w-full aspect-square rounded-none bg-slate-200 animate-pulse" />
-                  <div className="mt-4 px-1 w-full space-y-2">
-                    <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse" />
-                    <div className="h-3 bg-slate-200 rounded w-1/2 mx-auto animate-pulse" />
-                  </div>
-                  <div className="mt-4 pt-2.5 border-t border-slate-100/80 w-full flex justify-center">
-                    <div className="h-8 w-20 bg-slate-200 rounded-md animate-pulse" />
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-10">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-8 mt-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6 mt-10">
               {boardMembers.map((member, i) => (
-                <div
+                <SpotlightCard
                   key={`${member.name}-${i}`}
-                  className="flex flex-col items-center text-center bg-white border border-slate-100 rounded-none p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group justify-between min-h-[260px]"
+                  className="flex flex-col items-center text-center p-5 rounded-2xl border-gray-200 shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group justify-between min-h-[270px] bg-white"
+                  spotlightColor="rgba(201, 162, 39, 0.2)"
                 >
                   <div className="flex flex-col items-center w-full">
-                    {/* Professional Profile Picture Shell */}
-                    <div
-                      className="w-full aspect-square rounded-none overflow-hidden flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 p-0.5 group-hover:scale-102 transition-transform duration-300 shadow-inner relative"
-                      style={{ border: "2px solid var(--cinefil-gold)" }}
-                    >
+                    {/* Avatar Frame */}
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 border-2 border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 shadow-md relative">
                       {member.photo_url ? (
                         <img
                           src={member.photo_url}
                           alt={member.name}
-                          className="w-full h-full object-cover rounded-none"
+                          className="w-full h-full object-cover rounded-xl"
                           loading="lazy"
                           onError={(e) => {
-                            // Safe layout handler abstraction for invalid images
                             (e.target as HTMLImageElement).style.display = "none";
                             const backupIcon = (e.target as HTMLImageElement).nextElementSibling;
-                            if (backupIcon) {
-                              backupIcon.classList.remove("hidden");
-                            }
+                            if (backupIcon) backupIcon.classList.remove("hidden");
                           }}
                         />
                       ) : null}
-                      <div className={`absolute inset-0 flex items-center justify-center text-slate-300 ${member.photo_url ? 'hidden' : ''}`}>
-                        <User size={40} style={{ color: "var(--cinefil-gold)", opacity: 0.6 }} />
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center bg-slate-50 text-[var(--cinefil-navy)] ${
+                          member.photo_url ? "hidden" : ""
+                        }`}
+                      >
+                        <User size={36} className="text-[var(--cinefil-gold)]" />
                       </div>
                     </div>
 
-                    {/* Metadata Content Mapping */}
+                    {/* Member Details */}
                     <div className="mt-4 px-1">
                       <h3
-                        className="font-bold text-xs sm:text-sm text-slate-950 tracking-tight leading-tight line-clamp-2"
-                        style={{ color: "var(--cinefil-navy)", fontFamily: "var(--font-heading)" }}
+                        className="font-bold text-sm sm:text-base text-gray-900 tracking-tight leading-tight line-clamp-2 group-hover:text-[var(--cinefil-navy)] transition-colors"
+                        style={{ fontFamily: "var(--font-heading)" }}
                       >
                         {member.name}
                       </h3>
-                      <p
-                        className="text-[10px] sm:text-xs mt-1 font-bold uppercase tracking-wider"
-                        style={{ color: "var(--cinefil-gold)" }}
-                      >
+                      <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
                         {member.position}
-                      </p>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Operational Link CTA Trigger */}
-                  <div className="mt-4 pt-2.5 border-t border-slate-100/80 w-full flex justify-center">
+                  {/* Profile Action */}
+                  <div className="mt-4 pt-3 border-t border-gray-100 w-full flex justify-center">
                     {member.biography || isLiveRegistry ? (
                       <button
                         onClick={() => onNavigate(`profile/${member.slug || member.id}`)}
-                        className="inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-700 bg-slate-50 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1 rounded-md transition-all duration-300 border border-slate-200/40"
-                        type="button"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
                       >
-                        <span>Profile</span>
-                        <ChevronRight size={10} />
+                        <span>View Profile</span>
+                        <ChevronRight size={12} />
                       </button>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-400 py-1">
-                        <HelpCircle size={10} className="opacity-60" />
-                        <span>Corporate File</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400">
+                        <Award size={11} className="text-[var(--cinefil-gold)]" />
+                        <span>Executive Council</span>
                       </span>
                     )}
                   </div>
-                </div>
+                </SpotlightCard>
               ))}
             </div>
           )}

@@ -1,5 +1,18 @@
-import { ChevronRight, Download, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import {
+  ChevronRight,
+  Download,
+  ShieldCheck,
+  Film,
+  Sparkles,
+  Users,
+  Tv,
+  ArrowUpRight,
+  CheckCircle2,
+  Lock,
+  Globe2,
+} from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { SectionHeader } from "./SectionHeader";
 import type { Page } from "./Navbar";
@@ -7,8 +20,13 @@ import { industryService } from "../../../services/industryService";
 import announcementService, { Announcement } from "../../../services/announcementService";
 import statsService, { SiteStats } from "../../../services/statsService";
 import { HomePageSkeleton } from "./HomePageSkeleton";
+import { CinematicBeamsHero } from "../../../components/ui/CinematicBeamsHero";
+import { SpotlightCard } from "../../../components/ui/SpotlightCard";
+import { AnimatedCounter } from "../../../components/ui/AnimatedCounter";
+import { FilmStripMarquee } from "../../../components/ui/FilmStripMarquee";
+import { InteractiveHowItWorks } from "../../../components/ui/InteractiveHowItWorks";
+import { AnnouncementTicker } from "../../../components/ui/AnnouncementTicker";
 import "../../../styles/HomePage.css";
-
 
 interface Industry {
   id: number;
@@ -58,7 +76,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
       try {
         setAnnouncementsLoading(true);
         const response = await announcementService.getAnnouncements();
-        if (response.results.length > 0) {
+        if (response.results && response.results.length > 0) {
           setAnnouncements(response.results);
         }
         setAnnouncementsError(null);
@@ -87,7 +105,6 @@ export function HomePage({ onNavigate }: HomePageProps) {
     fetchStats();
   }, []);
 
-  // Show skeleton while initial data is loading
   const isInitialLoading = industriesLoading || announcementsLoading || statsLoading;
 
   if (isInitialLoading) {
@@ -95,228 +112,365 @@ export function HomePage({ onNavigate }: HomePageProps) {
   }
 
   return (
-    <div style={{ fontFamily: "var(--font-body)" }}>
-      {/* Hero */}
-      <div
-        className="relative w-full overflow-hidden hero-bg-animation"
-        style={{ background: "linear-gradient(180deg, #000000 0%, #183858 100%)", minHeight: 440 }}
-      >
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center text-center gap-6">
-          <span
-            className="text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-full border"
-            style={{ color: "var(--cinefil-gold)", borderColor: "var(--cinefil-gold)" }}
+    <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] overflow-hidden">
+      {/* Live Announcement Bar */}
+      <AnnouncementTicker announcements={announcements} />
+
+      {/* Cinematic Beams Hero */}
+      <CinematicBeamsHero className="py-20 sm:py-28 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center gap-6 relative z-20">
+          {/* Top Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            Copyright Society · Est. India
-          </span>
-          <h1
-            className="text-white max-w-3xl px-4"
+            <span
+              className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-full border backdrop-blur-md shadow-lg"
+              style={{
+                color: "var(--cinefil-gold)",
+                borderColor: "rgba(201, 162, 39, 0.4)",
+                backgroundColor: "rgba(15, 37, 64, 0.6)",
+              }}
+            >
+              <ShieldCheck size={14} className="text-[var(--cinefil-gold)]" />
+              Copyright Society · Govt. of India Registered
+            </span>
+          </motion.div>
+
+          {/* Main Hero Headline with Cinematic Shimmer */}
+          <motion.h1
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            className="text-white max-w-4xl px-4 font-black tracking-tight"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(1.5rem, 6vw, 3.5rem)",
-              lineHeight: 1.2,
-              letterSpacing: "0.03em",
-              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+              fontSize: "clamp(2rem, 6.5vw, 4.25rem)",
+              lineHeight: 1.15,
+              textShadow: "0 4px 20px rgba(0,0,0,0.7)",
             }}
           >
             CINEFIL PRODUCERS
             <br />
-            <span style={{ color: "var(--cinefil-gold)" }}>PERFORMANCE LIMITED</span>
-          </h1>
-          <p className="text-white/70 max-w-xl text-base sm:text-lg leading-relaxed px-4">
-            A Copyright Society registered under the Central Government, managing Cinematograph Film Work
-            public performance rights across India and Overseas.
-          </p>
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center px-4">
+            <span className="gold-shimmer-text">PERFORMANCE LIMITED</span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+            className="text-white/80 max-w-2xl text-base sm:text-lg leading-relaxed px-4 font-normal"
+          >
+            Registered under Section 33(3) of the Copyright Act 1957. Empowering film producers,
+            protecting cinematograph rights, and issuing statutory public performance licenses PAN-India & Overseas.
+          </motion.p>
+
+          {/* Action CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+            className="flex flex-wrap gap-4 justify-center px-4 pt-3"
+          >
             <button
               onClick={() => (user?.is_member ? onNavigate("member-dashboard") : onNavigate("producers-owners"))}
-              className="px-6 sm:px-8 py-3 sm:py-4 rounded-md font-bold text-sm sm:text-base flex items-center gap-2 transition-all transform hover:scale-105"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2.5 transition-all transform hover:scale-105 active:scale-95 shadow-xl relative overflow-hidden group cursor-pointer"
               style={{
-                background: "linear-gradient(45deg, var(--cinefil-gold), var(--cinefil-gold-light))",
+                background: "linear-gradient(135deg, #c9a227 0%, #f0c040 100%)",
                 color: "var(--cinefil-navy)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                boxShadow: "0 8px 25px rgba(201, 162, 39, 0.35)",
               }}
             >
-              {user?.is_member ? "Member Dashboard" : "Become a Member"} <ChevronRight size={18} />
+              {/* Button light shimmer sweep */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform pointer-events-none" />
+              <Sparkles size={18} />
+              <span>{user?.is_member ? "Member Dashboard" : "Become a Member"}</span>
+              <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
+
             <button
               onClick={() => onNavigate("license-form")}
-              className="px-6 sm:px-8 py-3 sm:py-4 rounded-md font-bold text-sm sm:text-base border-2 border-white/50 text-white flex items-center gap-2 transition-all hover:bg-white/10 hover:border-white"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base border-2 border-white/40 text-white flex items-center gap-2.5 transition-all hover:bg-white/10 hover:border-white transform hover:scale-105 active:scale-95 backdrop-blur-md cursor-pointer"
             >
-              Get a Licence
+              <Tv size={18} className="text-[var(--cinefil-gold)]" />
+              <span>Get a Licence (CPL)</span>
             </button>
+          </motion.div>
+
+          {/* Mini Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.45 }}
+            className="flex flex-wrap items-center justify-center gap-6 pt-6 text-xs text-white/70"
+          >
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 size={15} className="text-[var(--cinefil-gold)]" /> Statutory Protection
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Lock size={15} className="text-[var(--cinefil-gold)]" /> Central Govt. Registered
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Globe2 size={15} className="text-[var(--cinefil-gold)]" /> PAN-India & Overseas
+            </span>
+          </motion.div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
+          <svg className="relative block w-full h-10 sm:h-14" viewBox="0 0 1440 60" preserveAspectRatio="none">
+            <path d="M0,60 C360,10 1080,10 1440,60 L1440,60 L0,60 Z" fill="#0a1420" />
+          </svg>
+        </div>
+      </CinematicBeamsHero>
+
+      {/* Film Strip Infinite Marquee */}
+      <FilmStripMarquee />
+
+      {/* Stats Counter Section with 21st.dev Spotlight Cards */}
+      <section className="py-16 sm:py-20 bg-[#0f2540] relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold uppercase tracking-widest text-[var(--cinefil-gold)]">
+              Authorized National Impact
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              Guarding India's Cinematograph Legacy
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              {
+                num: stats?.member_count ? `${stats.member_count}+` : "700+",
+                label: "Registered Producers",
+                sub: "Indian film rights owners",
+                icon: Users,
+              },
+              {
+                num: stats?.film_count ? `${stats.film_count}+` : "1,000+",
+                label: "Films in Repertoire",
+                sub: "Multi-lingual catalog",
+                icon: Film,
+              },
+              {
+                num: "33(3)",
+                label: "Copyright Act 1957",
+                sub: "Statutory authorization",
+                icon: ShieldCheck,
+              },
+              {
+                num: "PAN-India",
+                label: "Jurisdiction & Overseas",
+                sub: "Public performance enforcement",
+                icon: Globe2,
+              },
+            ].map((stat, idx) => {
+              const StatIcon = stat.icon;
+              return (
+                <SpotlightCard
+                  key={idx}
+                  className="p-6 sm:p-8 text-center bg-white/[0.05] border-white/10 text-white backdrop-blur-md hover:border-[var(--cinefil-gold)]/50"
+                  spotlightColor="rgba(201, 162, 39, 0.25)"
+                >
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 flex items-center justify-center text-[var(--cinefil-gold)]">
+                    <StatIcon size={24} />
+                  </div>
+                  <p
+                    className="text-3xl sm:text-5xl font-black text-white"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    <AnimatedCounter value={stat.num} />
+                  </p>
+                  <p className="text-sm sm:text-base font-bold text-[var(--cinefil-gold)] mt-2">
+                    {stat.label}
+                  </p>
+                  <p className="text-xs text-white/50 mt-1">
+                    {stat.sub}
+                  </p>
+                </SpotlightCard>
+              );
+            })}
           </div>
         </div>
+      </section>
 
-        {/* Wave */}
-        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ height: 60 }}>
-          <path d="M0,60 C360,0 1080,0 1440,60 L1440,60 L0,60 Z" fill="white" />
-        </svg>
-      </div>
+      {/* Interactive 3-Step Conversion Funnel */}
+      <InteractiveHowItWorks onNavigate={onNavigate} />
 
-      {/* Announcements */}
-      <div style={{ backgroundColor: "var(--cinefil-light-bg)" }} className="py-12">
-        {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {announcementsLoading && <p className="text-center text-sm">Loading announcements...</p>}
-          {announcementsError && <p className="text-center text-sm text-red-500">{announcementsError}</p>}
-          {!announcementsLoading && !announcementsError && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {announcements.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center gap-4 px-6 py-5 rounded-xl bg-white shadow-lg border-l-4 cursor-pointer hover:shadow-xl transition-all hover:scale-[1.02]"
-                  style={{ borderLeftColor: "var(--cinefil-gold)" }}
-                  onClick={() => a.file && window.open(a.file, '_blank')}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      a.file && window.open(a.file, '_blank');
-                    }
-                  }}
-                >
-                  <span style={{ color: "var(--cinefil-gold)" }}><Bell size={20} /></span>
-                  <div>
-                    <p className="font-bold text-base" style={{ color: "var(--cinefil-navy)" }}>{a.title}</p>
-                    <p className="text-sm" style={{ color: "var(--cinefil-muted)" }}>
-                      {new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </p>
-                  </div>
-                  <ChevronRight size={18} className="ml-auto" style={{ color: "var(--cinefil-muted)" }} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
-      </div>
-
-      {/* Are you using... */}
-      <div className="py-8 sm:py-12" style={{ background: "linear-gradient(180deg, #0f2540 0%, #183858 100%)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-semibold text-base sm:text-lg px-4" style={{ color: "var(--cinefil-gold)", fontFamily: "var(--font-heading)" }}>
-            Are you using Television, LCD Screen, or any other device for communication to the public?
-          </p>
-          <p className="text-white/60 text-xs sm:text-sm mt-2 px-4">
-            You may require a CINEFIL (Cinematograph Film) Performance License (CPL)
-          </p>
-          <button
-            onClick={() => onNavigate("license-form")}
-            className="mt-4 px-5 sm:px-6 py-2 sm:py-2.5 rounded text-xs sm:text-sm font-semibold transition-all hover:opacity-90 hover:shadow-lg"
-            style={{ backgroundColor: "var(--cinefil-gold)", color: "var(--cinefil-navy)" }}
-          >
-            Apply for Licence
-          </button>
-        </div>
-      </div>
-
-      {/* Businesses */}
-      <section className="py-12 sm:py-20 bg-white">
+      {/* Businesses that Require Licence */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            title="Businesses That Require CINEFIL Licence"
-            subtitle="If your business communicates film content to the public via any screen, you need a CPL."
+            title="Commercial Sectors Requiring CINEFIL Licence"
+            subtitle="If your commercial establishment communicates cinematograph film content to the public via TV, LED walls, screens, or projection, an authorized CPL is mandatory by law."
           />
+
           {industriesLoading && (
-            <div className="text-center">
-              <p>Loading industries...</p>
+            <div className="text-center py-12">
+              <div className="inline-block w-8 h-8 border-4 border-[var(--cinefil-gold)] border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm text-gray-500 mt-3">Loading licensing sectors...</p>
             </div>
           )}
+
           {industriesError && (
-            <div className="text-center text-red-500">
+            <div className="text-center py-8 text-red-500 text-sm">
               <p>{industriesError}</p>
             </div>
           )}
+
           {!industriesLoading && !industriesError && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-10">
               {industries.map((industry) => (
-                <button
+                <div
                   key={industry.id}
                   onClick={() => onNavigate("license-form")}
-                  className="group relative overflow-hidden rounded-2xl shadow-lg transition-all transform hover:scale-[1.03] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)] focus:ring-offset-2 aspect-[4/3]"
+                  className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl cursor-pointer border border-gray-100 aspect-[4/3]"
                 >
-                  <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-white text-sm sm:text-lg font-bold px-2 text-center">{industry.industry_name}</p>
-                  </div>
                   <img
                     src={industry.photo}
                     alt={industry.industry_name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-85 group-hover:opacity-100"
                   />
-                </button>
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 flex flex-col justify-end p-6 transition-all duration-300">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--cinefil-gold)]">
+                          Licensing Category
+                        </span>
+                        <h3 className="text-white text-lg sm:text-xl font-bold leading-tight mt-0.5">
+                          {industry.industry_name}
+                        </h3>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] flex items-center justify-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
+                        <ArrowUpRight size={20} />
+                      </div>
+                    </div>
+                    <p className="text-xs text-white/70 mt-2 line-clamp-2">
+                      {industry.description || "Authorized Cinematograph Performance License for commercial exhibition."}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           )}
+
+          {/* Quick Apply Banner inside Business section */}
+          <div className="mt-14 p-8 rounded-3xl bg-gradient-to-r from-[#0f2540] to-[#183858] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-[var(--cinefil-gold)]/30">
+            <div className="space-y-2 text-center md:text-left">
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
+                Not sure if your business needs a licence?
+              </h3>
+              <p className="text-xs sm:text-sm text-white/70 max-w-xl">
+                Our licensing officers provide instant tariff assessment according to your venue size and screen capacity.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate("license-form")}
+              className="px-6 py-3 rounded-xl font-bold text-sm bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-gold-light)] transition-all flex items-center gap-2 shadow-lg flex-shrink-0 cursor-pointer"
+            >
+              Get Tariff Assessment <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* About + Stats */}
-      <section style={{ backgroundColor: "var(--cinefil-light-bg)" }} className="py-16 sm:py-24">
+      {/* About CINEFIL & Repertoire Overview */}
+      <section className="py-20 bg-[#f4f5f7] border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 items-center">
-            <div>
-              <SectionHeader title="CINEFIL Producers Performance Limited" centered={false} />
-              <div className="space-y-4 sm:space-y-5 text-sm sm:text-base leading-relaxed" style={{ color: "var(--cinefil-muted)" }}>
-                <p>
-                  CINEFIL PRODUCERS PERFORMANCE LTD (CINEFIL) is a Copyright Society registered by the Central
-                  Government under Section 33(3) of the Copyright Act 1957 for Cinematograph Film Work and its formed
-                  by the Film Producers and Other Owners Film India (collectively referred as "Members") having the
-                  object of collecting royalties from India and Overseas by issuing and granting Cinematograph Film
-                  Work public performance License.
-                </p>
-                <p>
-                  An Introduced Tariff (Tarrif) CINEFIL has obtained successive authorizations from its Author and
-                  Other Owners transmitted to the associations of Sections 34 of the Copyright Act 1957. Presently,
-                  members of CINEFIL are not less than 700 members which will be updated subsequently.
-                </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[var(--cinefil-navy)]">
+                  About the Society
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-[var(--cinefil-navy)] mt-1">
+                  Empowering Creators, Administering Rights
+                </h2>
+              </div>
+              <p className="text-sm sm:text-base leading-relaxed text-gray-700">
+                <strong>CINEFIL PRODUCERS PERFORMANCE LTD (CINEFIL)</strong> is a registered Copyright Society under Section 33(3) of the Copyright Act 1957 for Cinematograph Film Works. Founded and governed by Indian film producers and owners, CINEFIL collects and distributes statutory royalties from public performance venues across India and Overseas.
+              </p>
+              <p className="text-sm sm:text-base leading-relaxed text-gray-700">
+                Under Section 34 of the Copyright Act 1957, CINEFIL administers authorizations across cinema chains, OTT networks, hotels, transport hubs, and public commercial venues.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2">
                 <button
                   onClick={() => onNavigate("governance")}
-                  className="inline-flex items-center gap-2 text-sm sm:text-base font-bold mt-4 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)] focus:ring-offset-2 rounded px-2 py-1"
-                  style={{ color: "var(--cinefil-gold)" }}
+                  className="px-6 py-3 rounded-xl font-bold text-sm bg-[var(--cinefil-navy)] text-white hover:bg-[var(--cinefil-navy-mid)] transition-all flex items-center gap-2 shadow-md cursor-pointer"
                 >
-                  Learn More <ChevronRight size={16} />
+                  Governance & Board <ChevronRight size={16} />
+                </button>
+                <button
+                  onClick={() => onNavigate("films")}
+                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[var(--cinefil-navy)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy)] hover:text-white transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  Search Film Catalog <Film size={16} />
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:gap-6">
-              {[
-                { num: stats ? `${stats.member_count}+` : "700+", label: "Members" },
-                { num: stats ? `${stats.film_count}+` : "1000+", label: "Films Registered" },
-                { num: "33(3)", label: "Copyright Act" },
-                { num: "PAN India", label: "Reach" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-white p-4 sm:p-8 rounded-2xl text-center shadow-xl border-t-4 transform hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)] focus:ring-offset-2"
-                  style={{ borderTopColor: "var(--cinefil-gold)" }}
-                >
-                  <p
-                    className="text-2xl sm:text-4xl font-extrabold"
-                    style={{ color: "var(--cinefil-navy)", fontFamily: "var(--font-display)" }}
-                  >
-                    {stat.num}
-                  </p>
-                  <p className="text-xs sm:text-sm mt-2 font-semibold" style={{ color: "var(--cinefil-muted)" }}>{stat.label}</p>
+
+            <div className="lg:col-span-5 space-y-4">
+              <SpotlightCard
+                className="p-6 bg-white shadow-xl border-gray-100"
+                spotlightColor="rgba(24, 56, 88, 0.15)"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-amber-100 text-amber-800">
+                    <ShieldCheck size={28} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">National Registration</h3>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Statutory registration granted by the Ministry of Commerce and Industry, Copyright Office, Govt. of India.
+                    </p>
+                  </div>
                 </div>
-              ))}
+              </SpotlightCard>
+
+              <SpotlightCard
+                className="p-6 bg-white shadow-xl border-gray-100"
+                spotlightColor="rgba(24, 56, 88, 0.15)"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-sky-100 text-sky-800">
+                    <Film size={28} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">Comprehensive Repertoire</h3>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Protecting feature films, short films, and documentaries across Hindi, Tamil, Telugu, Malayalam, Bengali, and all regional languages.
+                    </p>
+                  </div>
+                </div>
+              </SpotlightCard>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Copyright banner */}
+      {/* Official Copyright Certificate Download Banner */}
       <div
-        className="py-8 sm:py-12 text-center"
-        style={{ background: "linear-gradient(180deg, #0f2540 0%, #183858 100%)" }}
+        className="py-10 text-center relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0a1828 0%, #183858 100%)" }}
       >
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <p className="font-semibold text-sm sm:text-base px-2" style={{ color: "var(--cinefil-gold)", fontFamily: "var(--font-heading)" }}>
-            Copyright Registration through Copyright Office Website, Government of India
-          </p>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+          <div className="text-left">
+            <p className="font-bold text-base sm:text-lg text-[var(--cinefil-gold)]">
+              Copyright Registration through Copyright Office Website, Government of India
+            </p>
+            <p className="text-xs text-white/60">
+              Download statutory documentation, certificates, and tariff schedules.
+            </p>
+          </div>
           <button
             onClick={() => onNavigate("governance")}
-            className="px-4 sm:px-5 py-2 sm:py-2.5 rounded text-xs sm:text-sm font-semibold border text-white hover:border-[--cinefil-gold] transition-all flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)] focus:ring-offset-2"
-            style={{ borderColor: "rgba(255,255,255,0.3)" }}
+            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 border-[var(--cinefil-gold)] text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)] hover:text-[var(--cinefil-navy)] transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer shadow-lg"
           >
-            <Download size={14} /> Download
+            <Download size={15} /> Official Documents
           </button>
         </div>
       </div>

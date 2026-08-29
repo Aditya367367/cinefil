@@ -26,6 +26,8 @@ import { SnackbarProvider, useSnackbar } from "./contexts/SnackbarContext";
 import { LoadingScreen } from "./components/pages/LoadingScreen";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { AnimatePresence } from "motion/react";
+import { PageTransition } from "../components/ui/PageTransition";
 
 const validPages: Page[] = [
   "home",
@@ -195,8 +197,12 @@ function MainApp() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#f4f5f7" }}>
       {currentPage !== 'login' && currentPage !== 'forgot-password' && currentPage !== 'change-password' && <Navbar currentPage={currentPage as Page} onNavigate={navigate} />}
-      <main className="flex-1">
-        {renderPage(currentPage, navigate)}
+      <main className="flex-1 overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          <PageTransition pageKey={currentPage} key={currentPage}>
+            {renderPage(currentPage, navigate)}
+          </PageTransition>
+        </AnimatePresence>
       </main>
       {currentPage !== 'login' && currentPage !== 'forgot-password' && currentPage !== 'change-password' && !currentPage.startsWith('mentor-dashboard') && !currentPage.startsWith('member-dashboard') && !currentPage.startsWith('officer-dashboard') && !currentPage.startsWith('profile') && !isOfficer && (
         <Footer onNavigate={navigate} />

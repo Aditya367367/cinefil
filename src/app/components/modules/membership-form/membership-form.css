@@ -1188,4 +1188,64 @@
   background: #c59735;
 }
 
+/* ─────────────────────────────────────────────
+   Animated Icons & Micro-Interactions
+   ───────────────────────────────────────────── */
+
+@keyframes iconPulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(201, 162, 39, 0));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.45));
+  }
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes iconSpinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mf-icon-pulse {
+  animation: iconPulseGlow 2.5s ease-in-out infinite;
+}
+
+.mf-icon-float {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+.mf-icon-spin-slow {
+  animation: iconSpinSlow 12s linear infinite;
+}
+
+/* Hover effects for form icons */
+.mf-step svg {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+
+.mf-step button:hover svg {
+  transform: scale(1.15);
+}
+
+.mf-upload:hover svg {
+  transform: scale(1.2) translateY(-2px);
+  color: var(--cinefil-gold, #c9a227);
+}
+
+
 

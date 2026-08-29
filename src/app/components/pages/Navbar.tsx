@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell, CheckSquare, FileText, LayoutDashboard, Globe, LogOut } from "lucide-react";
+import { Bell, CheckSquare, FileText, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { ProfileMenu } from "./ProfileMenu";
 import { useAuth } from "../../../context/AuthContext";
 import { notificationService } from "../../../services/notificationService";
 import { useTranslation } from "../../contexts/LanguageContext";
+import LogoImage from "../../../imports/Cinefil-New-Logo-Small-Header-150x150.png";
 
 export type Page =
   | "home"
@@ -43,7 +45,7 @@ interface NotificationItem {
 
 export function Navbar({ currentPage, onNavigate }: NavbarProps) {
   const { isAuthenticated, user, logout } = useAuth();
-  const { language, setLanguage, t } = useTranslation();
+  const { t } = useTranslation();
 
   const handleLogoutClick = async () => {
     try {
@@ -53,6 +55,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
       console.error("Logout failed", e);
     }
   };
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -78,7 +81,6 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
     if (!isAuthenticated) return;
     try {
       const res = await notificationService.getNotifications();
-      // Django returns a paginated list of results or list directly
       if (res.results) {
         setNotifications(res.results);
       } else {
@@ -93,7 +95,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
     if (isAuthenticated) {
       fetchUnreadCount();
       fetchNotifications();
-      const interval = setInterval(fetchUnreadCount, 30000); // refresh every 30s
+      const interval = setInterval(fetchUnreadCount, 30000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
@@ -139,7 +141,6 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
       }
       setShowDropdown(false);
       if (notif.link) {
-        // If relative link, navigate via SPA router
         if (notif.link.startsWith("/")) {
           const pageName = notif.link.replace("/", "") as Page;
           onNavigate(pageName);
@@ -152,100 +153,277 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
     }
   };
 
-  const isOfficer = user?.is_membership_executive || user?.is_rights_verification_officer || user?.is_legal_officer || user?.is_ceo_authorised_officer || user?.is_membership_committee_member || ['admin', 'membership_executive', 'rights_verification_officer', 'legal_officer', 'ceo', 'membership_committee'].includes(user?.role || '');
+  const isOfficer =
+    user?.is_membership_executive ||
+    user?.is_rights_verification_officer ||
+    user?.is_legal_officer ||
+    user?.is_ceo_authorised_officer ||
+    user?.is_membership_committee_member ||
+    [
+      "admin",
+      "membership_executive",
+      "rights_verification_officer",
+      "legal_officer",
+      "ceo",
+      "membership_committee",
+    ].includes(user?.role || "");
 
-  const isMember = user?.is_member === true || user?.membership_status === 'approved' || user?.role === 'member';
+  const isMember = user?.is_member === true || user?.membership_status === "approved" || user?.role === "member";
 
-  const officerDashboardLabel = user?.is_ceo_authorised_officer || user?.role === 'ceo' ? 'CEO Dashboard' :
-    user?.is_membership_executive || user?.role === 'membership_executive' ? 'Executive Dashboard' :
-      user?.is_legal_officer || user?.role === 'legal_officer' ? 'Legal Dashboard' :
-        user?.is_rights_verification_officer || user?.role === 'rights_verification_officer' ? 'Verification Dashboard' :
-          'Officer Dashboard';
+  const officerDashboardLabel =
+    user?.is_ceo_authorised_officer || user?.role === "ceo"
+      ? "CEO Dashboard"
+      : user?.is_membership_executive || user?.role === "membership_executive"
+      ? "Executive Dashboard"
+      : user?.is_legal_officer || user?.role === "legal_officer"
+      ? "Legal Dashboard"
+      : user?.is_rights_verification_officer || user?.role === "rights_verification_officer"
+      ? "Verification Dashboard"
+      : "Officer Dashboard";
 
+  const isGovernanceActive = [
+    "governance",
+    "governing-board",
+    "honorary-board",
+    "committee",
+    "legal-advisor",
+  ].includes(currentPage);
+
+  const isJoinActive = ["membership-form", "license-form"].includes(currentPage);
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-white/10 shadow-lg"
+      className="sticky top-0 z-50 border-b border-white/10 shadow-xl"
       style={{
-        background: "linear-gradient(180deg, #0f2540 0%, #183858 100%)",
-        backdropFilter: "blur(10px)",
+        background: "linear-gradient(180deg, rgba(15, 37, 64, 0.95) 0%, rgba(24, 56, 88, 0.95) 100%)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         fontFamily: "var(--font-body)",
       }}
     >
       <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand Logo & Name */}
         <button
           onClick={() => onNavigate(isOfficer ? "officer-dashboard" : "home")}
-          className="flex items-center gap-3 transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-white/20 rounded-lg p-1"
+          className="flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 focus:outline-none rounded-xl p-1 cursor-pointer"
           aria-label="Go to home"
         >
           <img
-            src="/dist/assets/Cinefil-New-Logo-Small-Header-150x150-C1KSNnOQ.png"
-            alt="Cinefil logo"
-            className="h-12 w-12 object-cover"
-            style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))" }}
+            src={LogoImage}
+            alt="Cinefil Logo"
+            className="h-12 w-12 object-contain rounded-md"
+            style={{ filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.5))" }}
           />
+          <div className="text-left hidden sm:block">
+            <span className="text-white font-extrabold tracking-wider text-base leading-none block font-display">
+              CINEFIL
+            </span>
+            <span className="text-[10px] text-[var(--cinefil-gold)] tracking-widest uppercase font-semibold">
+              Copyright Society
+            </span>
+          </div>
         </button>
 
-        {/* Navigation Links */}
+        {/* Desktop Navigation Links */}
         {!isAuthenticated && (
-          <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-white/80">
-            <button onClick={() => onNavigate("home")} className={`hover:text-white transition-colors ${currentPage === 'home' ? 'text-white font-bold' : ''}`}>{t("Home")}</button>
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-medium text-white/80">
+            {/* Home */}
+            <button
+              onClick={() => onNavigate("home")}
+              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+                currentPage === "home"
+                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  : "hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {t("Home")}
+              {currentPage === "home" && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                />
+              )}
+            </button>
 
+            {/* Governance Dropdown */}
             <div className="relative" ref={menuDropdownRef}>
               <button
                 onClick={() => setShowMenuDropdown(!showMenuDropdown)}
-                className="flex items-center gap-1 hover:text-white transition-colors"
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  isGovernanceActive
+                    ? "text-white font-bold bg-white/10 shadow-inner"
+                    : "hover:text-white hover:bg-white/5"
+                }`}
               >
-                {t("Governance")} ▾
+                {t("Governance")}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showMenuDropdown ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
+                {isGovernanceActive && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  />
+                )}
               </button>
-              {showMenuDropdown && (
-                <div className="absolute left-0 mt-3 w-48 rounded-none border border-white/10 shadow-2xl bg-gradient-to-b from-[#0f2540] to-[#183858] py-2 z-[70]">
-                  <button onClick={() => { onNavigate("governance"); setShowMenuDropdown(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Governance")}</button>
-                  <button onClick={() => { onNavigate("governing-board"); setShowMenuDropdown(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Governing Board")}</button>
-                  <button onClick={() => { onNavigate("honorary-board"); setShowMenuDropdown(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Honorary Board")}</button>
-                  <button onClick={() => { onNavigate("committee"); setShowMenuDropdown(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Committee")}</button>
-                  <button onClick={() => { onNavigate("legal-advisor"); setShowMenuDropdown(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Legal Advisor")}</button>
-                </div>
-              )}
+
+              <AnimatePresence>
+                {showMenuDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 mt-2 w-56 rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] py-2 z-[70] backdrop-blur-xl overflow-hidden"
+                  >
+                    {[
+                      { label: t("Governance Overview"), page: "governance" as Page },
+                      { label: t("Governing Board"), page: "governing-board" as Page },
+                      { label: t("Honorary Board"), page: "honorary-board" as Page },
+                      { label: t("Committee"), page: "committee" as Page },
+                      { label: t("Legal Advisor"), page: "legal-advisor" as Page },
+                    ].map((item) => (
+                      <button
+                        key={item.page}
+                        onClick={() => {
+                          onNavigate(item.page);
+                          setShowMenuDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-between ${
+                          currentPage === item.page
+                            ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
+                            : "text-white/80 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
+            {/* Join Cinefil Dropdown */}
             <div className="relative" ref={membershipDropdownRef}>
               <button
                 onClick={() => setShowMembership(!showMembership)}
-                className="flex items-center gap-1 hover:text-white transition-colors"
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  isJoinActive
+                    ? "text-white font-bold bg-white/10 shadow-inner"
+                    : "hover:text-white hover:bg-white/5"
+                }`}
               >
-                {t("Join Cinefil")} ▾
+                {t("Join Cinefil")}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showMembership ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
+                {isJoinActive && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  />
+                )}
               </button>
-              {showMembership && (
-                <div className="absolute left-0 mt-3 w-48 rounded-none border border-white/10 shadow-2xl bg-gradient-to-b from-[#0f2540] to-[#183858] py-2 z-[70]">
-                  <button onClick={() => { onNavigate("membership-form"); setShowMembership(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("Membership Form")}</button>
-                  <button onClick={() => { onNavigate("license-form"); setShowMembership(false); }} className="w-full text-left px-4 py-2 hover:bg-white/10 transition-colors">{t("License Form")}</button>
-                </div>
-              )}
+
+              <AnimatePresence>
+                {showMembership && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 mt-2 w-56 rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] py-2 z-[70] backdrop-blur-xl overflow-hidden"
+                  >
+                    <button
+                      onClick={() => {
+                        onNavigate("membership-form");
+                        setShowMembership(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                        currentPage === "membership-form"
+                          ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
+                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {t("Membership Application")}
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate("license-form");
+                        setShowMembership(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                        currentPage === "license-form"
+                          ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
+                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {t("License Application (CPL)")}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
+            {/* Schemes */}
+            <button
+              onClick={() => onNavigate("schemes")}
+              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+                currentPage === "schemes"
+                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  : "hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {t("Schemes")}
+              {currentPage === "schemes" && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                />
+              )}
+            </button>
 
-            <button onClick={() => onNavigate("schemes")} className={`hover:text-white transition-colors ${currentPage === 'schemes' ? 'text-white font-bold' : ''}`}>{t("Schemes")}</button>
-            <button onClick={() => onNavigate("films")} className={`hover:text-white transition-colors ${currentPage === 'films' ? 'text-white font-bold' : ''}`}>{t("Works")}</button>
-            <button onClick={() => onNavigate("contact")} className={`hover:text-white transition-colors ${currentPage === 'contact' ? 'text-white font-bold' : ''}`}>{t("Contact")}</button>
+            {/* Works */}
+            <button
+              onClick={() => onNavigate("films")}
+              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+                currentPage === "films"
+                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  : "hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {t("Works")}
+              {currentPage === "films" && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                />
+              )}
+            </button>
+
+            {/* Contact */}
+            <button
+              onClick={() => onNavigate("contact")}
+              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+                currentPage === "contact"
+                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  : "hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {t("Contact")}
+              {currentPage === "contact" && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                />
+              )}
+            </button>
           </div>
         )}
 
+        {/* Right Actions */}
         <div className="flex items-center gap-3 relative">
           {!isAuthenticated && (
             <>
-              {/* Language Switcher */}
-              {/* <button
-                onClick={() => setLanguage(language === "EN" ? "HI" : "EN")}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-white transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-white/20"
-              >
-                <Globe size={14} />
-                <span>{language === "EN" ? "हिन्दी" : "English"}</span>
-              </button> */}
-
               <button
                 onClick={() => onNavigate("login")}
-                className="inline-flex items-center gap-2 rounded-lg bg-[var(--cinefil-gold)] px-4 py-2 text-sm font-bold text-[#0a1e35] hover:bg-[var(--cinefil-gold-hover)] transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--cinefil-gold)] to-[var(--cinefil-gold-light)] px-5 py-2.5 text-xs sm:text-sm font-bold text-[var(--cinefil-navy)] hover:shadow-lg hover:shadow-[var(--cinefil-gold)]/25 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-md"
               >
                 {t("Member Login")}
               </button>
@@ -255,111 +433,120 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {isAuthenticated && isMember && !isOfficer && (
             <button
               onClick={() => onNavigate("member-dashboard")}
-              className="hidden lg:inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="hidden lg:inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs sm:text-sm font-medium text-white hover:bg-white/20 transition-all cursor-pointer shadow-sm"
               aria-label="Member Dashboard"
             >
-              <LayoutDashboard size={16} />
-              <span className="hidden sm:inline">Member Dashboard</span>
+              <LayoutDashboard size={16} className="text-[var(--cinefil-gold)]" />
+              <span>Member Dashboard</span>
             </button>
           )}
 
           {isAuthenticated && isOfficer && (
             <button
               onClick={() => onNavigate("officer-dashboard")}
-              className="inline-flex items-center gap-2 rounded-lg border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/10 px-4 py-2 text-sm font-medium text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/20 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--cinefil-gold)]/50"
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/15 px-4 py-2.5 text-xs sm:text-sm font-bold text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/25 transition-all shadow-md cursor-pointer"
               aria-label="Officer Dashboard"
             >
               <LayoutDashboard size={16} />
-              <span className="hidden sm:inline">
-                {officerDashboardLabel}
-              </span>
+              <span>{officerDashboardLabel}</span>
             </button>
           )}
 
           {(!isAuthenticated || (!user?.is_member && !isOfficer)) && (
             <button
               onClick={() => onNavigate("membership-form")}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-white/20 hidden lg:inline-flex"
+              className="hidden xl:inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white/90 hover:bg-white/10 transition-all cursor-pointer"
               aria-label="Membership Form"
             >
-              <FileText size={16} />
-              <span className="hidden sm:inline">Membership Application</span>
+              <FileText size={15} className="text-[var(--cinefil-gold)]" />
+              <span>Apply for Membership</span>
             </button>
           )}
 
+          {/* Notifications Bell */}
           {isAuthenticated && (
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={handleBellClick}
-                className="relative h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/85 inline-flex hover:bg-white/5 transition-all focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="relative h-10 w-10 items-center justify-center rounded-xl border border-white/15 text-white/90 inline-flex hover:bg-white/10 transition-all cursor-pointer"
                 aria-label="Notifications"
                 type="button"
               >
-                <Bell size={20} />
+                <Bell size={18} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-[#0a1e35]">
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-[#0f2540] animate-bounce">
                     {unreadCount}
                   </span>
                 )}
               </button>
 
-              {showDropdown && (
-                <div className="fixed left-4 right-4 top-[80px] sm:absolute sm:left-auto sm:right-0 sm:top-auto mt-2 sm:mt-3 sm:w-96 overflow-hidden rounded-none border border-white/10 shadow-2xl bg-gradient-to-b from-[#0f2540] to-[#183858] text-white z-[70]">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                    <span className="text-sm font-bold">Notifications</span>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={handleMarkAllRead}
-                        className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50 rounded px-2 py-1"
-                      >
-                        <CheckSquare size={13} />
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  <div className="max-h-80 overflow-y-auto divide-y divide-white/5">
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-6 text-center text-xs text-white/50">
-                        No notifications yet.
-                      </div>
-                    ) : (
-                      notifications.map((notif) => (
-                        <div
-                          key={notif.id}
-                          onClick={() => handleNotificationClick(notif)}
-                          className={`px-4 py-3 cursor-pointer hover:bg-white/5 transition ${!notif.is_read ? 'bg-white/[0.03]' : ''}`}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              handleNotificationClick(notif);
-                            }
-                          }}
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="fixed left-4 right-4 top-[80px] sm:absolute sm:left-auto sm:right-0 sm:top-auto mt-3 sm:w-96 overflow-hidden rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] text-white z-[70] backdrop-blur-xl"
+                  >
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)]">
+                        Notifications
+                      </span>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors cursor-pointer"
                         >
-                          <div className="flex justify-between items-start gap-1">
-                            <span className={`text-xs font-bold ${!notif.is_read ? 'text-amber-400' : 'text-white/80'}`}>
-                              {notif.title}
-                            </span>
-                            {!notif.is_read && (
-                              <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0 mt-1" />
-                            )}
-                          </div>
-                          <p className="text-xs text-white/75 mt-1 leading-relaxed">{notif.message}</p>
-                          <span className="text-[10px] text-white/40 block mt-2">
-                            {new Date(notif.created_at).toLocaleDateString()}
-                          </span>
+                          <CheckSquare size={13} />
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto divide-y divide-white/5">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-6 text-center text-xs text-white/50">
+                          No notifications yet.
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => handleNotificationClick(notif)}
+                            className={`px-4 py-3 cursor-pointer hover:bg-white/10 transition ${
+                              !notif.is_read ? "bg-white/[0.04]" : ""
+                            }`}
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <span
+                                className={`text-xs font-bold ${
+                                  !notif.is_read ? "text-[var(--cinefil-gold)]" : "text-white/80"
+                                }`}
+                              >
+                                {notif.title}
+                              </span>
+                              {!notif.is_read && (
+                                <span className="h-2 w-2 rounded-full bg-[var(--cinefil-gold)] shrink-0 mt-1" />
+                              )}
+                            </div>
+                            <p className="text-xs text-white/70 mt-1 leading-relaxed">{notif.message}</p>
+                            <span className="text-[10px] text-white/40 block mt-2">
+                              {new Date(notif.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
+
+          {/* Logout for Officers / ProfileMenu for Members & Mobile */}
           {isAuthenticated && isOfficer ? (
             <button
               onClick={handleLogoutClick}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-3.5 py-2 text-xs font-bold text-rose-400 transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/15 hover:bg-rose-500/25 px-3.5 py-2 text-xs font-bold text-rose-300 transition-all cursor-pointer shadow-sm"
               aria-label="Logout"
             >
               <LogOut size={14} />
@@ -372,6 +559,6 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           )}
         </div>
       </div>
-    </nav >
+    </nav>
   );
 }

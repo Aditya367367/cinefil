@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { User, Scale, AlertCircle, ShieldAlert, ChevronRight } from "lucide-react";
+import { User, Scale, ShieldAlert, ChevronRight, ShieldCheck, Mail } from "lucide-react";
 import { PageBanner } from "./PageBanner";
 import { SectionHeader } from "./SectionHeader";
 import { useTranslation } from "../../contexts/LanguageContext";
 import { legalAdvisorService, LegalAdvisor } from "../../../services/legalAdvisorService";
 import { useSnackbar } from "../../contexts/SnackbarContext";
+import { SpotlightCard } from "../../../components/ui/SpotlightCard";
 
 export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, state?: any) => void }) {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, st
         console.error("Failed to load legal council records:", err);
         if (isMounted) {
           setErrorOccurred(true);
-          showSnackbar("Unable to retrieve our legal advisory directory. Please try again later.", "error");
+          showSnackbar("Unable to retrieve legal advisory directory. Please try again later.", "error");
         }
       } finally {
         if (isMounted) {
@@ -42,7 +43,7 @@ export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, st
 
     const timer = setTimeout(() => {
       setMinimumLoading(false);
-    }, 1500);
+    }, 1000);
 
     return () => {
       isMounted = false;
@@ -51,81 +52,63 @@ export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, st
   }, []);
 
   return (
-    <div style={{ fontFamily: "var(--font-body)" }} className="bg-slate-50 min-h-screen">
+    <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] min-h-screen">
       <PageBanner
-        title={t("Legal Advisor")}
-        subtitle="Expert legal counsel guiding CINEFIL's institutional compliance and strategic rights enforcement."
+        title={t("LEGAL ADVISORS")}
+        subtitle="Expert legal counsel and distinguished IP advocates steering institutional compliance and rights enforcement."
+        badge="Legal Council"
       />
 
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title={t("Legal Advisory Council")}
-            subtitle="CINEFIL's panel of eminent legal experts and legal scholars specializing in intellectual property, media governance, and global copyright law."
+            subtitle="CINEFIL's panel of eminent advocates and legal scholars specializing in intellectual property, cinematograph performance rights, and global copyright laws."
+            badge="Expert Counsel"
           />
 
-          {/* Loading State */}
           {loading || minimumLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16 mt-8 sm:mt-10">
-              {[...Array(6)].map((_, index) => (
-                <div key={index} className="flex flex-col justify-between p-4 sm:p-6 bg-white rounded-none border border-slate-200/80 shadow-xs">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-none bg-slate-200 animate-pulse" />
-                    <div className="mt-3 sm:mt-4 w-full space-y-1.5 sm:space-y-2">
-                      <div className="h-3 sm:h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse" />
-                      <div className="h-2.5 sm:h-3 bg-slate-200 rounded w-1/2 mx-auto animate-pulse" />
-                      <div className="h-14 sm:h-16 bg-slate-100 rounded-none mt-2 animate-pulse" />
-                    </div>
-                  </div>
-                  <div className="mt-4 sm:mt-5 pt-2.5 sm:pt-3 border-t border-slate-100 flex justify-center">
-                    <div className="h-7 sm:h-8 w-20 sm:w-24 bg-slate-200 rounded-none animate-pulse" />
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 mt-10">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-72 rounded-3xl bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
             <>
-              {/* Empty State */}
               {!errorOccurred && advisors.length === 0 && (
-                <div className="max-w-sm mx-auto my-8 sm:my-12 p-6 sm:p-8 bg-slate-50 border border-slate-200 rounded-none text-center shadow-inner animate-fade-in">
-                  <ShieldAlert size={36} className="mx-auto text-slate-300 mb-2 w-8 h-8 sm:w-9 sm:h-9" />
-                  <h4 className="text-[10px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">Directory Empty</h4>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 mt-1">The advisory panel list is undergoing administrative verification updates.</p>
+                <div className="max-w-md mx-auto my-12 p-8 bg-slate-50 border border-slate-200 rounded-3xl text-center shadow-inner">
+                  <ShieldAlert size={36} className="mx-auto text-slate-400 mb-2" />
+                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Directory In Progress</h4>
+                  <p className="text-xs text-slate-500 mt-1">The legal advisory panel is undergoing administrative updates.</p>
                 </div>
               )}
 
-              {/* Advisors Grid Content */}
               {!errorOccurred && advisors.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16 mt-8 sm:mt-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 mt-10">
                   {advisors.map((a) => (
-                    <div
+                    <SpotlightCard
                       key={a.id}
-                      className="flex flex-col justify-between p-4 sm:p-6 bg-white rounded-none border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+                      className="flex flex-col justify-between p-6 sm:p-8 bg-white rounded-3xl border-gray-200 shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group"
+                      spotlightColor="rgba(201, 162, 39, 0.2)"
                     >
                       <div className="flex flex-col items-center text-center">
                         {/* User Avatar Frame */}
-                        <div
-                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-none overflow-hidden flex items-center justify-center shadow-inner bg-gradient-to-b from-slate-50 to-slate-100 p-1 group-hover:scale-102 transition-transform duration-300"
-                          style={{ border: "2px solid var(--cinefil-gold)" }}
-                        >
+                        <div className="w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center shadow-md bg-slate-100 border-2 border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 relative">
                           {a.photo_url ? (
                             <img
                               src={a.photo_url}
                               alt={a.member_name}
-                              className="w-full h-full rounded-none object-cover"
+                              className="w-full h-full rounded-xl object-cover"
                               loading="lazy"
                               onError={(e) => {
-                                // Safe fallback treatment for broken asset URLs
                                 (e.target as HTMLImageElement).style.display = "none";
                                 const fallbackContainer = (e.target as HTMLImageElement).parentElement;
-                                if (fallbackContainer) {
-                                  fallbackContainer.classList.add("bg-slate-900");
-                                }
+                                if (fallbackContainer) fallbackContainer.classList.add("bg-slate-900");
                               }}
                             />
                           ) : (
-                            <div className="w-full h-full rounded-none bg-slate-900 flex items-center justify-center text-slate-400">
-                              <User size={40} style={{ color: "var(--cinefil-gold)", opacity: 0.7 }} />
+                            <div className="w-full h-full rounded-xl bg-slate-50 flex items-center justify-center text-[var(--cinefil-navy)]">
+                              <User size={36} className="text-[var(--cinefil-gold)]" />
                             </div>
                           )}
                         </div>
@@ -133,40 +116,34 @@ export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, st
                         {/* Meta Body Info */}
                         <div className="mt-4">
                           <h3
-                            className="font-bold text-sm text-slate-900 tracking-tight"
-                            style={{ color: "var(--cinefil-navy)", fontFamily: "var(--font-heading)" }}
+                            className="font-extrabold text-base text-gray-900 tracking-tight leading-tight group-hover:text-[var(--cinefil-navy)] transition-colors"
+                            style={{ fontFamily: "var(--font-heading)" }}
                           >
                             {a.member_name}
                           </h3>
-                          <p
-                            className="text-[11px] font-bold uppercase tracking-wider mt-1"
-                            style={{ color: "var(--cinefil-gold)" }}
-                          >
-                            {a.specialisation}
-                          </p>
+                          <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                            {a.specialisation || "Legal Advisor"}
+                          </span>
 
                           {a.description && (
-                            <p
-                              className="text-xs text-slate-500 mt-2.5 leading-relaxed font-medium line-clamp-3 bg-slate-50 px-3 py-2 rounded-none border border-slate-100"
-                            >
+                            <p className="text-xs text-gray-600 mt-3 leading-relaxed line-clamp-3 bg-slate-50 p-3 rounded-xl border border-gray-100">
                               {a.description}
                             </p>
                           )}
                         </div>
                       </div>
 
-                      {/* Core Action Footer Trigger */}
-                      <div className="mt-5 pt-3 border-t border-slate-100 flex justify-center">
+                      <div className="mt-6 pt-4 border-t border-gray-100 flex justify-center">
                         <button
                           onClick={() => onNavigate(`profile/${a.slug || a.member}`)}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 group-hover:bg-[var(--cinefil-navy)] group-hover:text-white px-4 py-1.5 rounded-none transition-all duration-300 shadow-2xs"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-4 py-2 rounded-xl transition-all shadow-sm cursor-pointer"
                           type="button"
                         >
                           <span>{t("Know More")}</span>
-                          <ChevronRight size={12} className="opacity-70" />
+                          <ChevronRight size={13} />
                         </button>
                       </div>
-                    </div>
+                    </SpotlightCard>
                   ))}
                 </div>
               )}
@@ -174,35 +151,38 @@ export function LegalAdvisorPage({ onNavigate }: { onNavigate: (page: string, st
           )}
 
           {/* Statutory Policy Framework Legal Notice Block */}
-          <div
-            className="p-6 sm:p-8 rounded-none shadow-xs border transition-all duration-300 hover:shadow-sm"
-            style={{ backgroundColor: "var(--cinefil-light-bg)", borderColor: "rgba(201,162,39,0.15)" }}
+          <SpotlightCard
+            className="p-8 sm:p-10 rounded-3xl shadow-xl border-gray-200 bg-slate-900 text-white"
+            spotlightColor="rgba(201, 162, 39, 0.25)"
           >
-            <div className="flex flex-col sm:flex-row items-start gap-4">
-              <div className="p-3 bg-white border border-amber-200 shadow-2xs rounded-none text-center shrink-0">
-                <Scale size={26} style={{ color: "var(--cinefil-gold)" }} />
+            <div className="flex flex-col sm:flex-row items-start gap-5">
+              <div className="p-4 bg-white/10 border border-[var(--cinefil-gold)]/40 rounded-2xl text-center shrink-0">
+                <Scale size={32} className="text-[var(--cinefil-gold)]" />
               </div>
 
-              <div className="space-y-3.5 text-sm leading-relaxed text-slate-600 font-medium">
+              <div className="space-y-4 text-xs sm:text-sm leading-relaxed text-white/80">
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  Statutory Intellectual Property Oversight
+                </h3>
                 <p>
-                  CINEFIL's centralized legal advisory panel comprises highly distinguished statutory practitioners and intellectual property counsel. These specialists actively guide the Society on all core technical vectors regarding legal execution regimes, institutional compliance matrices, policy configurations, and proactive rights administration.
+                  CINEFIL's legal advisory panel comprises distinguished practitioners and intellectual property counsel. These specialists actively guide the Society on all core statutory mandates regarding legal execution, institutional compliance matrices, and proactive rights administration.
                 </p>
                 <p>
-                  Our assigned legal advisors serve an indispensable oversight capacity, securing complete operational transparency within the exact ambit of the <strong>Copyright Act 1957</strong>. They insulate global portfolio operations and ensure that your individual or label intellectual assets are vigorously guarded against unvetted commercial exploit pipelines.
+                  Our legal advisors ensure complete operational transparency within the exact ambit of the <strong>Copyright Act 1957</strong>, protecting film creators against unlicensed commercial exploitation across India and overseas territories.
                 </p>
-                <div className="pt-3 border-t border-slate-200/60 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                  <span>{t("For active litigation support, formal corporate inquiries, or enforcement notifications, direct correspondence to:")}</span>
+                <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs text-white/60">
+                  <Mail size={14} className="text-[var(--cinefil-gold)]" />
+                  <span>For active litigation support or corporate inquiries, write to:</span>
                   <a
                     href="mailto:admin@cinefilindia.com"
-                    className="font-bold underline tracking-wide hover:opacity-80 transition-opacity"
-                    style={{ color: "var(--cinefil-navy)" }}
+                    className="font-bold text-[var(--cinefil-gold)] hover:underline"
                   >
                     admin@cinefilindia.com
                   </a>
                 </div>
               </div>
             </div>
-          </div>
+          </SpotlightCard>
         </div>
       </section>
     </div>

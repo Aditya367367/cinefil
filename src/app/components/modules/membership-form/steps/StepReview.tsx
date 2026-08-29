@@ -1,6 +1,6 @@
 import React from "react";
 import { useMembershipForm } from "../context/MembershipFormContext";
-import { Edit2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Edit2, CheckCircle2, AlertCircle, Sparkles, Send, CreditCard, ChevronLeft, ArrowRight, Loader2, Check } from "lucide-react";
 
 export const StepReview = () => {
   const {
@@ -23,8 +23,6 @@ export const StepReview = () => {
     stateField,
     country,
     pinCode,
-    isEmailVerified,
-    isMobileVerified,
     // Step 3 (Authorized Rep)
     repName,
     repDesignation,
@@ -43,12 +41,12 @@ export const StepReview = () => {
     // Step 5 (KYC)
     panCard,
     existingPanCardUrl,
+    aadharCard,
+    existingAadharCardUrl,
     boardResolution,
     existingBoardResolutionUrl,
     passportPhoto,
     existingPassportPhotoUrl,
-    passportPhoto2,
-    existingPassportPhoto2Url,
     // Step 6 (Ownership)
     isOriginalProducer,
     relationWithProducer,
@@ -73,9 +71,10 @@ export const StepReview = () => {
     digitalSignature,
     signaturePlace,
     signatureDate,
+    handleSubmitWithoutPayment,
+    submitting,
   } = useMembershipForm();
 
-  // Map each logical step key to a UI step number
   const getStepIndexByKey = (stepKey: string) => {
     const idx = activeSteps.indexOf(stepKey);
     return idx !== -1 ? idx + 1 : -1;
@@ -91,13 +90,6 @@ export const StepReview = () => {
     ? !selectedMembershipType?.membership_name?.toLowerCase().includes("producer")
     : membershipCategories.includes("other_member");
 
-  /* ── Helpers ──────────────────────────────── */
-  const val = (v: string | null | undefined | boolean | File | null) => {
-    if (v instanceof File) return v.name;
-    if (typeof v === "boolean") return v ? "Yes" : "No";
-    return v?.toString().trim() || null;
-  };
-
   const DataRow = ({
     label,
     value,
@@ -111,53 +103,30 @@ export const StepReview = () => {
       value instanceof File
         ? value.name
         : typeof value === "boolean"
-          ? value
-            ? "Yes"
-            : null
-          : value?.toString().trim() || null;
+        ? value
+          ? "Yes"
+          : null
+        : value?.toString().trim() || null;
 
     const isEmpty = resolved === null || resolved === undefined || resolved === "";
 
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "40% 60%",
-          gap: "12px",
-          marginBottom: "10px",
-          fontSize: "14px",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ color: "var(--mf-text-secondary)", fontWeight: 500 }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-gray-100 text-xs sm:text-sm gap-1">
+        <span className="text-gray-500 font-medium">
           {label}
-          {required && (
-            <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
-          )}
-        </div>
-        <div
-          style={{
-            fontWeight: 600,
-            wordBreak: "break-word",
-            color: isEmpty
-              ? "#ef4444"
-              : "var(--mf-accent)",
-            fontStyle: isEmpty ? "italic" : "normal",
-            fontSize: isEmpty ? "13px" : "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
+          {required && <span className="text-rose-500 ml-0.5">*</span>}
+        </span>
+        <span
+          className={`font-semibold text-right ${
+            isEmpty
+              ? required
+                ? "text-rose-500 italic font-bold"
+                : "text-gray-400 italic"
+              : "text-gray-900"
+          }`}
         >
-          {isEmpty ? (
-            <>
-              <AlertCircle size={14} color="#ef4444" />
-              Not filled
-            </>
-          ) : (
-            resolved
-          )}
-        </div>
+          {isEmpty ? (required ? "Missing Required" : "Not Provided") : resolved}
+        </span>
       </div>
     );
   };
@@ -169,63 +138,35 @@ export const StepReview = () => {
     required = false,
   }: {
     label: string;
-    file: File | null | undefined;
+    file: File | null;
     existingUrl?: string | null;
     required?: boolean;
   }) => {
-    const hasFile = file || existingUrl;
-    const displayName = file ? file.name : existingUrl ? "Existing Document" : null;
+    const hasFile = !!(file || existingUrl);
 
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "40% 60%",
-          gap: "12px",
-          marginBottom: "10px",
-          fontSize: "14px",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ color: "var(--mf-text-secondary)", fontWeight: 500 }}>
+      <div className="flex items-center justify-between py-2 border-b border-gray-100 text-xs sm:text-sm">
+        <span className="text-gray-500 font-medium">
           {label}
-          {required && (
-            <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
-          )}
-        </div>
-        <div
-          style={{
-            fontWeight: 600,
-            color: hasFile ? "var(--mf-accent)" : "#ef4444",
-            fontStyle: !hasFile ? "italic" : "normal",
-            fontSize: !hasFile ? "13px" : "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
-        >
-          {hasFile ? (
-            <>
-              <CheckCircle2 size={14} color="var(--mf-success)" />
-              {displayName}
-              {existingUrl && !file && (
-                <a
-                  href={`http://localhost:8000${existingUrl.startsWith('/') ? '' : '/'}${existingUrl.replace('http://localhost:8000', '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ fontSize: '12px', marginLeft: '8px', color: '#3b82f6', textDecoration: 'underline' }}
-                >
-                  View
-                </a>
-              )}
-            </>
-          ) : (
-            <>
-              <AlertCircle size={14} color="#ef4444" />
-              Not uploaded
-            </>
-          )}
-        </div>
+          {required && <span className="text-rose-500 ml-0.5">*</span>}
+        </span>
+        {file ? (
+          <span className="font-semibold text-emerald-700 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <CheckCircle2 size={13} /> {file.name}
+          </span>
+        ) : existingUrl ? (
+          <span className="font-semibold text-sky-700 flex items-center gap-1.5 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">
+            <CheckCircle2 size={13} /> Uploaded on file
+          </span>
+        ) : (
+          <span
+            className={`text-xs italic ${
+              required ? "text-rose-500 font-bold" : "text-gray-400"
+            }`}
+          >
+            {required ? "Missing Document" : "Not Provided"}
+          </span>
+        )}
       </div>
     );
   };
@@ -236,152 +177,107 @@ export const StepReview = () => {
     children,
   }: {
     title: string;
-    editStep: number;
+    editStep?: number;
     children: React.ReactNode;
   }) => (
-    <div
-      style={{
-        background: "#fff",
-        border: "1px solid var(--mf-border)",
-        borderRadius: "var(--mf-radius)",
-        marginBottom: "16px",
-        overflow: "hidden",
-      }}
-    >
-      {/* Section Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "14px 20px",
-          background: "rgba(15,42,74,0.03)",
-          borderBottom: "1px solid var(--mf-border)",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "14px",
-            fontWeight: 700,
-            color: "var(--mf-accent)",
-            letterSpacing: "-0.01em",
-          }}
-        >
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm mb-6 relative group hover:border-[var(--cinefil-gold)] transition-colors">
+      <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+        <h4 className="text-sm sm:text-base font-extrabold text-[var(--cinefil-navy)] tracking-tight">
           {title}
-        </span>
-        <button
-          type="button"
-          onClick={() => setStep(editStep)}
-          style={{
-            background: "none",
-            border: "1.5px solid var(--mf-gold)",
-            color: "var(--mf-gold)",
-            fontSize: "12px",
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "5px",
-            padding: "5px 12px",
-            borderRadius: "99px",
-            transition: "var(--mf-transition)",
-          }}
-        >
-          <Edit2 size={12} /> Edit
-        </button>
+        </h4>
+        {editStep && editStep > 0 && (
+          <button
+            type="button"
+            onClick={() => setStep(editStep)}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--cinefil-gold)] hover:text-[var(--cinefil-navy)] px-3 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-all cursor-pointer"
+          >
+            <Edit2 size={12} />
+            <span>Edit</span>
+          </button>
+        )}
       </div>
-      {/* Section Body */}
-      <div style={{ padding: "16px 20px" }}>{children}</div>
+      <div className="space-y-1">{children}</div>
     </div>
   );
 
-  const filledFilms = films.filter((f) => f.title);
+  const filledFilms = (films || []).filter(
+    (f) => f.title || (f.cast && f.cast.length > 0) || f.year || f.language
+  );
 
   return (
-    <div className="mf-step">
-      <div className="mf-step__header">
-        <span className="mf-step__pretitle">Step {getStepIndexByKey("review")}</span>
-        <h2 className="mf-step__title flex items-center gap-2">
-          Review Application
-          <abbr title="Review all the entered details in your application before proceeding to payment." style={{ cursor: "help", textDecoration: "none" }}>
-            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">i</span>
-          </abbr>
-        </h2>
-        <p className="mf-step__subtitle">
-          Review all your details below. Fields marked in{" "}
-          <span style={{ color: "#ef4444", fontWeight: 600 }}>red</span> are
-          empty — click <strong>Edit</strong> to fill them in.
+    <div className="mf-step max-w-4xl mx-auto animate-in fade-in duration-300">
+      <div className="mf-step__header mb-6 text-center sm:text-left">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 text-[var(--cinefil-gold)] text-xs font-bold uppercase tracking-wider mb-2">
+          <Sparkles size={13} /> Final Verification
+        </div>
+        <h3 className="mf-step__title text-2xl font-black text-[var(--cinefil-navy)]">
+          Review Application Dossier
+        </h3>
+        <p className="mf-step__subtitle text-xs sm:text-sm text-gray-500 mt-1">
+          Please verify all applicant, KYC, bank, and film repertoire details before finalizing submission.
         </p>
       </div>
 
-      {/* ── Step 1: Membership Category ─────── */}
+      {/* Step 1: Membership Category */}
       {activeSteps.includes("category") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("category")} — Membership Category`}
           editStep={getStepIndexByKey("category")}
         >
           <DataRow
-            label="Membership Categories"
+            label="Membership Category"
             value={
-              membershipCategories
-                .join(", ")
-                .replace(/_/g, " ")
-                .toLowerCase()
-                .replace(/\b\w/g, (char) => char.toUpperCase()) || null
+              membershipCategories.includes("producer_member")
+                ? "Producer Member (Right Holder)"
+                : "Other Member"
             }
             required
           />
           <DataRow
-            label="Applicant Types"
-            value={
-              applicantTypes
-                .join(", ")
-                .replace(/_/g, " ")
-                .toLowerCase()
-                .replace(/\b\w/g, (char) => char.toUpperCase()) || null
-            }
+            label="Applicant Entity Type"
+            value={applicantTypes.map((t) => t.replace(/_/g, " ")).join(", ")}
             required
           />
         </SectionCard>
       )}
 
-      {/* ── Step 2: Personal Information ────── */}
+      {/* Step 2: Applicant Details */}
       {activeSteps.includes("applicant") && (
         <SectionCard
-          title={`Step ${getStepIndexByKey("applicant")} — Personal Information`}
+          title={`Step ${getStepIndexByKey("applicant")} — Applicant Details`}
           editStep={getStepIndexByKey("applicant")}
         >
-          <DataRow label="Full Name" value={applicantName} required />
+          <DataRow label="Applicant / Entity Name" value={applicantName} required />
           <DataRow label="Email Address" value={applicantEmail} required />
-          <DataRow label="Email Verified" value={isEmailVerified ? "Verified ✓" : null} required />
-          <DataRow label="Mobile Number" value={mobileNumber} required />
-          <DataRow label="Mobile Verified" value={isMobileVerified ? "Verified ✓" : null} required />
+          <DataRow label="Mobile Contact" value={mobileNumber} required />
           <DataRow label="PAN Number" value={panNumberField} required />
           <DataRow label="Registered Address" value={registeredAddress} required />
-          <DataRow label="City" value={city} />
-          <DataRow label="State" value={stateField} />
-          <DataRow label="Country" value={country} />
-          <DataRow label="Pin Code" value={pinCode} />
+          <DataRow label="City / State" value={`${city || ""}, ${stateField || ""}`} required />
+          <DataRow label="PIN Code / Country" value={`${pinCode || ""}, ${country || "India"}`} required />
         </SectionCard>
       )}
 
-      {/* ── Step 3: Authorized Representative ── */}
-      {activeSteps.includes("representative") && (
+      {/* Step 3: Authorized Representative */}
+      {activeSteps.includes("rep") && !isIndividual && (
         <SectionCard
-          title={`Step ${getStepIndexByKey("representative")} — Authorized Representative`}
-          editStep={getStepIndexByKey("representative")}
+          title={`Step ${getStepIndexByKey("rep")} — Authorized Representative`}
+          editStep={getStepIndexByKey("rep")}
         >
-          <DataRow label="Representative Name" value={repName} />
-          <DataRow label="Designation" value={repDesignation} />
-          <DataRow label="Email" value={repEmail} />
-          <DataRow label="Mobile" value={repMobile} />
-          <DataRow label="Aadhar Number" value={repAadhar} />
-          <DataRow label="PAN" value={repPan} />
-          <FileRow label="Authority Letter" file={repAuthorityLetter} existingUrl={existingRepAuthorityLetterUrl} />
+          <DataRow label="Representative Name" value={repName} required />
+          <DataRow label="Designation" value={repDesignation} required />
+          <DataRow label="Mobile Number" value={repMobile} required />
+          <DataRow label="Email Address" value={repEmail} required />
+          <DataRow label="Aadhaar Number" value={repAadhar} />
+          <DataRow label="PAN Number" value={repPan} />
+          <FileRow
+            label="Authority Letter"
+            file={repAuthorityLetter}
+            existingUrl={existingRepAuthorityLetterUrl}
+          />
         </SectionCard>
       )}
 
-      {/* ── Step 4: Bank Details ─────────────── */}
+      {/* Step 4: Bank Details */}
       {activeSteps.includes("bank") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("bank")} — Bank Details`}
@@ -395,22 +291,32 @@ export const StepReview = () => {
         </SectionCard>
       )}
 
-      {/* ── Step 5: KYC Documents ─────────────── */}
+      {/* Step 5: KYC Documents */}
       {activeSteps.includes("kyc") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("kyc")} — KYC Documents`}
           editStep={getStepIndexByKey("kyc")}
         >
           <FileRow label="PAN Card" file={panCard} existingUrl={existingPanCardUrl} required />
+          <FileRow label="Aadhaar Card" file={aadharCard} existingUrl={existingAadharCardUrl} />
           {!isIndividual && (
-            <FileRow label="Authority Letter or Board Resolution" file={boardResolution} existingUrl={existingBoardResolutionUrl} required />
+            <FileRow
+              label="Board Resolution / Authority Letter"
+              file={boardResolution}
+              existingUrl={existingBoardResolutionUrl}
+              required
+            />
           )}
-          <FileRow label="Passport-Size Photograph" file={passportPhoto} existingUrl={existingPassportPhotoUrl} required />
-          {/* <FileRow label="Passport-Size Photograph 2" file={passportPhoto2} existingUrl={existingPassportPhoto2Url} required /> */}
+          <FileRow
+            label="Passport Photograph"
+            file={passportPhoto}
+            existingUrl={existingPassportPhotoUrl}
+            required
+          />
         </SectionCard>
       )}
 
-      {/* ── Step 6: Ownership Details ─────────── */}
+      {/* Step 6: Ownership Details */}
       {activeSteps.includes("ownership") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("ownership")} — Ownership Details`}
@@ -424,7 +330,12 @@ export const StepReview = () => {
               )}
               <DataRow label="Production House Name" value={productionHouseName} required />
               <DataRow label="Total Films Owned" value={totalFilmsOwned} required />
-              <FileRow label="Producer Ownership Declaration" file={producerOwnershipDeclaration} existingUrl={existingProducerOwnershipDeclarationUrl} required />
+              <FileRow
+                label="Producer Ownership Declaration"
+                file={producerOwnershipDeclaration}
+                existingUrl={existingProducerOwnershipDeclarationUrl}
+                required
+              />
             </>
           )}
           {isOtherMember && (
@@ -434,140 +345,139 @@ export const StepReview = () => {
                 value={natureOfOwnership.join(", ").replace(/_/g, " ") || null}
                 required
               />
-              <FileRow label="Assignment Agreement" file={assignmentAgreement} existingUrl={existingAssignmentAgreementUrl} required />
-              <FileRow label="Other Ownership Declaration" file={otherOwnershipDeclaration} existingUrl={existingOtherOwnershipDeclarationUrl} required />
+              <FileRow
+                label="Assignment Agreement"
+                file={assignmentAgreement}
+                existingUrl={existingAssignmentAgreementUrl}
+                required
+              />
+              <FileRow
+                label="Other Ownership Declaration"
+                file={otherOwnershipDeclaration}
+                existingUrl={existingOtherOwnershipDeclarationUrl}
+                required
+              />
             </>
           )}
         </SectionCard>
       )}
 
-      {/* ── Step 7: Repertoire / Film Details ─── */}
+      {/* Step 7: Repertoire Details */}
       {activeSteps.includes("film") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("film")} — Repertoire Details`}
           editStep={getStepIndexByKey("film")}
         >
           {filledFilms.length === 0 ? (
-            <div
-              style={{
-                color: "#ef4444",
-                fontStyle: "italic",
-                fontSize: "13px",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <AlertCircle size={14} /> No films added yet
+            <div className="flex items-center gap-2 text-xs font-bold text-rose-500 py-2">
+              <AlertCircle size={15} /> No films added yet
             </div>
           ) : (
-            <>
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "var(--mf-text-secondary)",
-                  marginBottom: "12px",
-                }}
-              >
-                {filledFilms.length} film(s) listed
-                {excelUploaded && " (via Excel upload)"}
-              </div>
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-500">
+                {filledFilms.length} film(s) registered {excelUploaded && "(via Excel Upload)"}
+              </p>
               {filledFilms.map((f, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "var(--mf-bg)",
-                    border: "1px solid var(--mf-border)",
-                    borderRadius: "var(--mf-radius)",
-                    padding: "12px 16px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontWeight: 700,
-                      color: "var(--mf-accent)",
-                      marginBottom: "4px",
-                      fontSize: "14px",
-                    }}
-                  >
+                <div key={i} className="p-3 bg-slate-50 border border-gray-200 rounded-xl text-xs">
+                  <span className="font-bold text-[var(--cinefil-navy)]">
                     {i + 1}. {f.title?.label || f.title?.value}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "var(--mf-text-secondary)",
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                      gap: "4px 16px",
-                    }}
-                  >
-                    {(f.release_date || f.year) && <span>Year: {f.release_date ? f.release_date.substring(0, 4) : f.year}</span>}
-                    {f.language && <span>Language: {f.language}</span>}
+                  </span>
+                  <div className="flex flex-wrap gap-4 mt-1 text-gray-600">
+                    <span>Year: {f.release_date ? f.release_date.substring(0, 4) : f.year || "N/A"}</span>
+                    <span>Language: {f.language || "N/A"}</span>
                     {f.remarks && <span>Remarks: {f.remarks}</span>}
                   </div>
                 </div>
               ))}
-            </>
+            </div>
           )}
         </SectionCard>
       )}
 
-      {/* ── Step 8: Declaration of Rights ──────── */}
+      {/* Step 8: Declarations */}
       {activeSteps.includes("declaration") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("declaration")} — Declaration of Rights`}
           editStep={getStepIndexByKey("declaration")}
         >
-          <DataRow
-            label="Declared as Lawful Owner"
-            value={declareLawfulOwner ? "Accepted ✓" : null}
-            required
-          />
-          <DataRow
-            label="Authorized CINEFIL to Administer"
-            value={authorizeCinefil ? "Accepted ✓" : null}
-            required
-          />
-          <DataRow
-            label="Agreed to Abide by Rules"
-            value={agreeToAbide ? "Accepted ✓" : null}
-            required
-          />
+          <DataRow label="Declared as Lawful Owner" value={declareLawfulOwner ? "Accepted ✓" : null} required />
+          <DataRow label="Authorized CINEFIL to Administer" value={authorizeCinefil ? "Accepted ✓" : null} required />
+          <DataRow label="Agreed to Abide by Rules" value={agreeToAbide ? "Accepted ✓" : null} required />
         </SectionCard>
       )}
 
-      {/* ── Step 9: Membership Agreement ──────── */}
+      {/* Step 9: Membership Agreement */}
       {activeSteps.includes("agreement") && (
         <SectionCard
           title={`Step ${getStepIndexByKey("agreement")} — Membership Agreement`}
           editStep={getStepIndexByKey("agreement")}
         >
-          <DataRow
-            label="Agreement Accepted"
-            value={agreementAccepted ? "Accepted ✓" : null}
-            required
-          />
+          <DataRow label="Agreement Terms Accepted" value={agreementAccepted ? "Accepted ✓" : null} required />
           <DataRow label="Digital Signature (Full Name)" value={digitalSignature} required />
           <DataRow label="Place of Signing" value={signaturePlace} required />
           <DataRow label="Date of Signing" value={signatureDate} required />
         </SectionCard>
       )}
 
-      {/* ── Actions ─────────────────────────── */}
-      <div
-        className="mf-info-box mf-info-box--neutral"
-        style={{ marginBottom: "16px" }}
-      >
-        On the next step, you can pay with Razorpay or submit without payment. Either option activates Associate Member access; unpaid membership will be clearly marked in your dashboard.
+      {/* Submission Choices & Callout */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-50 to-blue-500/10 border border-amber-300/60 shadow-md mb-8">
+        <div className="flex items-start gap-3">
+          <Sparkles size={20} className="text-[var(--cinefil-gold)] flex-shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+            <p className="font-extrabold text-[var(--cinefil-navy)] mb-1">
+              Submission & Enrollment Options:
+            </p>
+            <p>
+              You can instantly <strong>Submit Without Payment</strong> to activate your Associate Membership number, or proceed to <strong>Online Payment</strong> via Razorpay.
+            </p>
+          </div>
+        </div>
       </div>
-      <div className="mf-actions">
-        <button type="button" className="mf-btn mf-btn--prev" onClick={prevStep}>
-          ← Back
+
+      {/* Bottom Actions */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-200">
+        <button
+          type="button"
+          onClick={prevStep}
+          disabled={submitting}
+          className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition cursor-pointer"
+        >
+          <ChevronLeft size={16} /> Back
         </button>
-        <button type="button" className="mf-btn mf-btn--next" onClick={nextStep}>
-          Continue to Payment Options →
-        </button>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {/* Submit Without Payment Button */}
+          <button
+            type="button"
+            onClick={handleSubmitWithoutPayment}
+            disabled={submitting}
+            className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs sm:text-sm border-2 border-[var(--cinefil-navy)] text-[var(--cinefil-navy)] bg-white hover:bg-[var(--cinefil-navy)] hover:text-white transition-all shadow-md flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
+          >
+            {submitting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <Send size={15} />
+                <span>Submit Without Payment</span>
+              </>
+            )}
+          </button>
+
+          {/* Continue to Payment */}
+          <button
+            type="button"
+            onClick={nextStep}
+            disabled={submitting}
+            className="w-full sm:w-auto px-7 py-3 rounded-xl font-extrabold text-xs sm:text-sm text-[var(--cinefil-navy)] bg-gradient-to-r from-[var(--cinefil-gold)] to-[var(--cinefil-gold-light)] hover:shadow-lg transition-all shadow-md flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
+          >
+            <CreditCard size={16} />
+            <span>Continue to Payment Options</span>
+            <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
