@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { cn } from "../../lib/utils";
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,21 +16,24 @@ export function SpotlightCard({
   ...props
 }: SpotlightCardProps) {
   const divRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current) return;
+    if (!divRef.current || !glowRef.current) return;
     const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    glowRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, ${spotlightColor}, transparent 70%)`;
   };
 
   const handleMouseEnter = () => {
-    setOpacity(1);
+    if (glowRef.current) glowRef.current.style.opacity = "1";
+    if (divRef.current) divRef.current.style.borderColor = borderColor;
   };
 
   const handleMouseLeave = () => {
-    setOpacity(0);
+    if (glowRef.current) glowRef.current.style.opacity = "0";
+    if (divRef.current) divRef.current.style.borderColor = "";
   };
 
   return (
@@ -43,21 +46,16 @@ export function SpotlightCard({
         "relative rounded-2xl border bg-white overflow-hidden transition-all duration-300",
         className
       )}
-      style={{
-        borderColor: opacity > 0 ? borderColor : undefined,
-      }}
       {...props}
     >
       {/* Radial spotlight glow overlay */}
       <div
-        className="pointer-events-none absolute -inset-px transition-opacity duration-300 ease-in-out"
-        style={{
-          opacity,
-          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 70%)`,
-        }}
+        ref={glowRef}
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300 ease-in-out opacity-0"
       />
       {/* Content */}
       <div className="relative z-10">{children}</div>
     </div>
   );
 }
+

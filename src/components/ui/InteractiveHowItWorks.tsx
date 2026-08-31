@@ -80,10 +80,9 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
   const IconComponent = current.icon;
 
   return (
-    <section className="py-20 bg-gradient-to-b from-[#0f2540] to-[#0a1828] text-white relative overflow-hidden">
+    <section className="py-16 sm:py-20 bg-gradient-to-b from-[#0f2540] to-[#0a1828] text-white relative overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-[var(--cinefil-gold)]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_30%_20%,rgba(201,162,39,0.15),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(56,189,248,0.1),transparent_50%)]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Heading */}
@@ -108,10 +107,10 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
               <button
                 key={s.id}
                 onClick={() => setActiveStep(idx)}
-                className={`flex items-center gap-4 p-5 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group ${
+                className={`flex items-center gap-4 p-5 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden group ${
                   isActive
-                    ? "bg-white/[0.12] border-[var(--cinefil-gold)] shadow-xl shadow-black/30 scale-[1.02]"
-                    : "bg-white/[0.04] border-white/10 hover:bg-white/[0.08] hover:border-white/25"
+                    ? "bg-[#163354] border-[var(--cinefil-gold)] shadow-xl shadow-black/30 scale-[1.02]"
+                    : "bg-[#0d2036] border-white/10 hover:bg-[#122842] hover:border-white/25"
                 }`}
               >
                 {/* Active indicator glow */}
@@ -144,11 +143,11 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="p-8 sm:p-12 rounded-3xl bg-white/[0.06] border border-white/15 backdrop-blur-xl shadow-2xl"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="p-6 sm:p-12 rounded-3xl bg-[#0f243c] border border-white/15 shadow-2xl"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7 space-y-5">

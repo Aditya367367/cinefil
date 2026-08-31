@@ -105,14 +105,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
     fetchStats();
   }, []);
 
-  const isInitialLoading = industriesLoading || announcementsLoading || statsLoading;
-
-  if (isInitialLoading) {
-    return <HomePageSkeleton />;
-  }
-
   return (
-    <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] overflow-hidden">
+    <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] overflow-x-hidden">
       {/* Live Announcement Bar */}
       <AnnouncementTicker announcements={announcements} />
 
@@ -332,7 +326,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   <img
                     src={industry.photo}
                     alt={industry.industry_name}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-85 group-hover:opacity-100"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-85 group-hover:opacity-100"
                   />
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 flex flex-col justify-end p-6 transition-all duration-300">

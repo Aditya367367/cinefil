@@ -880,6 +880,7 @@ export function SectionMembershipDetails() {
           <h4 className="mb-4 text-lg font-bold text-gray-900 border-b pb-2">KYC & Title Documents</h4>
           <div className="grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
             <DocumentLink label="PAN Card" url={application.pan_card} fieldKey="pan_card" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
+            <DocumentLink label="Aadhaar Card" url={application.aadhar_card} fieldKey="aadhar_card" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
             <DocumentLink label="Passport-Size Photograph" url={application.passport_photo} fieldKey="passport_photo" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
             <DocumentLink label="Probate (Optional)" url={application.probate} fieldKey="probate" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />
             <DocumentLink label="Letter of Administration (Optional)" url={application.letter_of_administration} fieldKey="letter_of_administration" onUpload={handleDocumentUpload} readOnly={user?.is_member_prime || user?.is_prime || isUnderReview} />

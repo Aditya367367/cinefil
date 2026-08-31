@@ -35,9 +35,17 @@ interface Application {
   account_number?: string;
   ifsc_code?: string;
   pan_card?: string;
+  aadhar_card?: string;
   board_resolution?: string;
   passport_photo?: string;
   passport_photo_2?: string;
+  rep_name?: string;
+  rep_designation?: string;
+  rep_mobile?: string;
+  rep_email?: string;
+  rep_aadhar?: string;
+  rep_pan?: string;
+  rep_authority_letter?: string;
   membership_categories?: string[];
   applicant_types?: string[];
   other_applicant_type?: string;
@@ -424,6 +432,31 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                 {renderSectionReviewInput("Step 2: Applicant Details")}
               </div>
 
+              {/* Step 2b: Authorized Representative (if present) */}
+              {(selectedApp.rep_name || selectedApp.rep_aadhar || selectedApp.rep_pan || selectedApp.rep_authority_letter) && (
+                <div className="bg-white border border-slate-200 rounded shadow-sm">
+                  <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
+                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                      <User size={14} className="text-indigo-600" />
+                      Authorized Representative Details
+                    </h3>
+                  </div>
+                  <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {renderFieldValue("Representative Name", selectedApp.rep_name)}
+                    {renderFieldValue("Designation", selectedApp.rep_designation)}
+                    {renderFieldValue("Mobile Number", selectedApp.rep_mobile)}
+                    {renderFieldValue("Email Address", selectedApp.rep_email)}
+                    {renderFieldValue("Aadhaar Number", selectedApp.rep_aadhar)}
+                    {renderFieldValue("PAN Number", selectedApp.rep_pan)}
+                    {selectedApp.rep_authority_letter && (
+                      <div className="col-span-full">
+                        {renderDocumentLink("Representative Authority Letter", selectedApp.rep_authority_letter)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Step 3: Bank Details */}
               <div className="bg-white border border-slate-200 rounded shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
@@ -452,6 +485,7 @@ export function OfficerDashboardPage({ onNavigate }: { onNavigate: (page: string
                 </div>
                 <div className="p-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {renderDocumentLink("PAN Card", selectedApp.pan_card)}
+                  {renderDocumentLink("Aadhaar Card", selectedApp.aadhar_card)}
                   {renderDocumentLink("Authority Letter / Board Resolution", selectedApp.board_resolution)}
                   {renderDocumentLink("Passport Photograph", selectedApp.passport_photo)}
                 </div>

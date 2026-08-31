@@ -20,29 +20,25 @@ const marqueeItems: MarqueeItem[] = [
 
 export function FilmStripMarquee() {
   return (
-    <div className="relative w-full bg-[#0a1420] py-4 overflow-hidden border-y border-[var(--cinefil-gold)]/25">
-      {/* Film Sprocket Perforations Top */}
-      <div className="flex justify-between w-[200%] mb-2 opacity-30 select-none">
-        {Array.from({ length: 40 }).map((_, i) => (
-          <div key={i} className="w-3 h-2 bg-white/40 rounded-sm inline-block mx-2" />
-        ))}
-      </div>
-
+    <div className="relative w-full bg-[#0a1420] py-3.5 overflow-hidden border-y border-[var(--cinefil-gold)]/25">
       {/* Infinite scrolling track */}
-      <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-6">
-        {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
+      <div 
+        className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-4 sm:gap-6 py-1"
+        style={{ willChange: "transform", transform: "translateZ(0)" }}
+      >
+        {[...marqueeItems, ...marqueeItems].map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-3.5 px-5 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 hover:border-[var(--cinefil-gold)]/40 hover:bg-white/[0.08] transition-all duration-200 cursor-default backdrop-blur-sm"
+            className="flex items-center gap-3 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#0f233a] border border-white/10 hover:border-[var(--cinefil-gold)]/40 hover:bg-[#152e4d] transition-colors duration-150 cursor-default flex-shrink-0"
           >
-            <div className="p-2 rounded-lg bg-[var(--cinefil-navy)]/80 border border-[var(--cinefil-gold)]/30">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-[var(--cinefil-navy)] border border-[var(--cinefil-gold)]/30 flex-shrink-0">
               {item.icon}
             </div>
             <div>
-              <p className="text-white text-xs sm:text-sm font-semibold tracking-wide flex items-center gap-1.5">
+              <p className="text-white text-xs sm:text-sm font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
                 {item.label}
               </p>
-              <p className="text-[10px] sm:text-xs text-white/50 tracking-wider">
+              <p className="text-[10px] sm:text-xs text-white/60 tracking-wider whitespace-nowrap">
                 {item.sub}
               </p>
             </div>
@@ -50,16 +46,10 @@ export function FilmStripMarquee() {
         ))}
       </div>
 
-      {/* Film Sprocket Perforations Bottom */}
-      <div className="flex justify-between w-[200%] mt-2 opacity-30 select-none">
-        {Array.from({ length: 40 }).map((_, i) => (
-          <div key={i} className="w-3 h-2 bg-white/40 rounded-sm inline-block mx-2" />
-        ))}
-      </div>
-
       {/* Left and Right Fade Gradients */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a1420] to-transparent pointer-events-none z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a1420] to-transparent pointer-events-none z-10" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-[#0a1420] to-transparent pointer-events-none z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-[#0a1420] to-transparent pointer-events-none z-10" />
     </div>
   );
 }
+

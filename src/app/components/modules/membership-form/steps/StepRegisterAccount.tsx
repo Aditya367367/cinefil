@@ -655,7 +655,7 @@ export function StepRegisterAccount() {
 
           <div className="mt-6 flex justify-between items-center gap-3">
             {/* DEV: Skip entire registration step */}
-            <button
+            {/* <button
               type="button"
               onClick={() => {
                 setIsEmailVerified(true);
@@ -678,6 +678,7 @@ export function StepRegisterAccount() {
                 cursor: 'pointer',
                 letterSpacing: '0.03em',
                 transition: 'all 0.2s',
+                
               }}
               onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.18)'; }}
               onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.08)'; }}
@@ -687,7 +688,7 @@ export function StepRegisterAccount() {
                 <line x1="19" y1="3" x2="19" y2="21"/>
               </svg>
               DEV: Skip
-            </button>
+            </button> */}
 
             <button
               type="button"
