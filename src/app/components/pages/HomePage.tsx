@@ -108,7 +108,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
   return (
     <div style={{ fontFamily: "var(--font-body)" }} className="bg-[#f8fafc] overflow-x-hidden">
       {/* Live Announcement Bar */}
-      <AnnouncementTicker announcements={announcements} />
+      {/* <AnnouncementTicker announcements={announcements} /> */}
 
       {/* Cinematic Beams Hero */}
       <CinematicBeamsHero className="py-20 sm:py-28 relative">
