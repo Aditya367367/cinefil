@@ -87,7 +87,7 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 text-[var(--cinefil-gold)] text-xs font-semibold uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-[3px] bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 text-[var(--cinefil-gold)] text-xs font-semibold uppercase tracking-widest mb-4">
             <Sparkles size={13} /> The CINEFIL Ecosystem
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -107,20 +107,20 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
               <button
                 key={s.id}
                 onClick={() => setActiveStep(idx)}
-                className={`flex items-center gap-4 p-5 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden group ${
+                className={`flex items-center gap-4 p-5 rounded-[4px] border text-left transition-all duration-200 relative overflow-hidden group ${
                   isActive
-                    ? "bg-[#163354] border-[var(--cinefil-gold)] shadow-xl shadow-black/30 scale-[1.02]"
+                    ? "bg-[#163354] border-[var(--cinefil-gold)] shadow-md shadow-black/30 scale-[1.01]"
                     : "bg-[#0d2036] border-white/10 hover:bg-[#122842] hover:border-white/25"
                 }`}
               >
                 {/* Active indicator glow */}
                 {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--cinefil-gold)]" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--cinefil-gold)]" />
                 )}
                 <div
-                  className={`p-3 rounded-xl transition-colors ${
+                  className={`p-3 rounded-[4px] transition-colors ${
                     isActive
-                      ? "bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] font-bold shadow-lg"
+                      ? "bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] font-bold shadow-sm"
                       : "bg-white/10 text-white/80 group-hover:text-white"
                   }`}
                 >
@@ -147,11 +147,11 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="p-6 sm:p-12 rounded-3xl bg-[#0f243c] border border-white/15 shadow-2xl"
+            className="p-6 sm:p-10 rounded-[4px] bg-[#0f243c] border border-white/15 shadow-xl"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)] text-xs font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[3px] bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)] text-xs font-bold uppercase tracking-wider">
                   Phase {current.stepNum} · {current.subtitle}
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
@@ -174,7 +174,7 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
                 <div className="pt-4 flex flex-wrap items-center gap-4">
                   <button
                     onClick={() => onNavigate(current.ctaTarget)}
-                    className="px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+                    className="px-6 py-3 rounded-[4px] font-bold text-sm flex items-center gap-2 transition-all transform hover:scale-[1.02] shadow-sm cursor-pointer"
                     style={{
                       backgroundColor: "var(--cinefil-gold)",
                       color: "var(--cinefil-navy)",
@@ -190,11 +190,11 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
 
               {/* Visual Spotlight Graphic */}
               <div className="lg:col-span-5 flex justify-center">
-                <div className="relative w-full max-w-sm aspect-square rounded-2xl p-8 bg-gradient-to-tr from-white/[0.08] to-white/[0.02] border border-white/20 flex flex-col items-center justify-center text-center shadow-inner group">
-                  <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_center,rgba(201,162,39,0.2)_0%,transparent_70%)] pointer-events-none" />
+                <div className="relative w-full max-w-sm aspect-square rounded-[4px] p-8 bg-gradient-to-tr from-white/[0.08] to-white/[0.02] border border-white/20 flex flex-col items-center justify-center text-center shadow-inner group">
+                  <div className="absolute inset-0 rounded-[4px] bg-[radial-gradient(circle_at_center,rgba(201,162,39,0.2)_0%,transparent_70%)] pointer-events-none" />
                   
-                  <div className="w-24 h-24 rounded-full bg-[var(--cinefil-gold)]/20 border-2 border-[var(--cinefil-gold)] flex items-center justify-center text-[var(--cinefil-gold)] mb-6 shadow-xl animate-pulse-slow">
-                    <IconComponent size={48} />
+                  <div className="w-20 h-20 rounded-[4px] bg-[var(--cinefil-gold)]/20 border border-[var(--cinefil-gold)] flex items-center justify-center text-[var(--cinefil-gold)] mb-6 shadow-md animate-pulse-slow">
+                    <IconComponent size={40} />
                   </div>
 
                   <p className="text-lg font-bold text-white tracking-wide">
@@ -204,7 +204,7 @@ export function InteractiveHowItWorks({ onNavigate }: InteractiveHowItWorksProps
                     {current.subtitle}
                   </p>
                   
-                  <div className="mt-6 inline-block px-4 py-1.5 rounded-full bg-white/10 text-[11px] text-[var(--cinefil-gold)] font-mono">
+                  <div className="mt-6 inline-block px-3 py-1 rounded-[3px] bg-white/10 text-[11px] text-[var(--cinefil-gold)] font-mono">
                     Statutory Protocol Section 33(3)
                   </div>
                 </div>

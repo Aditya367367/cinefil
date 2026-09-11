@@ -57,9 +57,9 @@ export function ProfileMenu({ currentPage, onNavigate, dark = false, showLabel =
   }, []);
 
   const buttonText = dark ? "text-white/85" : "text-slate-700";
-  const buttonBorder = dark ? "rgba(255,255,255,0.18)" : "rgba(15,23,42,0.12)";
+  const buttonBorder = dark ? "rgba(201,162,39,0.3)" : "rgba(15,23,42,0.12)";
   const panelBg = dark
-    ? "linear-gradient(180deg, #0f2540 0%, #183858 100%)"
+    ? "linear-gradient(180deg, #0a1828 0%, #060e18 100%)"
     : "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)";
   const panelText = dark ? "text-white/80" : "text-slate-600";
 

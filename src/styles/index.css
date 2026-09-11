@@ -1,6 +1,22 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+@layer base {
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: #f4f5f7;
+    color: #1a1a2e;
+  }
+}
+
 @layer utilities {
   /* Hides standard cross-browser view scrollbars dynamically */
   .scrollbar-none::-webkit-scrollbar {
@@ -10,8 +26,23 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Square div container with 3-5px border radius styling */
+  .square-card {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .square-card-dark {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0f2540;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
   
-  /* Global border-radius override to set cards, panels, and dropdowns to boxy with a tiny roundness */
+  /* Global border-radius override to set cards, panels, and dropdowns to boxy with a tiny roundness (3-5px) */
   .rounded-xl,
   .rounded-lg,
   .rounded-2xl,

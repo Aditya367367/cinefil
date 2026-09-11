@@ -73,20 +73,19 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 bg-gradient-to-t from-slate-950 via-[#0a1e35]/90 to-[#0f2540]/80 backdrop-blur-[3px]">
           <button
             onClick={() => onNavigate("home")}
-            className="flex flex-col items-center justify-center p-8 bg-white/5 hover:bg-white/10 rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:scale-102 transition-all duration-300 border border-white/10 group cursor-pointer max-w-xs text-center space-y-4"
+            className="flex flex-col items-center justify-center p-8 bg-white/5 hover:bg-white/10 rounded-[4px] shadow-[0_24px_60px_rgba(0,0,0,0.5)] hover:scale-[1.01] transition-all duration-200 border border-white/10 group cursor-pointer max-w-xs text-center space-y-4"
           >
             <img
               src={LogoImage}
               alt="Cinefil Logo"
-              className="w-24 h-24 object-contain transition-transform duration-300 group-hover:scale-105"
+              className="w-24 h-24 object-contain transition-transform duration-200 group-hover:scale-105"
             />
             <div className="space-y-1">
-              {/* <h2 className="text-lg font-black text-white tracking-widest uppercase">Cinefil</h2> */}
               <p className="text-[11px] text-slate-300 font-bold leading-normal">
                 Professional Network of Cinema Owners & Film Producers
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 text-[10px] font-bold uppercase tracking-wider text-amber-300 rounded-full border border-amber-500/30 group-hover:bg-amber-500/30 transition">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 text-[10px] font-bold uppercase tracking-wider text-amber-300 rounded-[3px] border border-amber-500/30 group-hover:bg-amber-500/30 transition">
               Go to Home page
             </span>
           </button>
@@ -114,7 +113,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
             <p className="text-xs font-semibold text-slate-400">
               Sign in to manage your repertoire, royalties, and membership console.
             </p>
-            <div className="h-[3px] w-16 mx-auto lg:mx-0 bg-amber-500 rounded-full" />
+            <div className="h-0.5 w-12 mx-auto lg:mx-0 bg-amber-500 rounded-[2px]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -123,7 +122,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
                 {t("Email Address")}
               </label>
-              <div className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3.5 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/10 focus-within:bg-white transition-all duration-200">
+              <div className="flex items-center gap-2 rounded-[4px] bg-slate-50 border border-slate-200 px-4 py-3.5 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500/20 focus-within:bg-white transition-all duration-200">
                 <Mail size={16} className="text-slate-400 shrink-0" />
                 <input
                   type="text"
@@ -141,7 +140,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
                 {t("Password")}
               </label>
-              <div className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3.5 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/10 focus-within:bg-white transition-all duration-200">
+              <div className="flex items-center gap-2 rounded-[4px] bg-slate-50 border border-slate-200 px-4 py-3.5 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500/20 focus-within:bg-white transition-all duration-200">
                 <Lock size={16} className="text-slate-400 shrink-0" />
                 <input
                   type={showPassword ? "text" : "password"}
@@ -154,7 +153,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-slate-400 hover:text-slate-600 focus:outline-none transition shrink-0"
+                  className="text-slate-400 hover:text-slate-600 focus:outline-none transition shrink-0 cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -166,7 +165,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               <button
                 type="button"
                 onClick={() => onNavigate("forgot-password")}
-                className="text-xs font-bold text-slate-500 hover:text-amber-600 transition"
+                className="text-xs font-bold text-slate-500 hover:text-amber-600 transition cursor-pointer"
               >
                 {t("Forgot Password?")}
               </button>
@@ -176,7 +175,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 px-5 text-sm font-bold text-white transition-all shadow-md hover:shadow-lg hover:opacity-95 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl cursor-pointer"
+              className="w-full py-3.5 px-5 text-sm font-bold text-white transition-all shadow-sm hover:opacity-95 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 rounded-[4px] cursor-pointer"
               style={{ background: "linear-gradient(135deg, #0f2540 0%, #183858 100%)" }}
             >
               <LogIn size={16} />
@@ -196,7 +195,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
             <span>{t("Don't have an account?")} </span>
             <button
               onClick={() => onNavigate("membership-form")}
-              className="font-bold text-[#0f2540] hover:text-amber-600 hover:underline transition"
+              className="font-bold text-[#0f2540] hover:text-amber-600 hover:underline transition cursor-pointer"
             >
               {t("Membership Application")}
             </button>

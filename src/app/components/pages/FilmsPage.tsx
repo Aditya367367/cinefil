@@ -78,39 +78,39 @@ export function FilmsPage() {
         
         {/* Metric & Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div className="bg-white rounded-[4px] p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Registered Catalog</p>
               <h4 className="text-2xl font-black text-slate-900 mt-1">{totalCount || films.length} Titles</h4>
             </div>
-            <div className="p-3 bg-blue-50 text-blue-700 rounded-xl">
+            <div className="p-3 bg-blue-50 text-blue-700 rounded-[4px]">
               <Film size={24} />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div className="bg-white rounded-[4px] p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Licensing Coverage</p>
               <h4 className="text-2xl font-black text-emerald-700 mt-1">100% Statutory</h4>
             </div>
-            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
+            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-[4px]">
               <ShieldCheck size={24} />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div className="bg-white rounded-[4px] p-5 border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Regional Languages</p>
               <h4 className="text-2xl font-black text-amber-600 mt-1">{uniqueLanguages.length || "Pan-India"}</h4>
             </div>
-            <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
+            <div className="p-3 bg-amber-50 text-amber-700 rounded-[4px]">
               <Globe size={24} />
             </div>
           </div>
         </div>
 
         {/* Search, Language Filter & View Mode Bar */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm space-y-4">
+        <div className="bg-white rounded-[4px] p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-4">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             
             {/* Search Input */}
@@ -121,12 +121,12 @@ export function FilmsPage() {
                 placeholder="Search by film title, censor certificate, or cast member..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+                className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-[4px] text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500 transition"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -143,7 +143,7 @@ export function FilmsPage() {
                     setSelectedLanguage(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition cursor-pointer"
+                  className="w-full appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-[4px] text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500 transition cursor-pointer"
                 >
                   <option value="">All Languages</option>
                   {uniqueLanguages.map((lang) => (
@@ -156,10 +156,10 @@ export function FilmsPage() {
               </div>
 
               {/* View Mode Toggle */}
-              <div className="flex items-center bg-slate-100 p-1 rounded-xl shrink-0">
+              <div className="flex items-center bg-slate-100 p-1 rounded-[4px] shrink-0">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[3px] transition cursor-pointer ${
                     viewMode === "grid" ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-900"
                   }`}
                   title="Grid View"
@@ -169,7 +169,7 @@ export function FilmsPage() {
                 </button>
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[3px] transition cursor-pointer ${
                     viewMode === "table" ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-900"
                   }`}
                   title="Table View"
@@ -186,28 +186,28 @@ export function FilmsPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs space-y-4 animate-pulse">
+              <div key={index} className="bg-white p-6 rounded-[4px] border border-slate-200/80 shadow-xs space-y-4 animate-pulse">
                 <div className="flex justify-between items-start">
-                  <div className="h-6 bg-slate-200 rounded-lg w-3/4" />
-                  <div className="h-5 bg-slate-200 rounded-full w-16" />
+                  <div className="h-6 bg-slate-200 rounded-[3px] w-3/4" />
+                  <div className="h-5 bg-slate-200 rounded-[3px] w-16" />
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-4 bg-slate-200 rounded w-20" />
-                  <div className="h-4 bg-slate-200 rounded w-16" />
+                  <div className="h-4 bg-slate-200 rounded-[3px] w-20" />
+                  <div className="h-4 bg-slate-200 rounded-[3px] w-16" />
                 </div>
                 <div className="border-t border-slate-100 pt-3 space-y-2">
-                  <div className="h-3 bg-slate-200 rounded w-16" />
+                  <div className="h-3 bg-slate-200 rounded-[3px] w-16" />
                   <div className="flex gap-2">
-                    <div className="h-5 bg-slate-200 rounded-full w-16" />
-                    <div className="h-5 bg-slate-200 rounded-full w-20" />
+                    <div className="h-5 bg-slate-200 rounded-[3px] w-16" />
+                    <div className="h-5 bg-slate-200 rounded-[3px] w-20" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : films.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-slate-200/80 shadow-xs">
-            <div className="p-4 bg-slate-50 rounded-full text-slate-400 inline-flex mb-3 border border-slate-100">
+          <div className="text-center py-16 bg-white rounded-[4px] border border-slate-200/80 shadow-xs">
+            <div className="p-4 bg-slate-50 rounded-[4px] text-slate-400 inline-flex mb-3 border border-slate-100">
               <Film size={32} />
             </div>
             <h3 className="text-base font-bold text-slate-800">No matching films found</h3>
@@ -220,7 +220,7 @@ export function FilmsPage() {
                   setSearchTerm("");
                   setSelectedLanguage("");
                 }}
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-[4px] text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -233,10 +233,10 @@ export function FilmsPage() {
               <div
                 key={film.id}
                 onClick={() => setSelectedFilmModal(film)}
-                className="group bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-xl hover:border-amber-400/50 transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden"
+                className="group bg-white rounded-[4px] border border-slate-200/80 p-5 shadow-xs hover:shadow-md hover:border-amber-400/50 transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden"
               >
                 {/* Decorative Top Accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-amber-500 to-[#1e3a5f] opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#1e3a5f] via-amber-500 to-[#1e3a5f] opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-3">
@@ -250,17 +250,17 @@ export function FilmsPage() {
                     </div>
 
                     {film.censor_certificate_no ? (
-                      <span className="shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-[3px] flex items-center gap-1">
                         <CheckCircle2 size={10} className="text-emerald-600" /> Cert
                       </span>
                     ) : (
-                      <span className="shrink-0 bg-slate-100 text-slate-500 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
+                      <span className="shrink-0 bg-slate-100 text-slate-500 text-[10px] font-semibold px-2 py-0.5 rounded-[3px]">
                         Pending Cert
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs font-medium text-slate-600 mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-4 text-xs font-medium text-slate-600 mb-4 bg-slate-50 p-2.5 rounded-[4px] border border-slate-100">
                     <div className="flex items-center gap-1.5">
                       <Globe size={14} className="text-amber-500" />
                       <span>{film.language || "N/A"}</span>
@@ -286,13 +286,13 @@ export function FilmsPage() {
                         {film.cast.slice(0, 4).map((c) => (
                           <span
                             key={c.id}
-                            className="text-[10px] bg-amber-50 text-amber-900 border border-amber-200/60 px-2.5 py-0.5 rounded-full font-bold"
+                            className="text-[10px] bg-amber-50 text-amber-900 border border-amber-200/60 px-2 py-0.5 rounded-[3px] font-bold"
                           >
                             {c.actor_name}
                           </span>
                         ))}
                         {film.cast.length > 4 && (
-                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
+                          <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-[3px] font-semibold">
                             +{film.cast.length - 4} more
                           </span>
                         )}
@@ -310,7 +310,7 @@ export function FilmsPage() {
           </div>
         ) : (
           /* TABLE VIEW */
-          <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
+          <div className="bg-white rounded-[4px] border border-slate-200/80 overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#1e3a5f] text-white text-[10px] font-bold uppercase tracking-widest">
@@ -337,7 +337,7 @@ export function FilmsPage() {
                       </td>
                       <td className="p-4 font-mono">
                         {film.censor_certificate_no ? (
-                          <span className="bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded text-[11px]">
+                          <span className="bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded-[3px] text-[11px]">
                             {film.censor_certificate_no}
                           </span>
                         ) : (
@@ -345,7 +345,7 @@ export function FilmsPage() {
                         )}
                       </td>
                       <td className="p-4">
-                        <span className="bg-slate-100 text-slate-800 font-bold px-2.5 py-1 rounded-lg text-[11px]">
+                        <span className="bg-slate-100 text-slate-800 font-bold px-2.5 py-1 rounded-[3px] text-[11px]">
                           {film.language || "N/A"}
                         </span>
                       </td>
@@ -359,7 +359,7 @@ export function FilmsPage() {
                         <div className="flex flex-wrap gap-1">
                           {film.cast && film.cast.length > 0 ? (
                             film.cast.slice(0, 2).map((c) => (
-                              <span key={c.id} className="text-[10px] bg-amber-50 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+                              <span key={c.id} className="text-[10px] bg-amber-50 text-amber-900 px-2 py-0.5 rounded-[3px] font-bold">
                                 {c.actor_name}
                               </span>
                             ))
@@ -377,7 +377,7 @@ export function FilmsPage() {
                             e.stopPropagation();
                             setSelectedFilmModal(film);
                           }}
-                          className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#1e3a5f] hover:text-white text-slate-800 text-xs font-bold transition-all"
+                          className="px-3.5 py-1.5 rounded-[4px] bg-slate-100 hover:bg-[#1e3a5f] hover:text-white text-slate-800 text-xs font-bold transition-all cursor-pointer"
                         >
                           Details
                         </button>
@@ -392,7 +392,7 @@ export function FilmsPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white rounded-[4px] p-4 sm:p-5 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs sm:text-sm font-medium text-slate-500">
               Showing <span className="font-bold text-slate-800">{(page - 1) * pageSize + 1}</span> to{" "}
               <span className="font-bold text-slate-800">{Math.min(page * pageSize, totalCount)}</span> of{" "}
@@ -403,7 +403,7 @@ export function FilmsPage() {
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-2xs"
+                className="px-4 py-2 rounded-[4px] border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-2xs cursor-pointer"
               >
                 Previous
               </button>
@@ -420,7 +420,7 @@ export function FilmsPage() {
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                      className={`px-3.5 py-2 rounded-[4px] text-xs font-bold transition-all cursor-pointer ${
                         page === pageNum
                           ? "bg-[#1e3a5f] text-white shadow-xs"
                           : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
@@ -435,7 +435,7 @@ export function FilmsPage() {
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page === totalPages}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-2xs"
+                className="px-4 py-2 rounded-[4px] border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-2xs cursor-pointer"
               >
                 Next
               </button>
@@ -447,12 +447,12 @@ export function FilmsPage() {
       {/* FILM DETAILS MODAL */}
       {selectedFilmModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all duration-300 animate-scale-up">
+          <div className="bg-white w-full max-w-xl rounded-[4px] shadow-xl border border-slate-200 overflow-hidden transform transition-all duration-300 animate-scale-up">
             
             {/* Modal Header */}
             <div className="bg-[#1e3a5f] text-white px-6 py-5 flex items-center justify-between border-b border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-500 text-slate-900 rounded-xl font-bold">
+                <div className="p-2 bg-amber-500 text-slate-900 rounded-[4px] font-bold">
                   <Film size={20} />
                 </div>
                 <div>
@@ -463,7 +463,7 @@ export function FilmsPage() {
 
               <button
                 onClick={() => setSelectedFilmModal(null)}
-                className="p-1.5 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition"
+                className="p-1.5 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-[4px] transition cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -474,17 +474,17 @@ export function FilmsPage() {
               
               {/* Key Attributes */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                <div className="bg-slate-50 p-3.5 rounded-[4px] border border-slate-100">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Language</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{selectedFilmModal.language || "N/A"}</p>
                 </div>
 
-                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                <div className="bg-slate-50 p-3.5 rounded-[4px] border border-slate-100">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Release Year</p>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">{selectedFilmModal.release_year || "N/A"}</p>
                 </div>
 
-                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 col-span-2 sm:col-span-1">
+                <div className="bg-slate-50 p-3.5 rounded-[4px] border border-slate-100 col-span-2 sm:col-span-1">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Censor Cert</p>
                   <p className="text-xs font-mono font-bold text-slate-800 mt-0.5 truncate">
                     {selectedFilmModal.censor_certificate_no || "Not Uploaded"}
@@ -494,8 +494,8 @@ export function FilmsPage() {
 
               {/* Producer / Owner */}
               {selectedFilmModal.member_name && (
-                <div className="bg-amber-50/60 border border-amber-200/60 rounded-2xl p-4 flex items-center gap-3">
-                  <div className="p-2 bg-amber-100 text-amber-800 rounded-xl shrink-0">
+                <div className="bg-amber-50/60 border border-amber-200/60 rounded-[4px] p-4 flex items-center gap-3">
+                  <div className="p-2 bg-amber-100 text-amber-800 rounded-[4px] shrink-0">
                     <User size={18} />
                   </div>
                   <div>
@@ -515,8 +515,8 @@ export function FilmsPage() {
                 {selectedFilmModal.cast && selectedFilmModal.cast.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
                     {selectedFilmModal.cast.map((actor) => (
-                      <div key={actor.id} className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center shrink-0">
+                      <div key={actor.id} className="bg-slate-50 border border-slate-100 p-2.5 rounded-[4px] flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-[3px] bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center shrink-0">
                           {actor.actor_name.charAt(0)}
                         </div>
                         <div className="min-w-0">
@@ -529,7 +529,7 @@ export function FilmsPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400 italic bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <p className="text-xs text-slate-400 italic bg-slate-50 p-3 rounded-[4px] border border-slate-100">
                     No individual cast members catalogued for this film.
                   </p>
                 )}
@@ -540,7 +540,7 @@ export function FilmsPage() {
             <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => setSelectedFilmModal(null)}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-xs"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-[4px] text-xs font-bold transition shadow-xs cursor-pointer"
               >
                 Close Details
               </button>

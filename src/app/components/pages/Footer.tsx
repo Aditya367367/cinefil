@@ -68,7 +68,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <img
                 src={LogoImage}
                 alt="Cinefil Logo"
-                className="w-12 h-12 object-contain rounded-lg p-1 bg-white/5 border border-[var(--cinefil-gold)]/40"
+                className="w-12 h-12 object-contain rounded-[4px] p-1 bg-white/5 border border-[var(--cinefil-gold)]/40"
               />
               <div>
                 <span className="font-extrabold text-white tracking-widest text-base font-display block">
@@ -82,7 +82,7 @@ export function Footer({ onNavigate }: FooterProps) {
             <p className="text-xs text-white/60 leading-relaxed">
               Cinefil Producers Performance Limited — A premier Copyright Society registered by the Central Government of India under Section 33(3) of the Copyright Act 1957.
             </p>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-[var(--cinefil-gold)] font-mono w-max">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[3px] bg-white/5 border border-white/10 text-[11px] text-[var(--cinefil-gold)] font-mono w-max">
               <Sparkles size={11} /> Est. Under Copyright Act 1957
             </div>
           </div>
@@ -114,7 +114,7 @@ export function Footer({ onNavigate }: FooterProps) {
                     onClick={() => onNavigate(page)}
                     className="text-xs text-white/60 hover:text-[var(--cinefil-gold)] transition-colors text-left flex items-center gap-1.5 cursor-pointer group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-[var(--cinefil-gold)]/40 group-hover:bg-[var(--cinefil-gold)] group-hover:w-2 transition-all" />
+                    <span className="w-1.5 h-1.5 rounded-[2px] bg-[var(--cinefil-gold)]/40 group-hover:bg-[var(--cinefil-gold)] group-hover:w-2.5 transition-all" />
                     {label}
                   </button>
                 </li>
@@ -165,14 +165,14 @@ export function Footer({ onNavigate }: FooterProps) {
                   placeholder="First Name*"
                   value={form.firstName}
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-lg bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
+                  className="px-3 py-2 text-xs rounded-[4px] bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
                 />
                 <input
                   type="text"
                   placeholder="Last Name*"
                   value={form.lastName}
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-lg bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
+                  className="px-3 py-2 text-xs rounded-[4px] bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -181,14 +181,14 @@ export function Footer({ onNavigate }: FooterProps) {
                   placeholder="Email*"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-lg bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
+                  className="px-3 py-2 text-xs rounded-[4px] bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
                 />
                 <input
                   type="tel"
                   placeholder="Mobile No*"
                   value={form.contact}
                   onChange={(e) => setForm({ ...form, contact: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-lg bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
+                  className="px-3 py-2 text-xs rounded-[4px] bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
                 />
               </div>
               <input
@@ -196,12 +196,12 @@ export function Footer({ onNavigate }: FooterProps) {
                 placeholder="Company / Venue Name*"
                 value={form.company}
                 onChange={(e) => setForm({ ...form, company: e.target.value })}
-                className="px-3 py-2 text-xs rounded-lg bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
+                className="px-3 py-2 text-xs rounded-[4px] bg-white/5 border border-white/15 text-white placeholder-white/40 focus:outline-none focus:border-[var(--cinefil-gold)] transition-colors"
               />
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-1 px-4 py-2.5 text-xs font-bold rounded-lg tracking-wide transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                className="mt-1 px-4 py-2.5 text-xs font-bold rounded-[4px] tracking-wide transition-all transform hover:scale-[1.01] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                 style={{ backgroundColor: "var(--cinefil-gold)", color: "var(--cinefil-navy)" }}
               >
                 <Send size={13} />
@@ -216,7 +216,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <span>© {new Date().getFullYear()} Cinefil Producers Performance Limited. All rights reserved.</span>
           <button
             onClick={scrollToTop}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-[var(--cinefil-gold)] transition-all cursor-pointer border border-white/10"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-white/5 hover:bg-white/10 text-white/70 hover:text-[var(--cinefil-gold)] transition-all cursor-pointer border border-white/10"
           >
             <span>Back to top</span>
             <ArrowUp size={13} />

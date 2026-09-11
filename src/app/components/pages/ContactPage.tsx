@@ -57,12 +57,12 @@ function ContactForm() {
 
   return (
     <SpotlightCard
-      className="p-8 sm:p-10 rounded-3xl border-gray-200 shadow-2xl bg-white"
+      className="p-8 sm:p-10 rounded-[4px] border-gray-200 shadow-xl bg-white"
       spotlightColor="rgba(201, 162, 39, 0.15)"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-2xl bg-[var(--cinefil-gold)]/15 text-[var(--cinefil-navy)] border border-[var(--cinefil-gold)]/30">
-          <Sparkles size={22} className="text-[var(--cinefil-gold)]" />
+        <div className="p-2.5 rounded-[4px] bg-[var(--cinefil-gold)]/15 text-[var(--cinefil-navy)] border border-[var(--cinefil-gold)]/30">
+          <Sparkles size={20} className="text-[var(--cinefil-gold)]" />
         </div>
         <div>
           <h3 className="text-xl font-extrabold text-[var(--cinefil-navy)]" style={{ fontFamily: "var(--font-heading)" }}>
@@ -84,7 +84,7 @@ function ContactForm() {
               required
               value={form.firstName}
               onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition"
             />
           </div>
           <div>
@@ -95,7 +95,7 @@ function ContactForm() {
               required
               value={form.lastName}
               onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition"
             />
           </div>
         </div>
@@ -109,7 +109,7 @@ function ContactForm() {
               required
               value={form.contact}
               onChange={(e) => setForm({ ...form, contact: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition"
             />
           </div>
           <div>
@@ -120,7 +120,7 @@ function ContactForm() {
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition"
             />
           </div>
         </div>
@@ -134,7 +134,7 @@ function ContactForm() {
               required
               value={form.company}
               onChange={(e) => setForm({ ...form, company: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition"
             />
           </div>
           <div>
@@ -143,7 +143,7 @@ function ContactForm() {
               value={form.industry}
               required
               onChange={(e) => setForm({ ...form, industry: e.target.value })}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-2 focus:ring-[var(--cinefil-gold)]/20 transition cursor-pointer"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-[4px] text-sm font-medium focus:bg-white focus:outline-none focus:border-[var(--cinefil-gold)] focus:ring-1 focus:ring-[var(--cinefil-gold)]/30 transition cursor-pointer"
             >
               <option value="" disabled>
                 Select Industry
@@ -165,7 +165,7 @@ function ContactForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-lg transform hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="w-full sm:w-auto px-8 py-3 rounded-[4px] font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-md transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 cursor-pointer"
             style={{ backgroundColor: "var(--cinefil-gold)", color: "var(--cinefil-navy)" }}
           >
             <Send size={15} />
@@ -186,9 +186,9 @@ export function ContactPage() {
         badge="Direct Support"
       />
 
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-14 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Form Column */}
             <div className="lg:col-span-7">
               <ContactForm />
@@ -197,17 +197,17 @@ export function ContactPage() {
             {/* Office Info Column */}
             <div className="lg:col-span-5 space-y-6">
               <SpotlightCard
-                className="p-8 rounded-3xl border-gray-200 shadow-xl bg-slate-900 text-white"
+                className="p-8 rounded-[4px] border-slate-800 shadow-xl bg-slate-900 text-white"
                 spotlightColor="rgba(201, 162, 39, 0.25)"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Building2 size={24} className="text-[var(--cinefil-gold)]" />
+                  <Building2 size={22} className="text-[var(--cinefil-gold)]" />
                   <h3 className="text-lg font-extrabold tracking-tight">Society Headquarters</h3>
                 </div>
 
-                <div className="space-y-5 text-xs sm:text-sm">
+                <div className="space-y-4 text-xs sm:text-sm">
                   <div className="flex items-start gap-3.5 pb-4 border-b border-white/10">
-                    <div className="p-2 rounded-lg bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
+                    <div className="p-2 rounded-[3px] bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
                       <MapPin size={16} />
                     </div>
                     <div>
@@ -221,7 +221,7 @@ export function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-3.5 pb-4 border-b border-white/10">
-                    <div className="p-2 rounded-lg bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
+                    <div className="p-2 rounded-[3px] bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
                       <Building2 size={16} />
                     </div>
                     <div>
@@ -235,7 +235,7 @@ export function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-3.5 pb-4 border-b border-white/10">
-                    <div className="p-2 rounded-lg bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
+                    <div className="p-2 rounded-[3px] bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
                       <Mail size={16} />
                     </div>
                     <div>
@@ -249,7 +249,7 @@ export function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-3.5">
-                    <div className="p-2 rounded-lg bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
+                    <div className="p-2 rounded-[3px] bg-white/10 text-[var(--cinefil-gold)] flex-shrink-0">
                       <Phone size={16} />
                     </div>
                     <div>
@@ -266,7 +266,7 @@ export function ContactPage() {
 
               {/* Working Hours Card */}
               <SpotlightCard
-                className="p-6 rounded-2xl border-gray-200 shadow-md bg-white"
+                className="p-6 rounded-[4px] border-gray-200 shadow-md bg-white"
                 spotlightColor="rgba(24, 56, 88, 0.1)"
               >
                 <div className="flex items-center gap-2.5 mb-3 text-[var(--cinefil-navy)] font-bold text-sm">

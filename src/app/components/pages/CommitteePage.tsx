@@ -17,12 +17,13 @@ interface CommitteeMember {
 export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state?: any) => void }) {
   const [committeeMembers, setCommitteeMembers] = useState<CommitteeMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [minimumLoading, setMinimumLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     memberService
       .getTeams()
       .then((res) => {
+        if (!isMounted) return;
         const teams = Array.isArray(res) ? res : res.results || [];
         const committeeTeam = teams.find((t: any) =>
           t.team_name.toLowerCase().includes("committee")
@@ -43,14 +44,12 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
         console.error("Failed to load committee members.", err);
       })
       .finally(() => {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       });
 
-    const timer = setTimeout(() => {
-      setMinimumLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -69,10 +68,10 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
             badge="Administration"
           />
 
-          {loading || minimumLoading ? (
+          {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mt-10">
               {[...Array(8)].map((_, index) => (
-                <div key={index} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+                <div key={index} className="h-64 rounded-[4px] bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -80,18 +79,19 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
               {committeeMembers.map((member) => (
                 <SpotlightCard
                   key={member.id}
-                  className="flex flex-col items-center text-center p-5 rounded-2xl border-gray-200 shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group justify-between bg-white min-h-[260px]"
+                  className="flex flex-col items-center text-center p-5 rounded-[4px] border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group justify-between bg-white min-h-[260px]"
                   spotlightColor="rgba(201, 162, 39, 0.2)"
                 >
                   <div className="flex flex-col items-center w-full">
                     {/* Avatar Frame */}
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 border-2 border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 shadow-md relative">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[4px] overflow-hidden flex items-center justify-center bg-slate-100 border border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 shadow-xs relative">
                       {member.photo_url ? (
                         <img
                           src={member.photo_url}
                           alt={member.name}
-                          className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-[3px]"
                           loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = "none";
                             const backupIcon = (e.target as HTMLImageElement).nextElementSibling;
@@ -115,7 +115,7 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
                       >
                         {member.name}
                       </h3>
-                      <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                      <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-[3px] border border-amber-200">
                         {member.role}
                       </span>
                     </div>
@@ -124,7 +124,7 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
                   <div className="mt-4 pt-3 border-t border-gray-100 w-full flex justify-center">
                     <button
                       onClick={() => onNavigate(`profile/${member.slug || member.id}`)}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1.5 rounded-[3px] transition-all duration-200 cursor-pointer"
                     >
                       <span>View Profile</span>
                       <ChevronRight size={12} />
@@ -139,3 +139,4 @@ export function CommitteePage({ onNavigate }: { onNavigate: (page: string, state
     </div>
   );
 }
+

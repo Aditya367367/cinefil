@@ -60,7 +60,6 @@ export function GovernancePage() {
   const [documents, setDocuments] = useState<DocItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
-  const [minimumLoading, setMinimumLoading] = useState<boolean>(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
 
   useEffect(() => {
@@ -90,13 +89,8 @@ export function GovernancePage() {
         if (isMounted) setLoading(false);
       });
 
-    const timer = setTimeout(() => {
-      setMinimumLoading(false);
-    }, 1200);
-
     return () => {
       isMounted = false;
-      clearTimeout(timer);
     };
   }, []);
 
@@ -146,7 +140,7 @@ export function GovernancePage() {
 
           <div className="grid md:grid-cols-2 gap-6 my-10 max-w-5xl mx-auto">
             <SpotlightCard
-              className="p-6 sm:p-8 bg-slate-50 border-slate-200 shadow-md"
+              className="p-6 sm:p-8 bg-slate-50 border-slate-200/80 shadow-xs rounded-[4px]"
               spotlightColor="rgba(24, 56, 88, 0.1)"
             >
               <div className="flex items-center gap-3 mb-4 text-[var(--cinefil-navy)]">
@@ -159,7 +153,7 @@ export function GovernancePage() {
             </SpotlightCard>
 
             <SpotlightCard
-              className="p-6 sm:p-8 bg-slate-50 border-slate-200 shadow-md"
+              className="p-6 sm:p-8 bg-slate-50 border-slate-200/80 shadow-xs rounded-[4px]"
               spotlightColor="rgba(201, 162, 39, 0.15)"
             >
               <div className="flex items-center gap-3 mb-4 text-[var(--cinefil-navy)]">
@@ -183,9 +177,9 @@ export function GovernancePage() {
               <button
                 key={tab.key}
                 onClick={() => setSelectedFilter(tab.key)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-[4px] text-xs font-bold transition-all cursor-pointer ${
                   selectedFilter === tab.key
-                    ? "bg-[var(--cinefil-navy)] text-white shadow-md scale-105"
+                    ? "bg-[var(--cinefil-navy)] text-white shadow-xs scale-[1.02]"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -195,16 +189,16 @@ export function GovernancePage() {
           </div>
 
           {errorOccurred && (
-            <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-semibold flex items-center gap-3 shadow-sm">
+            <div className="max-w-xl mx-auto mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-[4px] text-xs font-semibold flex items-center gap-3 shadow-xs">
               <AlertCircle size={18} className="text-amber-600 shrink-0" />
               <span>Loaded verified baseline statutory documents for reference.</span>
             </div>
           )}
 
-          {loading || minimumLoading ? (
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-64 rounded-[4px] bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -219,7 +213,7 @@ export function GovernancePage() {
                 return (
                   <SpotlightCard
                     key={doc.id}
-                    className="flex flex-col justify-between overflow-hidden shadow-lg border-gray-200 group hover:-translate-y-1.5 transition-all duration-300"
+                    className="flex flex-col justify-between overflow-hidden shadow-xs border-slate-200/80 rounded-[4px] group hover:-translate-y-1 transition-all duration-300 bg-white"
                     spotlightColor="rgba(201, 162, 39, 0.2)"
                   >
                     <div>
@@ -227,10 +221,12 @@ export function GovernancePage() {
                         <img
                           src={imageUrl}
                           alt={doc.title}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                        <span className="absolute top-3 left-3 bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider">
+                        <span className="absolute top-3 left-3 bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-[3px] shadow-2xs uppercase tracking-wider">
                           {doc.document_type?.replace(/_/g, " ") || "Statutory"}
                         </span>
                       </div>
@@ -243,7 +239,7 @@ export function GovernancePage() {
                           </h3>
                         </div>
                         {doc.version && (
-                          <span className="mt-3 inline-block text-[10px] font-semibold text-gray-500 px-2 py-0.5 rounded bg-gray-100 border border-gray-200">
+                          <span className="mt-3 inline-block text-[10px] font-semibold text-gray-500 px-2 py-0.5 rounded-[3px] bg-gray-100 border border-gray-200">
                             Version: {doc.version}
                           </span>
                         )}
@@ -253,13 +249,13 @@ export function GovernancePage() {
                     <div className="p-4 pt-0 grid grid-cols-2 gap-2">
                       <button
                         onClick={() => handlePreview(doc)}
-                        className="py-2 px-3 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                        className="py-2 px-3 rounded-[3px] text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <Eye size={13} /> View
                       </button>
                       <button
                         onClick={() => handleDownload(doc)}
-                        className="py-2 px-3 rounded-lg text-xs font-bold bg-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy-mid)] text-white transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-sm"
+                        className="py-2 px-3 rounded-[3px] text-xs font-bold bg-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy-mid)] text-white transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-xs"
                       >
                         <Download size={13} /> Download
                       </button>

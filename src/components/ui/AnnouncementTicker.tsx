@@ -27,7 +27,7 @@ export function AnnouncementTicker({ announcements }: AnnouncementTickerProps) {
       <div className="w-full bg-[#0a1828] border-b border-[var(--cinefil-gold)]/20 py-2.5 px-4 text-white text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 overflow-hidden flex-1">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] font-bold text-[10px] tracking-wider uppercase flex-shrink-0 animate-pulse-slow">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-[3px] bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] font-bold text-[10px] tracking-wider uppercase flex-shrink-0 animate-pulse-slow">
               <Sparkles size={11} /> Live Notice
             </span>
             <div
@@ -49,7 +49,7 @@ export function AnnouncementTicker({ announcements }: AnnouncementTickerProps) {
             )}
             <button
               onClick={() => setSelectedAnnouncement(current)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs text-white transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] bg-white/10 hover:bg-white/20 text-xs text-white transition-all cursor-pointer"
             >
               View Details <ChevronRight size={13} />
             </button>
@@ -60,16 +60,16 @@ export function AnnouncementTicker({ announcements }: AnnouncementTickerProps) {
       {/* Quick Announcement Modal Dialog */}
       {selectedAnnouncement && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#0f2540] border border-[var(--cinefil-gold)]/40 rounded-2xl max-w-lg w-full p-6 text-white shadow-2xl relative">
+          <div className="bg-[#0f2540] border border-[var(--cinefil-gold)]/40 rounded-[4px] max-w-lg w-full p-6 text-white shadow-xl relative">
             <button
               onClick={() => setSelectedAnnouncement(null)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+              className="absolute top-4 right-4 text-white/60 hover:text-white p-1 rounded-[3px] hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)] border border-[var(--cinefil-gold)]/40">
+              <div className="p-2.5 rounded-[4px] bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)] border border-[var(--cinefil-gold)]/40">
                 <Bell size={20} />
               </div>
               <div>
@@ -94,7 +94,7 @@ export function AnnouncementTicker({ announcements }: AnnouncementTickerProps) {
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
               <button
                 onClick={() => setSelectedAnnouncement(null)}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white/80 hover:bg-white/10 transition-colors"
+                className="px-4 py-2 rounded-[4px] text-xs font-semibold text-white/80 hover:bg-white/10 transition-colors cursor-pointer"
               >
                 Close
               </button>
@@ -103,7 +103,7 @@ export function AnnouncementTicker({ announcements }: AnnouncementTickerProps) {
                   href={selectedAnnouncement.file}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-lg text-xs font-bold bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] hover:opacity-90 flex items-center gap-1.5 shadow-lg transition-all"
+                  className="px-4 py-2 rounded-[4px] text-xs font-bold bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] hover:opacity-90 flex items-center gap-1.5 shadow-sm transition-all"
                 >
                   <Download size={14} /> Download Document
                 </a>

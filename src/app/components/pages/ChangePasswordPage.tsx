@@ -81,7 +81,7 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
             >
               {t("Change Password")}
             </h1>
-            <div className="h-[3px] w-24 mx-auto lg:mx-0 bg-[var(--cinefil-gold)]" />
+            <div className="h-0.5 w-16 mx-auto lg:mx-0 bg-[var(--cinefil-gold)] rounded-[2px]" />
             <p className="text-xs font-semibold text-slate-400 mt-2">
               {t("Please enter your current password followed by your new password to update account security.")}
             </p>
@@ -93,7 +93,7 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 {t("Current Password")}
               </label>
-              <div className="flex items-center gap-2 rounded-lg bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:bg-white transition-all">
+              <div className="flex items-center gap-2 rounded-[4px] bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:ring-1 focus-within:ring-[var(--cinefil-navy)]/20 focus-within:bg-white transition-all">
                 <Lock size={16} className="text-slate-400 shrink-0" />
                 <input
                   type="password"
@@ -111,7 +111,7 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 {t("New Password")}
               </label>
-              <div className="flex items-center gap-2 rounded-lg bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:bg-white transition-all">
+              <div className="flex items-center gap-2 rounded-[4px] bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:ring-1 focus-within:ring-[var(--cinefil-navy)]/20 focus-within:bg-white transition-all">
                 <Lock size={16} className="text-slate-400 shrink-0" />
                 <input
                   type="password"
@@ -129,7 +129,7 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 {t("Confirm New Password")}
               </label>
-              <div className="flex items-center gap-2 rounded-lg bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:bg-white transition-all">
+              <div className="flex items-center gap-2 rounded-[4px] bg-slate-50 border border-slate-200/80 px-4 py-3 focus-within:border-[var(--cinefil-navy)] focus-within:ring-1 focus-within:ring-[var(--cinefil-navy)]/20 focus-within:bg-white transition-all">
                 <Lock size={16} className="text-slate-400 shrink-0" />
                 <input
                   type="password"
@@ -146,7 +146,7 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-5 text-sm font-bold text-white transition-all shadow-md hover:shadow-lg active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 rounded-lg"
+              className="w-full py-3.5 px-5 text-sm font-bold text-white transition-all shadow-xs hover:opacity-95 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 rounded-[4px] cursor-pointer"
               style={{ backgroundColor: "var(--cinefil-navy)" }}
             >
               <Lock size={16} />
@@ -159,14 +159,11 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
 
       {/* Left Column: Vector Illustration */}
       <div className="block relative overflow-hidden order-2 lg:order-1 h-64 lg:h-auto min-h-[400px]">
-        <div className="absolute top-[-10%] left-[-10%] w-[35rem] h-[35rem] rounded-full bg-indigo-50/60 z-0" />
-        <div className="absolute bottom-[-15%] right-[-5%] w-[25rem] h-[25rem] rounded-full bg-amber-50/40 z-0" />
-        
         {/* Clickable Big Logo overlay linking to Home */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 bg-slate-900/30 backdrop-blur-[2px]">
           <button
             onClick={() => onNavigate("home")}
-            className="flex flex-col items-center justify-center p-8 bg-white/95 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-105 transition-all duration-300 border border-white/20 group cursor-pointer"
+            className="flex flex-col items-center justify-center p-8 bg-white/95 rounded-[4px] shadow-lg hover:scale-105 transition-all duration-300 border border-white/20 group cursor-pointer"
           >
             <img
               src={LogoImage}
@@ -188,3 +185,4 @@ export function ChangePasswordPage({ onNavigate }: ChangePasswordPageProps) {
     </div>
   );
 }
+

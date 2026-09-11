@@ -23,7 +23,6 @@ export function HonoraryBoard({ onNavigate }: { onNavigate: (page: string, state
   const [honoraryMembers, setHonoraryMembers] = useState<HonoraryMember[]>(DEFAULT_HONORARY_MEMBERS);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLiveFeedSynced, setIsLiveFeedSynced] = useState<boolean>(false);
-  const [minimumLoading, setMinimumLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -63,13 +62,8 @@ export function HonoraryBoard({ onNavigate }: { onNavigate: (page: string, state
         if (isMounted) setLoading(false);
       });
 
-    const timer = setTimeout(() => {
-      setMinimumLoading(false);
-    }, 1000);
-
     return () => {
       isMounted = false;
-      clearTimeout(timer);
     };
   }, []);
 
@@ -89,10 +83,10 @@ export function HonoraryBoard({ onNavigate }: { onNavigate: (page: string, state
             badge="National Icons"
           />
 
-          {loading || minimumLoading ? (
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12 max-w-3xl mx-auto">
               {[1, 2].map((i) => (
-                <div key={i} className="h-80 rounded-3xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-80 rounded-[4px] bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -100,18 +94,19 @@ export function HonoraryBoard({ onNavigate }: { onNavigate: (page: string, state
               {honoraryMembers.map((member, i) => (
                 <SpotlightCard
                   key={`${member.name}-${i}`}
-                  className="flex flex-col items-center text-center p-8 rounded-3xl border-gray-200 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group justify-between bg-gradient-to-b from-white to-amber-50/30"
+                  className="flex flex-col items-center text-center p-8 rounded-[4px] border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group justify-between bg-gradient-to-b from-white to-amber-50/20"
                   spotlightColor="rgba(201, 162, 39, 0.25)"
                 >
                   <div className="flex flex-col items-center w-full">
                     {/* Avatar Frame with Gold Accent */}
-                    <div className="w-32 h-32 rounded-3xl overflow-hidden flex items-center justify-center bg-slate-100 border-2 border-[var(--cinefil-gold)] p-1 group-hover:scale-105 transition-transform duration-300 shadow-lg relative glow-gold">
+                    <div className="w-32 h-32 rounded-[4px] overflow-hidden flex items-center justify-center bg-slate-100 border border-[var(--cinefil-gold)] p-1 group-hover:scale-105 transition-transform duration-300 shadow-xs relative glow-gold">
                       {member.photo_url ? (
                         <img
                           src={member.photo_url}
                           alt={member.name}
-                          className="w-full h-full object-cover rounded-2xl"
+                          className="w-full h-full object-cover rounded-[3px]"
                           loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = "none";
                             const backupIcon = (e.target as HTMLImageElement).nextElementSibling;
@@ -136,18 +131,18 @@ export function HonoraryBoard({ onNavigate }: { onNavigate: (page: string, state
                       >
                         {member.name}
                       </h3>
-                      <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-100/80 px-3.5 py-1 rounded-full border border-amber-300">
+                      <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-100/80 px-3 py-1 rounded-[3px] border border-amber-300">
                         <Award size={13} /> {member.role}
                       </span>
                     </div>
                   </div>
 
                   {/* Profile Link */}
-                  <div className="mt-6 pt-4 border-t border-amber-100 w-full flex justify-center">
+                  <div className="mt-6 pt-4 border-t border-amber-100/80 w-full flex justify-center">
                     {member.biography || isLiveFeedSynced ? (
                       <button
                         onClick={() => onNavigate(`profile/${member.slug || member.id}`)}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy-mid)] px-5 py-2 rounded-xl transition-all shadow-md cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy-mid)] px-5 py-2 rounded-[3px] transition-all shadow-xs cursor-pointer"
                       >
                         <span>View Profile & Bio</span>
                         <ChevronRight size={14} />

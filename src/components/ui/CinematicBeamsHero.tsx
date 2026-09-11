@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { cn } from "../../lib/utils";
+import { NetflixPostersBackdrop } from "./NetflixPostersBackdrop";
 
 interface CinematicBeamsHeroProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -148,6 +149,9 @@ export function CinematicBeamsHero({
       className={cn("relative w-full overflow-hidden bg-gradient-to-b from-[#000000] via-[#0b1b2d] to-[#183858]", className)}
       {...props}
     >
+      {/* Netflix-style scrolling film poster background — deepest layer */}
+      <NetflixPostersBackdrop />
+
       {/* Dynamic Animated Canvas on Desktop only */}
       <canvas
         ref={canvasRef}

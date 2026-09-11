@@ -120,11 +120,11 @@ export function HomePage({ onNavigate }: HomePageProps) {
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <span
-              className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-full border backdrop-blur-md shadow-lg"
+              className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase px-3.5 py-1.5 rounded-[3px] border backdrop-blur-md shadow-xs"
               style={{
                 color: "var(--cinefil-gold)",
                 borderColor: "rgba(201, 162, 39, 0.4)",
-                backgroundColor: "rgba(15, 37, 64, 0.6)",
+                backgroundColor: "rgba(15, 37, 64, 0.7)",
               }}
             >
               <ShieldCheck size={14} className="text-[var(--cinefil-gold)]" />
@@ -170,11 +170,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
           >
             <button
               onClick={() => (user?.is_member ? onNavigate("member-dashboard") : onNavigate("producers-owners"))}
-              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2.5 transition-all transform hover:scale-105 active:scale-95 shadow-xl relative overflow-hidden group cursor-pointer"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-[4px] font-bold text-sm sm:text-base flex items-center gap-2.5 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg relative overflow-hidden group cursor-pointer border border-[var(--cinefil-gold)]"
               style={{
                 background: "linear-gradient(135deg, #c9a227 0%, #f0c040 100%)",
                 color: "var(--cinefil-navy)",
-                boxShadow: "0 8px 25px rgba(201, 162, 39, 0.35)",
               }}
             >
               {/* Button light shimmer sweep */}
@@ -186,7 +185,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
             <button
               onClick={() => onNavigate("license-form")}
-              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base border-2 border-white/40 text-white flex items-center gap-2.5 transition-all hover:bg-white/10 hover:border-white transform hover:scale-105 active:scale-95 backdrop-blur-md cursor-pointer"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-[4px] font-bold text-sm sm:text-base border border-white/40 text-white flex items-center gap-2.5 transition-all hover:bg-white/10 hover:border-white transform hover:scale-[1.02] active:scale-[0.98] backdrop-blur-md cursor-pointer"
             >
               <Tv size={18} className="text-[var(--cinefil-gold)]" />
               <span>Get a Licence (CPL)</span>
@@ -266,10 +265,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
               return (
                 <SpotlightCard
                   key={idx}
-                  className="p-6 sm:p-8 text-center bg-white/[0.05] border-white/10 text-white backdrop-blur-md hover:border-[var(--cinefil-gold)]/50"
+                  className="p-6 sm:p-8 text-center bg-white/[0.05] border-white/10 text-white backdrop-blur-md hover:border-[var(--cinefil-gold)]/50 rounded-[4px]"
                   spotlightColor="rgba(201, 162, 39, 0.25)"
                 >
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 flex items-center justify-center text-[var(--cinefil-gold)]">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-[4px] bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 flex items-center justify-center text-[var(--cinefil-gold)]">
                     <StatIcon size={24} />
                   </div>
                   <p
@@ -304,7 +303,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
           {industriesLoading && (
             <div className="text-center py-12">
-              <div className="inline-block w-8 h-8 border-4 border-[var(--cinefil-gold)] border-t-transparent rounded-full animate-spin" />
+              <div className="inline-block w-8 h-8 border-3 border-[var(--cinefil-gold)] border-t-transparent rounded-full animate-spin" />
               <p className="text-sm text-gray-500 mt-3">Loading licensing sectors...</p>
             </div>
           )}
@@ -321,7 +320,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <div
                   key={industry.id}
                   onClick={() => onNavigate("license-form")}
-                  className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-xl transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl cursor-pointer border border-gray-100 aspect-[4/3]"
+                  className="group relative overflow-hidden rounded-[4px] bg-slate-900 shadow-sm transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md cursor-pointer border border-slate-200 aspect-[4/3]"
                 >
                   <img
                     src={industry.photo}
@@ -341,8 +340,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
                           {industry.industry_name}
                         </h3>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] flex items-center justify-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
-                        <ArrowUpRight size={20} />
+                      <div className="w-9 h-9 rounded-[4px] bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] flex items-center justify-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-sm">
+                        <ArrowUpRight size={18} />
                       </div>
                     </div>
                     <p className="text-xs text-white/70 mt-2 line-clamp-2">
@@ -355,7 +354,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           )}
 
           {/* Quick Apply Banner inside Business section */}
-          <div className="mt-14 p-8 rounded-3xl bg-gradient-to-r from-[#0f2540] to-[#183858] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-[var(--cinefil-gold)]/30">
+          <div className="mt-14 p-8 rounded-[4px] bg-gradient-to-r from-[#0f2540] to-[#183858] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-md border border-[var(--cinefil-gold)]/30">
             <div className="space-y-2 text-center md:text-left">
               <h3 className="text-xl sm:text-2xl font-bold text-white">
                 Not sure if your business needs a licence?
@@ -366,7 +365,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </div>
             <button
               onClick={() => onNavigate("license-form")}
-              className="px-6 py-3 rounded-xl font-bold text-sm bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-gold-light)] transition-all flex items-center gap-2 shadow-lg flex-shrink-0 cursor-pointer"
+              className="px-6 py-3 rounded-[4px] font-bold text-sm bg-[var(--cinefil-gold)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-gold-light)] transition-all flex items-center gap-2 shadow-sm flex-shrink-0 cursor-pointer"
             >
               Get Tariff Assessment <ChevronRight size={16} />
             </button>
@@ -396,13 +395,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
               <div className="flex flex-wrap gap-4 pt-2">
                 <button
                   onClick={() => onNavigate("governance")}
-                  className="px-6 py-3 rounded-xl font-bold text-sm bg-[var(--cinefil-navy)] text-white hover:bg-[var(--cinefil-navy-mid)] transition-all flex items-center gap-2 shadow-md cursor-pointer"
+                  className="px-6 py-3 rounded-[4px] font-bold text-sm bg-[var(--cinefil-navy)] text-white hover:bg-[var(--cinefil-navy-mid)] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
                 >
                   Governance & Board <ChevronRight size={16} />
                 </button>
                 <button
                   onClick={() => onNavigate("films")}
-                  className="px-6 py-3 rounded-xl font-bold text-sm border-2 border-[var(--cinefil-navy)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy)] hover:text-white transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 rounded-[4px] font-bold text-sm border border-[var(--cinefil-navy)] text-[var(--cinefil-navy)] hover:bg-[var(--cinefil-navy)] hover:text-white transition-all flex items-center gap-2 cursor-pointer"
                 >
                   Search Film Catalog <Film size={16} />
                 </button>
@@ -411,11 +410,11 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
             <div className="lg:col-span-5 space-y-4">
               <SpotlightCard
-                className="p-6 bg-white shadow-xl border-gray-100"
+                className="p-6 bg-white shadow-xs border-slate-200/80 rounded-[4px]"
                 spotlightColor="rgba(24, 56, 88, 0.15)"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-amber-100 text-amber-800">
+                  <div className="p-3 rounded-[4px] bg-amber-100 text-amber-800">
                     <ShieldCheck size={28} />
                   </div>
                   <div>
@@ -428,11 +427,11 @@ export function HomePage({ onNavigate }: HomePageProps) {
               </SpotlightCard>
 
               <SpotlightCard
-                className="p-6 bg-white shadow-xl border-gray-100"
+                className="p-6 bg-white shadow-xs border-slate-200/80 rounded-[4px]"
                 spotlightColor="rgba(24, 56, 88, 0.15)"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-sky-100 text-sky-800">
+                  <div className="p-3 rounded-[4px] bg-sky-100 text-sky-800">
                     <Film size={28} />
                   </div>
                   <div>
@@ -464,7 +463,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </div>
           <button
             onClick={() => onNavigate("governance")}
-            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 border-[var(--cinefil-gold)] text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)] hover:text-[var(--cinefil-navy)] transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer shadow-lg"
+            className="px-6 py-2.5 rounded-[4px] text-xs sm:text-sm font-bold border border-[var(--cinefil-gold)] text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)] hover:text-[var(--cinefil-navy)] transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer shadow-xs"
           >
             <Download size={15} /> Official Documents
           </button>
@@ -473,3 +472,4 @@ export function HomePage({ onNavigate }: HomePageProps) {
     </div>
   );
 }
+

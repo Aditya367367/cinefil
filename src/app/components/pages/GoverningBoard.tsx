@@ -35,7 +35,6 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
   const [boardMembers, setBoardMembers] = useState<BoardMember[]>(DEFAULT_BOARD_MEMBERS);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLiveRegistry, setIsLiveRegistry] = useState<boolean>(false);
-  const [minimumLoading, setMinimumLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -75,13 +74,8 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
         if (isMounted) setLoading(false);
       });
 
-    const timer = setTimeout(() => {
-      setMinimumLoading(false);
-    }, 1000);
-
     return () => {
       isMounted = false;
-      clearTimeout(timer);
     };
   }, []);
 
@@ -101,10 +95,10 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
             badge="Governing Body"
           />
 
-          {loading || minimumLoading ? (
+          {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-10">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="h-64 rounded-2xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-64 rounded-[4px] bg-gray-200 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -112,18 +106,19 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
               {boardMembers.map((member, i) => (
                 <SpotlightCard
                   key={`${member.name}-${i}`}
-                  className="flex flex-col items-center text-center p-5 rounded-2xl border-gray-200 shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group justify-between min-h-[270px] bg-white"
+                  className="flex flex-col items-center text-center p-5 rounded-[4px] border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group justify-between min-h-[270px] bg-white"
                   spotlightColor="rgba(201, 162, 39, 0.2)"
                 >
                   <div className="flex flex-col items-center w-full">
                     {/* Avatar Frame */}
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 border-2 border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 shadow-md relative">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[4px] overflow-hidden flex items-center justify-center bg-slate-100 border border-[var(--cinefil-gold)] p-0.5 group-hover:scale-105 transition-transform duration-300 shadow-xs relative">
                       {member.photo_url ? (
                         <img
                           src={member.photo_url}
                           alt={member.name}
-                          className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-[3px]"
                           loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = "none";
                             const backupIcon = (e.target as HTMLImageElement).nextElementSibling;
@@ -148,7 +143,7 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
                       >
                         {member.name}
                       </h3>
-                      <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                      <span className="mt-1 inline-block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)] bg-amber-50 px-2.5 py-0.5 rounded-[3px] border border-amber-200">
                         {member.position}
                       </span>
                     </div>
@@ -159,7 +154,7 @@ export function GoverningBoard({ onNavigate }: { onNavigate: (page: string, stat
                     {member.biography || isLiveRegistry ? (
                       <button
                         onClick={() => onNavigate(`profile/${member.slug || member.id}`)}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--cinefil-navy)] bg-slate-100 hover:bg-[var(--cinefil-navy)] hover:text-white px-3 py-1.5 rounded-[3px] transition-all duration-200 cursor-pointer"
                       >
                         <span>View Profile</span>
                         <ChevronRight size={12} />

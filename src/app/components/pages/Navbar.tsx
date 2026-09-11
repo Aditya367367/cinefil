@@ -193,11 +193,11 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-white/10 shadow-xl"
+      className="sticky top-0 z-50 border-b border-[var(--cinefil-gold)]/20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
       style={{
-        background: "linear-gradient(180deg, rgba(15, 37, 64, 0.95) 0%, rgba(24, 56, 88, 0.95) 100%)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
+        background: "linear-gradient(180deg, rgba(10, 24, 40, 0.97) 0%, rgba(6, 14, 24, 0.98) 100%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
         fontFamily: "var(--font-body)",
       }}
     >
@@ -205,20 +205,21 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
         {/* Brand Logo & Name */}
         <button
           onClick={() => onNavigate(isOfficer ? "officer-dashboard" : "home")}
-          className="flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 focus:outline-none rounded-xl p-1 cursor-pointer"
+          className="flex items-center gap-3.5 transition-all hover:opacity-95 active:scale-98 focus:outline-none rounded-[4px] p-1 cursor-pointer group"
           aria-label="Go to home"
         >
-          <img
-            src={LogoImage}
-            alt="Cinefil Logo"
-            className="h-12 w-12 object-contain rounded-md"
-            style={{ filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.5))" }}
-          />
+          <div className="p-1 bg-white/5 rounded-[4px] border border-[var(--cinefil-gold)]/30 group-hover:border-[var(--cinefil-gold)]/60 transition-all duration-300 shadow-[0_0_15px_rgba(201,162,39,0.15)]">
+            <img
+              src={LogoImage}
+              alt="Cinefil Logo"
+              className="h-11 w-11 object-contain rounded-[3px]"
+            />
+          </div>
           <div className="text-left hidden sm:block">
             <span className="text-white font-extrabold tracking-wider text-base leading-none block font-display">
               CINEFIL
             </span>
-            <span className="text-[10px] text-[var(--cinefil-gold)] tracking-widest uppercase font-semibold">
+            <span className="text-[9px] text-[var(--cinefil-gold)] tracking-[0.2em] uppercase font-bold mt-1 block">
               Copyright Society
             </span>
           </div>
@@ -226,13 +227,13 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
         {/* Desktop Navigation Links */}
         {!isAuthenticated && (
-          <div className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-medium text-white/80">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/80">
             {/* Home */}
             <button
               onClick={() => onNavigate("home")}
-              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+              className={`px-3.5 py-2 rounded-[4px] transition-all relative cursor-pointer ${
                 currentPage === "home"
-                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                   : "hover:text-white hover:bg-white/5"
               }`}
             >
@@ -240,7 +241,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               {currentPage === "home" && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                 />
               )}
             </button>
@@ -249,18 +250,18 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             <div className="relative" ref={menuDropdownRef}>
               <button
                 onClick={() => setShowMenuDropdown(!showMenuDropdown)}
-                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-[4px] transition-all flex items-center gap-1.5 cursor-pointer ${
                   isGovernanceActive
-                    ? "text-white font-bold bg-white/10 shadow-inner"
+                    ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                     : "hover:text-white hover:bg-white/5"
                 }`}
               >
                 {t("Governance")}
-                <ChevronDown size={14} className={`transition-transform duration-200 ${showMenuDropdown ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
+                <ChevronDown size={13} className={`transition-transform duration-200 ${showMenuDropdown ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
                 {isGovernanceActive && (
                   <motion.div
                     layoutId="activeNav"
-                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                   />
                 )}
               </button>
@@ -268,11 +269,12 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               <AnimatePresence>
                 {showMenuDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute left-0 mt-2 w-56 rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] py-2 z-[70] backdrop-blur-xl overflow-hidden"
+                    style={{ background: "linear-gradient(180deg, #0a1828 0%, #060e18 100%)" }}
+                    className="absolute left-0 mt-2 w-60 rounded-[4px] border border-[var(--cinefil-gold)]/25 shadow-[0_20px_40px_rgba(0,0,0,0.8)] py-1.5 z-[70] backdrop-blur-2xl overflow-hidden"
                   >
                     {[
                       { label: t("Governance Overview"), page: "governance" as Page },
@@ -287,10 +289,10 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                           onNavigate(item.page);
                           setShowMenuDropdown(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors flex items-center justify-between ${
+                        className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all flex items-center justify-between cursor-pointer ${
                           currentPage === item.page
-                            ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
-                            : "text-white/80 hover:bg-white/10 hover:text-white"
+                            ? "bg-[var(--cinefil-gold)]/15 text-[var(--cinefil-gold)] font-bold border-l-2 border-[var(--cinefil-gold)] pl-3.5"
+                            : "text-white/80 hover:bg-white/5 hover:text-white hover:pl-5"
                         }`}
                       >
                         {item.label}
@@ -305,18 +307,18 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             <div className="relative" ref={membershipDropdownRef}>
               <button
                 onClick={() => setShowMembership(!showMembership)}
-                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-[4px] transition-all flex items-center gap-1.5 cursor-pointer ${
                   isJoinActive
-                    ? "text-white font-bold bg-white/10 shadow-inner"
+                    ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                     : "hover:text-white hover:bg-white/5"
                 }`}
               >
                 {t("Join Cinefil")}
-                <ChevronDown size={14} className={`transition-transform duration-200 ${showMembership ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
+                <ChevronDown size={13} className={`transition-transform duration-200 ${showMembership ? "rotate-180 text-[var(--cinefil-gold)]" : ""}`} />
                 {isJoinActive && (
                   <motion.div
                     layoutId="activeNav"
-                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                   />
                 )}
               </button>
@@ -324,21 +326,22 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               <AnimatePresence>
                 {showMembership && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute left-0 mt-2 w-56 rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] py-2 z-[70] backdrop-blur-xl overflow-hidden"
+                    style={{ background: "linear-gradient(180deg, #0a1828 0%, #060e18 100%)" }}
+                    className="absolute left-0 mt-2 w-64 rounded-[4px] border border-[var(--cinefil-gold)]/25 shadow-[0_20px_40px_rgba(0,0,0,0.8)] py-1.5 z-[70] backdrop-blur-2xl overflow-hidden"
                   >
                     <button
                       onClick={() => {
                         onNavigate("membership-form");
                         setShowMembership(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                      className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all cursor-pointer ${
                         currentPage === "membership-form"
-                          ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
-                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                          ? "bg-[var(--cinefil-gold)]/15 text-[var(--cinefil-gold)] font-bold border-l-2 border-[var(--cinefil-gold)] pl-3.5"
+                          : "text-white/80 hover:bg-white/5 hover:text-white hover:pl-5"
                       }`}
                     >
                       {t("Membership Application")}
@@ -348,10 +351,10 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                         onNavigate("license-form");
                         setShowMembership(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${
+                      className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all cursor-pointer ${
                         currentPage === "license-form"
-                          ? "bg-[var(--cinefil-gold)]/20 text-[var(--cinefil-gold)]"
-                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                          ? "bg-[var(--cinefil-gold)]/15 text-[var(--cinefil-gold)] font-bold border-l-2 border-[var(--cinefil-gold)] pl-3.5"
+                          : "text-white/80 hover:bg-white/5 hover:text-white hover:pl-5"
                       }`}
                     >
                       {t("License Application (CPL)")}
@@ -364,9 +367,9 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             {/* Schemes */}
             <button
               onClick={() => onNavigate("schemes")}
-              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+              className={`px-3.5 py-2 rounded-[4px] transition-all relative cursor-pointer ${
                 currentPage === "schemes"
-                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                   : "hover:text-white hover:bg-white/5"
               }`}
             >
@@ -374,7 +377,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               {currentPage === "schemes" && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                 />
               )}
             </button>
@@ -382,9 +385,9 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             {/* Works */}
             <button
               onClick={() => onNavigate("films")}
-              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+              className={`px-3.5 py-2 rounded-[4px] transition-all relative cursor-pointer ${
                 currentPage === "films"
-                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                   : "hover:text-white hover:bg-white/5"
               }`}
             >
@@ -392,7 +395,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               {currentPage === "films" && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                 />
               )}
             </button>
@@ -400,9 +403,9 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             {/* Contact */}
             <button
               onClick={() => onNavigate("contact")}
-              className={`px-3.5 py-2 rounded-xl transition-all relative ${
+              className={`px-3.5 py-2 rounded-[4px] transition-all relative cursor-pointer ${
                 currentPage === "contact"
-                  ? "text-white font-bold bg-white/10 shadow-inner"
+                  ? "text-[var(--cinefil-gold)] font-bold bg-white/5 shadow-inner"
                   : "hover:text-white hover:bg-white/5"
               }`}
             >
@@ -410,7 +413,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               {currentPage === "contact" && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)]"
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--cinefil-gold)] shadow-[0_0_8px_rgba(201,162,39,0.8)]"
                 />
               )}
             </button>
@@ -419,11 +422,22 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 relative">
+          {(!isAuthenticated || (!user?.is_member && !isOfficer)) && (
+            <button
+              onClick={() => onNavigate("membership-form")}
+              className="hidden xl:inline-flex items-center gap-2 rounded-[4px] border border-[var(--cinefil-gold)]/40 bg-white/5 px-4 py-2 text-xs font-semibold text-white hover:border-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/10 transition-all cursor-pointer shadow-sm"
+              aria-label="Membership Form"
+            >
+              <FileText size={14} className="text-[var(--cinefil-gold)]" />
+              <span>Apply for Membership</span>
+            </button>
+          )}
+
           {!isAuthenticated && (
             <>
               <button
                 onClick={() => onNavigate("login")}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--cinefil-gold)] to-[var(--cinefil-gold-light)] px-5 py-2.5 text-xs sm:text-sm font-bold text-[var(--cinefil-navy)] hover:shadow-lg hover:shadow-[var(--cinefil-gold)]/25 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                className="inline-flex items-center gap-2 rounded-[4px] bg-gradient-to-r from-[var(--cinefil-gold)] via-[#e2b855] to-[var(--cinefil-gold)] px-5 py-2 text-xs sm:text-sm font-bold text-[var(--cinefil-navy)] shadow-[0_4px_14px_rgba(201,162,39,0.25)] hover:shadow-[0_6px_20px_rgba(201,162,39,0.4)] transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
               >
                 {t("Member Login")}
               </button>
@@ -433,10 +447,10 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {isAuthenticated && isMember && !isOfficer && (
             <button
               onClick={() => onNavigate("member-dashboard")}
-              className="hidden lg:inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs sm:text-sm font-medium text-white hover:bg-white/20 transition-all cursor-pointer shadow-sm"
+              className="hidden lg:inline-flex items-center gap-2 rounded-[4px] border border-[var(--cinefil-gold)]/30 bg-white/5 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-white/10 hover:border-[var(--cinefil-gold)] transition-all cursor-pointer shadow-sm"
               aria-label="Member Dashboard"
             >
-              <LayoutDashboard size={16} className="text-[var(--cinefil-gold)]" />
+              <LayoutDashboard size={15} className="text-[var(--cinefil-gold)]" />
               <span>Member Dashboard</span>
             </button>
           )}
@@ -444,22 +458,11 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {isAuthenticated && isOfficer && (
             <button
               onClick={() => onNavigate("officer-dashboard")}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/15 px-4 py-2.5 text-xs sm:text-sm font-bold text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/25 transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-[4px] border border-[var(--cinefil-gold)] bg-[var(--cinefil-gold)]/15 px-4 py-2 text-xs sm:text-sm font-bold text-[var(--cinefil-gold)] hover:bg-[var(--cinefil-gold)]/25 transition-all shadow-md cursor-pointer"
               aria-label="Officer Dashboard"
             >
-              <LayoutDashboard size={16} />
+              <LayoutDashboard size={15} />
               <span>{officerDashboardLabel}</span>
-            </button>
-          )}
-
-          {(!isAuthenticated || (!user?.is_member && !isOfficer)) && (
-            <button
-              onClick={() => onNavigate("membership-form")}
-              className="hidden xl:inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white/90 hover:bg-white/10 transition-all cursor-pointer"
-              aria-label="Membership Form"
-            >
-              <FileText size={15} className="text-[var(--cinefil-gold)]" />
-              <span>Apply for Membership</span>
             </button>
           )}
 
@@ -468,13 +471,13 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={handleBellClick}
-                className="relative h-10 w-10 items-center justify-center rounded-xl border border-white/15 text-white/90 inline-flex hover:bg-white/10 transition-all cursor-pointer"
+                className="relative h-9 w-9 items-center justify-center rounded-[4px] border border-[var(--cinefil-gold)]/30 text-white inline-flex hover:bg-white/10 transition-all cursor-pointer"
                 aria-label="Notifications"
                 type="button"
               >
-                <Bell size={18} />
+                <Bell size={16} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-[#0f2540] animate-bounce">
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-[3px] bg-rose-500 text-[9px] font-bold text-white ring-1 ring-[#0a1828]">
                     {unreadCount}
                   </span>
                 )}
@@ -483,10 +486,11 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
               <AnimatePresence>
                 {showDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="fixed left-4 right-4 top-[80px] sm:absolute sm:left-auto sm:right-0 sm:top-auto mt-3 sm:w-96 overflow-hidden rounded-2xl border border-white/15 shadow-2xl bg-[#0f2540] text-white z-[70] backdrop-blur-xl"
+                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                    style={{ background: "linear-gradient(180deg, #0a1828 0%, #060e18 100%)" }}
+                    className="fixed left-4 right-4 top-[80px] sm:absolute sm:left-auto sm:right-0 sm:top-auto mt-3 sm:w-96 overflow-hidden rounded-[4px] border border-[var(--cinefil-gold)]/30 shadow-[0_20px_50px_rgba(0,0,0,0.85)] text-white z-[70] backdrop-blur-2xl"
                   >
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
                       <span className="text-xs font-bold uppercase tracking-wider text-[var(--cinefil-gold)]">
@@ -525,7 +529,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                                 {notif.title}
                               </span>
                               {!notif.is_read && (
-                                <span className="h-2 w-2 rounded-full bg-[var(--cinefil-gold)] shrink-0 mt-1" />
+                                <span className="h-2 w-2 rounded-[2px] bg-[var(--cinefil-gold)] shrink-0 mt-1 shadow-[0_0_6px_rgba(201,162,39,0.8)]" />
                               )}
                             </div>
                             <p className="text-xs text-white/70 mt-1 leading-relaxed">{notif.message}</p>
@@ -546,7 +550,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {isAuthenticated && isOfficer ? (
             <button
               onClick={handleLogoutClick}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/15 hover:bg-rose-500/25 px-3.5 py-2 text-xs font-bold text-rose-300 transition-all cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-[4px] border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/25 px-3.5 py-2 text-xs font-bold text-rose-300 transition-all cursor-pointer shadow-sm"
               aria-label="Logout"
             >
               <LogOut size={14} />

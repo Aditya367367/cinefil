@@ -24,7 +24,7 @@ export function PageBanner({ title, subtitle, badge }: PageBannerProps) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 text-[var(--cinefil-gold)] text-[11px] font-bold tracking-widest uppercase mb-3 shadow-lg"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-[3px] bg-[var(--cinefil-gold)]/15 border border-[var(--cinefil-gold)]/30 text-[var(--cinefil-gold)] text-[11px] font-bold tracking-widest uppercase mb-3 shadow-xs"
           >
             <Sparkles size={12} /> {badge}
           </motion.div>
@@ -51,7 +51,7 @@ export function PageBanner({ title, subtitle, badge }: PageBannerProps) {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="w-20 h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-transparent via-[var(--cinefil-gold)] to-transparent shadow-lg"
+          className="w-16 h-0.5 mx-auto mt-4 rounded-[2px] bg-gradient-to-r from-transparent via-[var(--cinefil-gold)] to-transparent"
         />
 
         {/* Subtitle */}

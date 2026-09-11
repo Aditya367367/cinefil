@@ -1,33 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "../lib/queryClient";
 import { Navbar, type Page } from "./components/pages/Navbar";
 import { Footer } from "./components/pages/Footer";
-import { HomePage } from "./components/pages/HomePage";
-import { DashboardPage } from "./components/pages/DashboardPage";
-import { GoverningBoard } from "./components/pages/GoverningBoard";
-import { HonoraryBoard } from "./components/pages/HonoraryBoard";
-import { CommitteePage } from "./components/pages/CommitteePage";
-import { LegalAdvisorPage } from "./components/pages/LegalAdvisorPage";
-import { ProducersPage } from "./components/pages/ProducersPage";
-import { MembershipFormPage } from "./components/pages/MembershipFormPage";
-import { FilmsPage } from "./components/pages/FilmsPage";
-import { SchemesPage } from "./components/pages/SchemesPage";
-import { ContactPage } from "./components/pages/ContactPage";
-import { LicenseFormPage } from "./components/pages/LicenseFormPage";
-import { LoginPage } from "./components/pages/LoginPage";
-import { ForgotPasswordPage } from "./components/pages/ForgotPasswordPage";
-import { ChangePasswordPage } from "./components/pages/ChangePasswordPage";
-import { ProfilePage } from "./components/pages/ProfilePage";
-import { GovernancePage } from "./components/pages/GovernancePage";
-import { OfficerDashboardPage } from "./components/pages/OfficerDashboardPage";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { SnackbarProvider, useSnackbar } from "./contexts/SnackbarContext";
 import { LoadingScreen } from "./components/pages/LoadingScreen";
+import { GenericPageSkeleton } from "./components/pages/GenericPageSkeleton";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AnimatePresence } from "motion/react";
 import { PageTransition } from "../components/ui/PageTransition";
+
+// Lazy-loaded page components for fast initial load & route-level code splitting
+const HomePage = lazy(() => import("./components/pages/HomePage").then((m) => ({ default: m.HomePage })));
+const DashboardPage = lazy(() => import("./components/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
+const GoverningBoard = lazy(() => import("./components/pages/GoverningBoard").then((m) => ({ default: m.GoverningBoard })));
+const HonoraryBoard = lazy(() => import("./components/pages/HonoraryBoard").then((m) => ({ default: m.HonoraryBoard })));
+const CommitteePage = lazy(() => import("./components/pages/CommitteePage").then((m) => ({ default: m.CommitteePage })));
+const LegalAdvisorPage = lazy(() => import("./components/pages/LegalAdvisorPage").then((m) => ({ default: m.LegalAdvisorPage })));
+const ProducersPage = lazy(() => import("./components/pages/ProducersPage").then((m) => ({ default: m.ProducersPage })));
+const MembershipFormPage = lazy(() => import("./components/pages/MembershipFormPage").then((m) => ({ default: m.MembershipFormPage })));
+const FilmsPage = lazy(() => import("./components/pages/FilmsPage").then((m) => ({ default: m.FilmsPage })));
+const SchemesPage = lazy(() => import("./components/pages/SchemesPage").then((m) => ({ default: m.SchemesPage })));
+const ContactPage = lazy(() => import("./components/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
+const LicenseFormPage = lazy(() => import("./components/pages/LicenseFormPage").then((m) => ({ default: m.LicenseFormPage })));
+const LoginPage = lazy(() => import("./components/pages/LoginPage").then((m) => ({ default: m.LoginPage })));
+const ForgotPasswordPage = lazy(() => import("./components/pages/ForgotPasswordPage").then((m) => ({ default: m.ForgotPasswordPage })));
+const ChangePasswordPage = lazy(() => import("./components/pages/ChangePasswordPage").then((m) => ({ default: m.ChangePasswordPage })));
+const ProfilePage = lazy(() => import("./components/pages/ProfilePage").then((m) => ({ default: m.ProfilePage })));
+const GovernancePage = lazy(() => import("./components/pages/GovernancePage").then((m) => ({ default: m.GovernancePage })));
+const OfficerDashboardPage = lazy(() => import("./components/pages/OfficerDashboardPage").then((m) => ({ default: m.OfficerDashboardPage })));
 
 const validPages: Page[] = [
   "home",
@@ -121,20 +124,13 @@ function renderPage(page: Page | string, navigate: (p: Page | string) => void) {
 function MainApp() {
   const [currentPage, setCurrentPage] = useState<Page | string>(() => pathToPage(window.location.pathname));
   const { isAuthenticated, isLoading, user } = useAuth();
-  const [isPageLoading, setIsPageLoading] = useState(false);
   const { showSnackbar } = useSnackbar();
 
   const navigate = (page: Page | string) => {
-    console.log("=== NAVIGATION DEBUG ===");
-    console.log("Navigating from:", currentPage);
-    console.log("Navigating to:", page);
-    console.log("Auth isLoading:", isLoading);
-    setIsPageLoading(true);
     const newPath = pageToPath(page, user);
     window.history.pushState({ page }, "", newPath);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => setIsPageLoading(false), 1000);
   };
 
   useEffect(() => {
@@ -189,8 +185,7 @@ function MainApp() {
     }
   }, [isAuthenticated, currentPage, isLoading, user, isOfficer]);
 
-  if (isLoading || isPageLoading) {
-
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
@@ -200,7 +195,9 @@ function MainApp() {
       <main className="flex-1 overflow-x-hidden">
         <AnimatePresence mode="wait">
           <PageTransition pageKey={currentPage} key={currentPage}>
-            {renderPage(currentPage, navigate)}
+            <Suspense fallback={<GenericPageSkeleton />}>
+              {renderPage(currentPage, navigate)}
+            </Suspense>
           </PageTransition>
         </AnimatePresence>
       </main>
@@ -208,10 +205,8 @@ function MainApp() {
         <Footer onNavigate={navigate} />
       )}
       <CookieConsent />
-      
     </div>
   );
-
 }
 
 export default function App() {
